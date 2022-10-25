@@ -1,0 +1,42 @@
+# depslib dependency file v1.0
+1666465588 source:s:\creajeugits\cursesprojets\cluige\main.c
+	"main.h"
+
+1666465564 s:\creajeugits\cursesprojets\cluige\main.h
+
+1666544908 source:s:\creajeugits\cursesprojets\cluige\essai.c
+	"essai.h"
+
+1666538732 s:\creajeugits\cursesprojets\cluige\essai.h
+
+1666616006 source:s:\creajeugits\cursesprojets\cluige\cluige.c
+	<stdio.h>
+	"cluige.h"
+
+1666615984 s:\creajeugits\cursesprojets\cluige\cluige.h
+	<stdbool.h>
+	<stddef.h>
+	<stdlib.h>
+	"Node.h"
+	"StringBuilder.h"
+
+1666628172 s:\creajeugits\cursesprojets\cluige\node.h
+	<stdbool.h>
+	<stddef.h>
+
+1666635296 source:s:\creajeugits\cursesprojets\cluige\node.c
+	<stdio.h>
+	<assert.h>
+	"cluige.h"
+
+1666618466 s:\creajeugits\cursesprojets\cluige\stringbuilder.h
+
+1666625524 source:s:\creajeugits\cursesprojets\cluige\stringbuilder.c
+	<string.h>
+	<wchar.h>
+	<stdarg.h>
+	<limits.h>
+	<math.h>
+	"cluige.h"
+	"StringBuilder.h"
+

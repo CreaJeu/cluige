@@ -1,6 +1,7 @@
 
 #include<stdio.h>
 #include <assert.h>
+#include <wchar.h>
 #include "cluige.h"
 //#include "Node.h"
 
@@ -77,21 +78,21 @@ static int nde_getDepth(Node* node)
 //make unique name
 static void nde_autoName(Node* node)
 {
-    int depth = nde_getDepth(node);
     int b2d = iCluige.iStringBuilder.DECIMAL_DIGITS_FOR_INT;
     int p2d = iCluige.iStringBuilder.DECIMAL_DIGITS_FOR_POINTER;
-    size_t nameSizeMax = (depth * b2d) + p2d + depth;
+    size_t nameSizeMax = b2d + p2d + 1;
+    if(node->parent != NULL)
+    {
+        nameSizeMax += 1 + wcslen(node->parent->name);
+    }
 
     StringBuilder sb;
     node->name = iCluige.iStringBuilder.stringAlloc(&sb, nameSizeMax);
-    iCluige.iStringBuilder.append(&sb, L"%p", node);
+    iCluige.iStringBuilder.append(&sb, L"%p-%d", node, nde_getIndex(node));
 
-    Node* n = node->parent;
-    while(n != NULL)
+    if(node->parent != NULL)
     {
-        int nIndex = nde_getIndex(n);
-        iCluige.iStringBuilder.append(&sb, L"<%d", nIndex);
-        n = n->parent;
+        iCluige.iStringBuilder.append(&sb, L"<%ls", node->parent->name);
     }
 }
 

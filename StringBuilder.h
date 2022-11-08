@@ -5,7 +5,7 @@ typedef struct _StringBuilder StringBuilder;
 
 struct _StringBuilder
 {
-    size_t remainingSize;
+    //size_t remainingSize;
 	wchar_t* nextChar;
 };
 

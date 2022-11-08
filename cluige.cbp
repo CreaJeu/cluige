@@ -34,7 +34,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add option="-std=c99" />
+			<Add option="-std=c11" />
 		</Compiler>
 		<Unit filename="Node.c">
 			<Option compilerVar="CC" />
@@ -48,10 +48,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="cluige.h" />
-		<Unit filename="essai.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="essai.h" />
-		<Extensions />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

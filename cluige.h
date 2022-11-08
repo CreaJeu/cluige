@@ -16,10 +16,10 @@ struct iiCluige
 	struct iiNode iNode;
 
 	//for cluige nodes like clock
-	Node privateRoot2D;
+	Node* privateRoot2D;
 
 	//for user nodes
-	Node publicRoot2D;
+	Node* publicRoot2D;
 
 	//void* checkedMalloc(size_t)
 	void* (*checkedMalloc)(size_t);

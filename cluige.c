@@ -29,9 +29,11 @@ void cluigeInit()
 
     iiStringBuilderInit();
     iiNodeInit();
-    iCluige.iNode.initZero(&(iCluige.privateRoot2D));
-    iCluige.iNode.initZero(&(iCluige.publicRoot2D));
-    iCluige.iNode.addChild(&iCluige.privateRoot2D, &iCluige.publicRoot2D);
+    iCluige.privateRoot2D = iCluige.iNode.newNode();
+    iCluige.privateRoot2D->name = L"privateRoot2D";
+    iCluige.publicRoot2D = iCluige.iNode.newNode();
+    iCluige.publicRoot2D->name = L"publicRoot2D";
+    iCluige.iNode.addChild(iCluige.privateRoot2D, iCluige.publicRoot2D);
     //...
     //...
 
@@ -46,7 +48,7 @@ void cluigeRun()
 
 int cluigeFinish()
 {
-    iCluige.iNode.deleteNode(&iCluige.privateRoot2D);
+    iCluige.iNode.deleteNode(iCluige.privateRoot2D);
     //close files
     //free tmp locks
     //...

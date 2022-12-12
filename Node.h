@@ -14,7 +14,7 @@ struct _Node
 	Node* nextSibling;
 	Node* children;
 	Script* script;
-	wchar_t* name;
+	wchar_t* name;//must not point to the stack, see setName()
 	bool active;
 };
 
@@ -22,7 +22,7 @@ struct _Node
 struct iiNode
 {
     //void initZero(Node* node)
-	void (*initZero)(Node*);
+//	void (*initZero)(Node*);// no : would encourage not freeable nodes on the stack
 
 	//Node* newNode()
 	Node* (*newNode)();
@@ -35,6 +35,11 @@ struct iiNode
 
 	//int getDepth(Node*)
 	int (*getDepth)(Node*);
+
+	//use setName(n, "bob") instead of n->name = "bob"
+	//previous name is automatically freed
+	//void setName(Node*, char* newName)
+	void (*setName)(Node*, wchar_t* newName);
 
 	//asserts that wanted child doesn't have already a parent
 	//void addChild(Node* p, Node* c)

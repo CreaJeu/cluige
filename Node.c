@@ -1,5 +1,5 @@
-
-#include<stdio.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 #include <wchar.h>
 #include "cluige.h"
@@ -8,20 +8,27 @@
 
 ////////////////////////////////// iiNode /////////
 
-static void nde_initZero(Node* node)
+// no : would encourage not freeable nodes on the stack
+//static void nde_initZero(Node* node)
+//{
+//    node->parent = NULL;
+//    node->nextSibling = NULL;
+//    node->children = NULL;
+//    node->script = NULL;
+//    node->name = NULL;
+//    node->active = true;
+//}
+
+static Node* nde_newNode()
 {
+    Node* node = iCluige.checkedMalloc(sizeof(Node));
+    //nde_initZero(node);
     node->parent = NULL;
     node->nextSibling = NULL;
     node->children = NULL;
     node->script = NULL;
     node->name = NULL;
     node->active = true;
-}
-
-static Node* nde_newNode()
-{
-    Node* node = iCluige.checkedMalloc(sizeof(Node));
-    nde_initZero(node);
     return node;
 }
 
@@ -30,11 +37,14 @@ static void nde_deleteNode(Node* node)
     if(node->children != NULL)
     {
         nde_deleteNode(node->children);
+        node->children = NULL;
     }
     if(node->nextSibling != NULL)
     {
         nde_deleteNode(node->nextSibling);
+        node->nextSibling = NULL;
     }
+     //beware in C, hardcoded strings like char* s = "bob" are allocated on stack
     if(node->name != NULL)
     {
         free(node->name);
@@ -73,6 +83,20 @@ static int nde_getDepth(Node* node)
         res++;
     }
     return res;
+}
+
+static void nde_setName(Node* n, wchar_t* newName)
+{
+    //allocate new name to prevent pointing to the stack
+    int size = wcslen(newName);
+    wchar_t* nextName = iCluige.checkedMalloc((size + 1) * sizeof(wchar_t));
+    wcscpy(nextName, newName);
+    //free old name
+    if(n->name != NULL)
+    {
+        free(n->name);
+    }
+    n->name = nextName;
 }
 
 //make unique name
@@ -149,11 +173,12 @@ static void nde_printTreePretty(const Node* node)
 
 void iiNodeInit()
 {
-    iCluige.iNode.initZero = nde_initZero;
+    //iCluige.iNode.initZero = nde_initZero;
     iCluige.iNode.newNode = nde_newNode;
     iCluige.iNode.deleteNode = nde_deleteNode;
     iCluige.iNode.getIndex = nde_getIndex;
     iCluige.iNode.getDepth = nde_getDepth;
+    iCluige.iNode.setName = nde_setName;
     iCluige.iNode.addChild = nde_addChild;
     iCluige.iNode.printTreePretty = nde_printTreePretty;
 }

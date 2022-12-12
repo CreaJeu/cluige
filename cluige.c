@@ -30,9 +30,9 @@ void cluigeInit()
     iiStringBuilderInit();
     iiNodeInit();
     iCluige.privateRoot2D = iCluige.iNode.newNode();
-    iCluige.privateRoot2D->name = L"privateRoot2D";
+    iCluige.iNode.setName(iCluige.privateRoot2D, L"privateRoot2D");
     iCluige.publicRoot2D = iCluige.iNode.newNode();
-    iCluige.publicRoot2D->name = L"publicRoot2D";
+    iCluige.iNode.setName(iCluige.publicRoot2D, L"publicRoot2D");
     iCluige.iNode.addChild(iCluige.privateRoot2D, iCluige.publicRoot2D);
     //...
     //...

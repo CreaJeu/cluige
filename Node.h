@@ -2,7 +2,6 @@
 #define NODE_H_INCLUDED
 
 #include <stdbool.h>
-#include <stddef.h> //for wchar_t
 
 typedef struct _Node Node;
 typedef struct _Script Script;
@@ -14,7 +13,7 @@ struct _Node
 	Node* nextSibling;
 	Node* children;
 	Script* script;
-	wchar_t* name;//must not point to the stack, see setName()
+	char* name;//must not point to the stack, see setName()
 	bool active;
 };
 
@@ -31,15 +30,15 @@ struct iiNode
 	void (*deleteNode)(Node*);
 
 	//int getIndex(Node*)
-	int (*getIndex)(Node*);
+	int (*getIndex)(const Node*);
 
 	//int getDepth(Node*)
-	int (*getDepth)(Node*);
+	int (*getDepth)(const Node*);
 
 	//use setName(n, "bob") instead of n->name = "bob"
 	//previous name is automatically freed
 	//void setName(Node*, char* newName)
-	void (*setName)(Node*, wchar_t* newName);
+	void (*setName)(Node*, const char* newName);
 
 	//asserts that wanted child doesn't have already a parent
 	//void addChild(Node* p, Node* c)

@@ -5,8 +5,9 @@ typedef struct _StringBuilder StringBuilder;
 
 struct _StringBuilder
 {
+    char* builtString;
     size_t remainingSize;
-	wchar_t* nextChar;
+	char* nextChar;
 };
 
 //~namespace
@@ -15,14 +16,14 @@ struct iiStringBuilder
     int DECIMAL_DIGITS_FOR_INT;
     int DECIMAL_DIGITS_FOR_POINTER;
 
-    //wchar_t* stringAlloc(StringBuilder* sb, size_t maxSize)
-	wchar_t* (*stringAlloc)(StringBuilder* sb, size_t maxSize);
+    //char* stringAlloc(StringBuilder* sb, size_t maxSize)
+	char* (*stringAlloc)(StringBuilder* sb, size_t maxSize);
 
-	//void connectExistingString(StringBuilder* sb, wchar_t* dest)
-	void (*connectExistingString)(StringBuilder* sb, wchar_t* dest);
+	//void connectExistingString(StringBuilder* sb, char* dest)
+	void (*connectExistingString)(StringBuilder* sb, char* dest);
 
-	//void append(StringBuilder* sb, const wchar_t* formattedTail, ...)
-	void (*append)(StringBuilder* sb, const wchar_t* formattedTail, ...);
+	//void append(StringBuilder* sb, const char* formattedTail, ...)
+	void (*append)(StringBuilder* sb, const char* formattedTail, ...);
 };
 //iStringBuilder : in iiCluige
 

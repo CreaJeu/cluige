@@ -1,5 +1,5 @@
 
-#include<stdio.h>
+#include <stdio.h>
 #include "cluige.h"
 
 ////////////////////////////////// iiCluige /////////
@@ -9,7 +9,7 @@ static void* clg_checkedMalloc(size_t s)
     void* res = malloc(s);
     if(res == NULL)
     {
-        wprintf(L"\n\n\n    fatal memory alloc error !\n\n\n");
+        printf("\n\n\n    fatal memory alloc error !\n\n\n");
         exit(EXIT_FAILURE);
     }
     return res;
@@ -30,9 +30,9 @@ void cluigeInit()
     iiStringBuilderInit();
     iiNodeInit();
     iCluige.privateRoot2D = iCluige.iNode.newNode();
-    iCluige.iNode.setName(iCluige.privateRoot2D, L"privateRoot2D");
+    iCluige.iNode.setName(iCluige.privateRoot2D, "privateRoot2D");
     iCluige.publicRoot2D = iCluige.iNode.newNode();
-    iCluige.iNode.setName(iCluige.publicRoot2D, L"publicRoot2D");
+    iCluige.iNode.setName(iCluige.publicRoot2D, "publicRoot2D");
     iCluige.iNode.addChild(iCluige.privateRoot2D, iCluige.publicRoot2D);
     //...
     //...

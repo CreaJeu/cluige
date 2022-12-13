@@ -1,5 +1,5 @@
-//#include <string.h> //no! problems with wchar.h !
-#include <wchar.h>
+#include <string.h>
+#include <stdio.h> //for vsnprintf()
 #include <stdarg.h>
 #include <limits.h>
 #include <math.h>
@@ -9,26 +9,28 @@
 
 ////////////////////////////////// iiStringBuilder /////////
 
-static wchar_t* sbr_stringAlloc(StringBuilder* sb, size_t maxSize)
+static char* sbr_stringAlloc(StringBuilder* sb, size_t maxSize)
 {
-    sb->nextChar = iCluige.checkedMalloc((maxSize + 1) * sizeof(wchar_t));
+    sb->builtString = iCluige.checkedMalloc((maxSize + 1) * sizeof(char));
+    sb->nextChar = sb->builtString;
     sb->remainingSize = maxSize;
     return sb->nextChar;
 }
 
-static void sbr_connectExistingString(StringBuilder* sb, wchar_t* dest)
+static void sbr_connectExistingString(StringBuilder* sb, char* dest)
 {
-    sb->nextChar = dest;
-    sb->remainingSize = wcslen(dest);
+    sb->builtString = dest;
+    sb->nextChar = sb->builtString;
+    sb->remainingSize = strlen(dest);
 }
 
-static void sbr_append(StringBuilder* sb, const wchar_t* formattedTail, ...)
+static void sbr_append(StringBuilder* sb, const char* formattedTail, ...)
 {
     va_list args;
     va_start(args, formattedTail);
 
-    int written = vswprintf(sb->nextChar, sb->remainingSize, formattedTail, args);
-    //not C11 //int written = vswprintf(sb->nextChar, formattedTail, args);
+    int written = vsnprintf(sb->nextChar, sb->remainingSize, formattedTail, args);
+
     sb->remainingSize -= written;
     sb->nextChar += written;
 

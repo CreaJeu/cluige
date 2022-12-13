@@ -1,9 +1,10 @@
-#include <stdlib.h>
-#include <stdio.h>
+//#include <stdlib.h> //already in cluige.h
+//#include <stddef.h> //already in cluige.h
+#include <stdio.h> //for printTreePretty()
 #include <assert.h>
-#include <wchar.h>
+#include <string.h>
 #include "cluige.h"
-//#include "Node.h"
+//#include "Node.h" //already in cluige.h
 
 
 ////////////////////////////////// iiNode /////////
@@ -58,7 +59,7 @@ static void nde_deleteNode(Node* node)
     free(node);
 }
 
-static int nde_getIndex(Node* node)
+static int nde_getIndex(const Node* node)
 {
     int res = 0;
     if(node->parent != NULL)
@@ -73,7 +74,7 @@ static int nde_getIndex(Node* node)
     return res;
 }
 
-static int nde_getDepth(Node* node)
+static int nde_getDepth(const Node* node)
 {
     int res = 0;
     Node* parent = node->parent;
@@ -85,12 +86,12 @@ static int nde_getDepth(Node* node)
     return res;
 }
 
-static void nde_setName(Node* n, wchar_t* newName)
+static void nde_setName(Node* n, const char* newName)
 {
     //allocate new name to prevent pointing to the stack
-    int size = wcslen(newName);
-    wchar_t* nextName = iCluige.checkedMalloc((size + 1) * sizeof(wchar_t));
-    wcscpy(nextName, newName);
+    int size = strlen(newName);
+    char* nextName = iCluige.checkedMalloc((size + 1) * sizeof(char));
+    strcpy(nextName, newName);
     //free old name
     if(n->name != NULL)
     {
@@ -107,16 +108,16 @@ static void nde_autoName(Node* node)
     size_t nameSizeMax = b2d + p2d + 1;
     if(node->parent != NULL)
     {
-        nameSizeMax += 1 + wcslen(node->parent->name);
+        nameSizeMax += 1 + strlen(node->parent->name);
     }
 
     StringBuilder sb;
     node->name = iCluige.iStringBuilder.stringAlloc(&sb, nameSizeMax);
-    iCluige.iStringBuilder.append(&sb, L"%p-%d", node, nde_getIndex(node));
+    iCluige.iStringBuilder.append(&sb, "%p-%d", node, nde_getIndex(node));
 
     if(node->parent != NULL)
     {
-        iCluige.iStringBuilder.append(&sb, L"<%ls", node->parent->name);
+        iCluige.iStringBuilder.append(&sb, "<%s", node->parent->name);
     }
 }
 
@@ -153,9 +154,9 @@ static void nde_printTreePretty(const Node* node)
 
     for(int i=0; i<depth; i++)
     {
-        wprintf(L"   ");
+        printf("   ");
     }
-    wprintf(L"\\_%ls\n", node->name);
+    printf("\\_%s\n", node->name);
 
     if(node->children != NULL)
     {

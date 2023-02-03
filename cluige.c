@@ -48,7 +48,8 @@ void cluigeRun()
 
 int cluigeFinish()
 {
-    iCluige.iNode.deleteNode(iCluige.privateRoot2D);
+    //iCluige.iNode.deleteNode(iCluige.privateRoot2D);
+    iCluige.privateRoot2D->deleteNode(iCluige.privateRoot2D);
     //close files
     //free tmp locks
     //...

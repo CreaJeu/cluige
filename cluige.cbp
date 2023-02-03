@@ -48,10 +48,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="cluige.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-			<debugger />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

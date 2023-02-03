@@ -20,6 +20,34 @@
 //    node->active = true;
 //}
 
+static void nde_deleteNode(Node* node)
+{
+    if(node->children != NULL)
+    {
+        node->children->deleteNode(node->children);
+        node->children = NULL;
+    }
+    if(node->nextSibling != NULL)
+    {
+        node->nextSibling->deleteNode(node->nextSibling);
+        node->nextSibling = NULL;
+    }
+     //beware in C, hardcoded strings like char* s = "bob" are allocated on stack
+    if(node->name != NULL)
+    {
+        free(node->name);
+    }
+    free(node->_class_name);
+    assert(node->_subClass == NULL);
+    //TODO delete script
+//    if(node->script != NULL)
+//    {
+//        node->script->deleteScript(node->script);
+//    }
+
+    free(node);
+}
+
 static Node* nde_newNode()
 {
     Node* node = iCluige.checkedMalloc(sizeof(Node));
@@ -30,33 +58,14 @@ static Node* nde_newNode()
     node->script = NULL;
     node->name = NULL;
     node->active = true;
-    return node;
-}
 
-static void nde_deleteNode(Node* node)
-{
-    if(node->children != NULL)
-    {
-        nde_deleteNode(node->children);
-        node->children = NULL;
-    }
-    if(node->nextSibling != NULL)
-    {
-        nde_deleteNode(node->nextSibling);
-        node->nextSibling = NULL;
-    }
-     //beware in C, hardcoded strings like char* s = "bob" are allocated on stack
-    if(node->name != NULL)
-    {
-        free(node->name);
-    }
-    //TODO delete script
-//    if(node->script != NULL)
-//    {
-//        iCluige.iScript.deleteScript(node->script);
-//    }
-//    //other?
-    free(node);
+    StringBuilder sb;
+    node->_class_name = iCluige.iStringBuilder.stringAlloc(&sb, 4);
+    iCluige.iStringBuilder.append(&sb, "Node");
+
+    node->deleteNode = nde_deleteNode;
+    node->_subClass = NULL;
+    return node;
 }
 
 static int nde_getIndex(const Node* node)
@@ -156,7 +165,7 @@ static void nde_printTreePretty(const Node* node)
     {
         printf("   ");
     }
-    printf("\\_%s\n", node->name);
+    printf("\\_%s (%s)\n", node->name, node->_class_name);
 
     if(node->children != NULL)
     {
@@ -176,7 +185,7 @@ void iiNodeInit()
 {
     //iCluige.iNode.initZero = nde_initZero;
     iCluige.iNode.newNode = nde_newNode;
-    iCluige.iNode.deleteNode = nde_deleteNode;
+    //iCluige.iNode.deleteNode = nde_deleteNode;
     iCluige.iNode.getIndex = nde_getIndex;
     iCluige.iNode.getDepth = nde_getDepth;
     iCluige.iNode.setName = nde_setName;

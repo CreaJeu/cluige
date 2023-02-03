@@ -15,6 +15,15 @@ struct _Node
 	Script* script;
 	char* name;//must not point to the stack, see setName()
 	bool active;
+
+	//TODO : get child by name, get node by path, _draw, queue_free
+
+	//for inheritance
+	char* _class_name;
+	void* _subClass;
+
+	//virtual methods
+	void (*deleteNode)(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
@@ -27,7 +36,7 @@ struct iiNode
 	Node* (*newNode)();
 
 	//void deleteNode(Node*)
-	void (*deleteNode)(Node*);
+	//void (*deleteNode)(Node*); //see struct _Node (virtual method)
 
 	//int getIndex(Node*)
 	int (*getIndex)(const Node*);

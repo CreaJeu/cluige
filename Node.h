@@ -24,6 +24,7 @@ struct _Node
 
 	//virtual methods
 	void (*deleteNode)(Node*);
+	void (*nodeProcess)(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

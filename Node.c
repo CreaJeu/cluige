@@ -48,6 +48,18 @@ static void nde_deleteNode(Node* node)
     free(node);
 }
 
+static void nde_nodeProcess(Node* thisNode)
+{
+    static int bidon = 0;
+    printf("yo %d\n", bidon++);
+    if(bidon > 33)
+    {
+        iCluige.quitAsked = true;
+    }
+
+    // TODO : call script process
+}
+
 static Node* nde_newNode()
 {
     Node* node = iCluige.checkedMalloc(sizeof(Node));
@@ -64,6 +76,7 @@ static Node* nde_newNode()
     iCluige.iStringBuilder.append(&sb, "Node");
 
     node->deleteNode = nde_deleteNode;
+    node->nodeProcess = nde_nodeProcess;
     node->_subClass = NULL;
     return node;
 }

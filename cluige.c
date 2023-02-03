@@ -24,8 +24,7 @@ struct iiCluige iCluige;
 void cluigeInit()
 {
     iCluige.checkedMalloc = clg_checkedMalloc;
-    //...
-    //...
+    iCluige.quitAsked = false;
 
     iiStringBuilderInit();
     iiNodeInit();
@@ -41,9 +40,32 @@ void cluigeInit()
     //...
 }
 
+static void processTree(Node* root)
+{
+    //recursion mode : DFS
+    if(root->children != NULL)
+    {
+        processTree(root->children);
+    }
+
+    if(root->nodeProcess != NULL)
+    {
+        root->nodeProcess(root);
+    }
+
+    if(root->nextSibling != NULL)
+    {
+        processTree(root->nextSibling);
+    }
+}
+
 void cluigeRun()
 {
-    //game loop ...
+    //game loop
+    while(!(iCluige.quitAsked))
+    {
+        processTree(iCluige.privateRoot2D);
+    }
 }
 
 int cluigeFinish()

@@ -15,6 +15,9 @@ struct iiCluige
 	struct iiStringBuilder iStringBuilder;
 	struct iiNode iNode;
 
+	//to quit a game
+	bool quitAsked;
+
 	//for cluige nodes like clock
 	Node* privateRoot2D;
 

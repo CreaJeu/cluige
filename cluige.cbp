@@ -48,10 +48,26 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Nodes/Clock.h" />
+		<Unit filename="Nodes/Node2D.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Nodes/Node2D.h" />
+		<Unit filename="Nodes/SpriteText.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Nodes/SpriteText.h" />
+		<Unit filename="Script.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Script.h" />
 		<Unit filename="StringBuilder.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="StringBuilder.h" />
+		<Unit filename="Vector2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Vector2.h" />
 		<Unit filename="cluige.c">
 			<Option compilerVar="CC" />
 		</Unit>

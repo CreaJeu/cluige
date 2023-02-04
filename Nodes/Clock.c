@@ -35,8 +35,8 @@ static struct _Clock* clk_newClock()
     newClock->_lastTick = clock();
     newClock->_thisNode = newNode;
     newClock->deleteNode = newNode->deleteNode;
-    newClock->deleteClock = clk_deleteClock;
-    newClock->preProcessClock = clk_preProcessClock;
+    //newClock->deleteClock = clk_deleteClock;
+    //newClock->preProcessClock = clk_preProcessClock;
 
     newNode->_subClass = newClock;
 
@@ -45,8 +45,8 @@ static struct _Clock* clk_newClock()
     newNode->_className = iCluige.iStringBuilder.stringAlloc(&sb, 5);
     iCluige.iStringBuilder.append(&sb, "Clock");
 
-    newNode->deleteNode = newClock->deleteClock;
-    newNode->preProcessNode = newClock->preProcessClock;
+    newNode->deleteNode = clk_deleteClock;
+    newNode->preProcessNode = clk_preProcessClock;
 
     return newClock;
 }

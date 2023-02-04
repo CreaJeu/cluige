@@ -14,9 +14,9 @@ struct _Clock
 
 	//virtual methods
 	void (*deleteNode)(Node*);
-	void (*deleteClock)(Node*);
+	//in .c : void (*deleteClock)(Node*);
 
-	void (*preProcessClock)(Node*);
+	//in .c : void (*preProcessClock)(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
@@ -25,7 +25,7 @@ struct iiClock
 	//Clock* newClock()
 	struct _Clock* (*newClock)();
 };
-//iNode : in iiCluige
+//iClock : in iiCluige
 
 //to be called only by cluigeInit() to set iNode functions pointers
 void iiClockInit();

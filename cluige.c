@@ -35,6 +35,9 @@ void cluigeInit()
     iCluige.iNode.setName(iCluige.privateRoot2D, "privateRoot2D");
 
     iiScriptInit();
+    iiVector2Init();
+    iiNode2DInit();
+    iiSpriteTextInit();
 
     iiClockInit();
     iCluige.clock = iCluige.iClock.newClock();

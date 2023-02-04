@@ -11,6 +11,9 @@
 
 #include "Nodes/Clock.h"
 #include "Script.h"
+#include "Vector2.h"
+#include "Nodes/Node2D.h"
+#include "Nodes/SpriteText.h"
 
 //just a kind of namespace to prevent name collisions
 struct iiCluige
@@ -20,6 +23,9 @@ struct iiCluige
 	struct iiClock iClock;
 	struct _Clock* clock;
 	struct iiScript iScript;
+	struct iiVector2 iVector2;
+	struct iiNode2D iNode2D;
+	struct iiSpriteText iSpriteText;
 
 	//for target FPS, 15 fps by default
 	float wantedFrameSeconds;

@@ -4,9 +4,6 @@
 //#include "Node.h" //already in cluige.h
 #include "Clock.h"
 
-//TODO TMP
-#include <curses.h>
-
 ////////////////////////////////// _Clock /////////
 
 static void clk_deleteClock(Node* thisNode)
@@ -23,22 +20,6 @@ static void clk_preProcessClock(Node* thisNode)
     float dSec = (float)(newTick - thisClock->_lastTick) / CLOCKS_PER_SEC;
     thisClock->elapsedSeconds = thisClock->scale * dSec;
     thisClock->_lastTick = newTick;
-
-    //bidon
-    static float bidon = 0;
-    static StringBuilder sb;
-    static char* display = NULL;
-
-    if(display == NULL) display = iCluige.iStringBuilder.stringAlloc(&sb, 4);
-
-    bidon += thisClock->elapsedSeconds;
-    iCluige.iStringBuilder.replace(&sb, "%2.1f", bidon);
-    //printf("yo %s\n", display);
-    mvaddstr(4, 7, display);
-    if(bidon > 4)
-    {
-        iCluige.quitAsked = true;
-    }
 }
 
 

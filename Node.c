@@ -34,18 +34,21 @@ static void nde_deleteNode(Node* node)
     }
     free(node->_className);
     assert(node->_subClass == NULL);
-    //TODO delete script
-//    if(node->script != NULL)
-//    {
-//        node->script->deleteScript(node->script);
-//    }
+
+    if(node->script != NULL)
+    {
+        node->script->deleteScript(node->script);
+    }
 
     free(node);
 }
 
 static void nde_processNode(Node* thisNode)
 {
-    // TODO : call script process
+    if((thisNode->script != NULL) && (thisNode->script->process != NULL))
+    {
+        thisNode->script->process(thisNode->script, iCluige.clock->elapsedSeconds);
+    }
 }
 
 
@@ -160,7 +163,12 @@ static void nde_addChild(Node* parent, Node* child)
     {
         nde_autoName(child);
     }
-    //TODO if script, call enterTree()
+
+    //if script, call ready (not yet enterTree())
+    if((child->script != NULL) && (child->script->ready != NULL))
+    {
+        child->script->ready(child->script);
+    }
 }
 
 static void nde_printTreePretty(const Node* node)

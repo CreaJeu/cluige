@@ -1,17 +1,20 @@
+**fini récemment**
+- node inner process, main loop
+- clock/deltaTime/wantedFPS
+
 
 **tâches actuelles** (chantier : minimal usable Node/Script/main loop)
 
-- node inner process, main loop
+- script : process, enterTree, delete
 
 
 
 **Futures tâches**
 
-- clock/deltaTime/wantedFPS
-- script : process, enterTree, delete
+- position 2D (only translation?)
 - queue_free, remove child
 - get node by name/path
-- position 2D (only translation?)
+- _className static par classe
 
 
 

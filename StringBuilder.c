@@ -37,6 +37,20 @@ static void sbr_append(StringBuilder* sb, const char* formattedTail, ...)
     va_end(args);
 }
 
+static void sbr_replace(StringBuilder* sb, const char* formattedTail, ...)
+{
+    va_list args;
+    va_start(args, formattedTail);
+
+    sb->remainingSize = strlen(sb->builtString) + sb->remainingSize;
+    int written = vsnprintf(sb->builtString, sb->remainingSize, formattedTail, args);
+
+    sb->remainingSize -= written;
+    sb->nextChar = sb->builtString + written;
+
+    va_end(args);
+}
+
 
 ////////////////////////////////// StringBuilder /////////
 
@@ -45,6 +59,7 @@ void iiStringBuilderInit()
     iCluige.iStringBuilder.stringAlloc = sbr_stringAlloc;
     iCluige.iStringBuilder.connectExistingString = sbr_connectExistingString;
     iCluige.iStringBuilder.append = sbr_append;
+    iCluige.iStringBuilder.replace = sbr_replace;
 
     //+1 because of truncated results of log10
     iCluige.iStringBuilder.DECIMAL_DIGITS_FOR_INT = 1 + (int)(log10(UINT_MAX));

@@ -7,17 +7,12 @@
 //#include "Node.h" //already in cluige.h
 
 
-////////////////////////////////// iiNode /////////
+////////////////////////////////// _Node /////////
 
 // no : would encourage not freeable nodes on the stack
 //static void nde_initZero(Node* node)
 //{
-//    node->parent = NULL;
-//    node->nextSibling = NULL;
-//    node->children = NULL;
-//    node->script = NULL;
-//    node->name = NULL;
-//    node->active = true;
+//    ...
 //}
 
 static void nde_deleteNode(Node* node)
@@ -37,7 +32,7 @@ static void nde_deleteNode(Node* node)
     {
         free(node->name);
     }
-    free(node->_class_name);
+    free(node->_className);
     assert(node->_subClass == NULL);
     //TODO delete script
 //    if(node->script != NULL)
@@ -48,17 +43,13 @@ static void nde_deleteNode(Node* node)
     free(node);
 }
 
-static void nde_nodeProcess(Node* thisNode)
+static void nde_processNode(Node* thisNode)
 {
-    static int bidon = 0;
-    printf("yo %d\n", bidon++);
-    if(bidon > 33)
-    {
-        iCluige.quitAsked = true;
-    }
-
     // TODO : call script process
 }
+
+
+////////////////////////////////// iiNode /////////
 
 static Node* nde_newNode()
 {
@@ -72,11 +63,13 @@ static Node* nde_newNode()
     node->active = true;
 
     StringBuilder sb;
-    node->_class_name = iCluige.iStringBuilder.stringAlloc(&sb, 4);
+    node->_className = iCluige.iStringBuilder.stringAlloc(&sb, 4);
     iCluige.iStringBuilder.append(&sb, "Node");
 
     node->deleteNode = nde_deleteNode;
-    node->nodeProcess = nde_nodeProcess;
+    node->preProcessNode = NULL;
+    node->processNode = nde_processNode;
+    node->postProcessNode = NULL;
     node->_subClass = NULL;
     return node;
 }
@@ -178,7 +171,7 @@ static void nde_printTreePretty(const Node* node)
     {
         printf("   ");
     }
-    printf("\\_%s (%s)\n", node->name, node->_class_name);
+    printf("\\_%s (%s)\n", node->name, node->_className);
 
     if(node->children != NULL)
     {

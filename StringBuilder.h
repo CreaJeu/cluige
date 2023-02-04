@@ -24,6 +24,9 @@ struct iiStringBuilder
 
 	//void append(StringBuilder* sb, const char* formattedTail, ...)
 	void (*append)(StringBuilder* sb, const char* formattedTail, ...);
+
+	//void replace(StringBuilder* sb, const char* formattedTail, ...)
+	void (*replace)(StringBuilder* sb, const char* formattedTail, ...);
 };
 //iStringBuilder : in iiCluige
 

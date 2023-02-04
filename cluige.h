@@ -9,11 +9,18 @@
 #include "Node.h"
 #include "StringBuilder.h"
 
+#include "Nodes/Clock.h"
+
 //just a kind of namespace to prevent name collisions
 struct iiCluige
 {
 	struct iiStringBuilder iStringBuilder;
 	struct iiNode iNode;
+	struct iiClock iClock;
+	struct _Clock* clock;
+
+	//for target FPS, 15 fps by default
+	float wantedFrameSeconds;
 
 	//to quit a game
 	bool quitAsked;

@@ -1,11 +1,19 @@
 #ifndef SPRITE_TEXT_H_INCLUDED
 #define SPRITE_TEXT_H_INCLUDED
 
+#include "../Vector2.h"
+
 typedef struct _SpriteText SpriteText;
 
 struct _SpriteText
 {
-    char* text;//the ASCII art / unicode art
+    //first character of first line will be drawn at
+    //Node2D.position + offset
+    Vector2 offset;
+
+    //char** text;//array of text lines, the ASCII art / unicode art
+    char* text;//text with all \n replaced by \0, the ASCII art / unicode art
+    int nbLines;//TODO collection instead
 
 	//private
 	Node2D* _thisNode2D;

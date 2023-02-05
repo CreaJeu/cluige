@@ -13,6 +13,7 @@ struct iiVector2
 {
     void (*add)(const Vector2* v1, const Vector2* v2, Vector2 *result);
     void (*substract)(const Vector2* v1, const Vector2* v2, Vector2 *res);
+    void (*kMul)(const Vector2* v, float factor, Vector2 *res);
     void (*computeLineEquation)(const Vector2* v1, const Vector2* v2, float *a, float *b, float *c);
 };
 

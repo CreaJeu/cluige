@@ -27,6 +27,12 @@ struct iiStringBuilder
 
 	//void replace(StringBuilder* sb, const char* formattedTail, ...)
 	void (*replace)(StringBuilder* sb, const char* formattedTail, ...);
+
+//	//utility function, like java String.split()
+//	//does all malloc's to build the result
+//	//char** split(const char* text, char separator);
+//	char** (*split)(const char* text, const char* separator, int* nbSegments);
+//	//TODO collection instead of char**+size
 };
 //iStringBuilder : in iiCluige
 

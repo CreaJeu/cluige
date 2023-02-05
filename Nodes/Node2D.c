@@ -35,8 +35,8 @@ static void n2d_postProcessNode(Node* thisNode)
         void* nSubclass = thisNode->_subClass;
         if(nSubclass != NULL)
         {
-            int isN2D = strcmp(n->_className, "Node2D");
-            if(isN2D == 0) //n is a Node2D
+            char* found = strstr(n->_className, "NodeNode2D");
+            if(found == n->_className) //n is a Node2D
             {
                 Node2D* n2d = (Node2D*)(thisNode->_subClass);
                 mustUpdateGlobalPos = n2d->_localPositionChanged;
@@ -47,14 +47,14 @@ static void n2d_postProcessNode(Node* thisNode)
     if(mustUpdateGlobalPos)
     {
         n = thisNode;
-        thisNode2D->_tmpGlobalPosition = (Vector2){0., 0.};
-        while((n->parent != NULL) && !mustUpdateGlobalPos)
+        thisNode2D->_tmpGlobalPosition = thisNode2D->position;
+        while(n->parent != NULL)
         {
             void* nSubclass = thisNode->_subClass;
             if(nSubclass != NULL)
             {
-                int isN2D = strcmp(n->_className, "Node2D");
-                if(isN2D == 0) //n is a Node2D
+                char* found = strstr(n->_className, "NodeNode2D");
+                if(found == n->_className) //n is a Node2D
                 {
                     Node2D* n2d = (Node2D*)(thisNode->_subClass);
                     iCluige.iVector2.add(
@@ -91,8 +91,8 @@ static struct _Node2D* n2d_newNode2D()
 
     free(newNode->_className); //TODO static value to avoid free
     StringBuilder sb;
-    newNode->_className = iCluige.iStringBuilder.stringAlloc(&sb, 6);
-    iCluige.iStringBuilder.append(&sb, "Node2D");
+    newNode->_className = iCluige.iStringBuilder.stringAlloc(&sb, strlen("NodeNode2D"));
+    iCluige.iStringBuilder.append(&sb, "NodeNode2D");
     newNode->_subClass = newNode2D;
 
     newNode->deleteNode = n2d_deleteNode2D;

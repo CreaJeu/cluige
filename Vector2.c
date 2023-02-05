@@ -17,6 +17,12 @@ static void vct2_substract(const Vector2* v1, const Vector2* v2, Vector2 *result
     result->y = v1->y - v2->y;
 }
 
+static void vct2_kMul(const Vector2* v, float factor, Vector2 *result)
+{
+    result->x = factor * v->x;
+    result->y = factor * v->y;
+}
+
 static void vct2_computeLineEquation(const Vector2* v1, const Vector2* v2, float *a, float *b, float *c)
 {
     *a = v2->y - v1->y;
@@ -31,6 +37,7 @@ void iiVector2Init()
 {
     iCluige.iVector2.add = vct2_add;
     iCluige.iVector2.substract = vct2_substract;
+    iCluige.iVector2.kMul = vct2_kMul;
     iCluige.iVector2.computeLineEquation = vct2_computeLineEquation;
 }
 

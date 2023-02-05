@@ -51,6 +51,54 @@ static void sbr_replace(StringBuilder* sb, const char* formattedTail, ...)
     va_end(args);
 }
 
+//char** sbr_split(const char* text, const char* separator, int* outNbSegments)
+//{
+//    int totalLength = strlen(text);
+//    int separatorLength = strlen(separator);
+//    //quick and dirty, ok if text not too long
+//    int* segmentsPositions = calloc(totalLength, sizeof(int));
+//    if(segmentsPositions == NULL)
+//    {
+//        printf("\n\n\n    fatal memory alloc error !\n\n\n");
+//        exit(EXIT_FAILURE);
+//    }
+//    int nbSegments = 0;
+//    int lastPositionTested = 0;
+//    int nextSegmentLength = -1;
+//    char* currPos = text;
+//    //find segments
+//    while(lastPositionTested < totalLength - 1)
+//    {
+//        nextSegmentLength = strcspn(currPos, separator);
+//        segmentsPositions[nbSegments] = lastPositionTested;
+//        nbSegments++;
+//        lastPositionTested += nextSegmentLength + separatorLength;
+//        currPos += nextSegmentLength + separatorLength;
+//    }
+//    segmentsPositions[nbSegments] = totalLength + separatorLength;
+//
+//    //malloc and copy segments
+//    (*outNbSegments) = nbSegments;
+//    char** res = NULL;
+//    currPos = text;
+//    if(nbSegments != 0)
+//    {
+//        //array of char*
+//        char** res = iCluige.checkedMalloc(nbSegments * sizeof(char*));
+//        StringBuilder sb;
+//        for(int i=0; i<nbSegments; i++)
+//        {
+//            int nextLength = segmentsPositions[i+1] - segmentsPositions[i] - separatorLength;
+//            char* segment = iCluige.iStringBuilder.stringAlloc(&sb, nextLength);
+//            res[i] = segment;
+//            strncpy(segment, currPos, nextLength);
+//            segment[nextLength] = 0;//needed?
+//            currPos += nextLength + separatorLength;
+//        }
+//    }
+//    free(segmentsPositions);
+//    return res;
+//}
 
 ////////////////////////////////// StringBuilder /////////
 
@@ -60,6 +108,7 @@ void iiStringBuilderInit()
     iCluige.iStringBuilder.connectExistingString = sbr_connectExistingString;
     iCluige.iStringBuilder.append = sbr_append;
     iCluige.iStringBuilder.replace = sbr_replace;
+    //iCluige.iStringBuilder.split = sbr_split;
 
     //+1 because of truncated results of log10
     iCluige.iStringBuilder.DECIMAL_DIGITS_FOR_INT = 1 + (int)(log10(UINT_MAX));

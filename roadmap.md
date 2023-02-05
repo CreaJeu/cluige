@@ -4,11 +4,13 @@
 - script : process, enterTree, delete
 (chantier : minimal usable Node/Script/main loop)
 - position 2D (only translation?)
-
-
-**tâches actuelles** (chantier sprite text (no anim))
-
 - sprite text : recup code from textbird
+(chantier sprite text (no anim))
+
+
+**tâches actuelles** 
+
+- game jam
 
 
 **Futures tâches**

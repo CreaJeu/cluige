@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include <curses.h>
+#include <math.h>
 
 ////////////////////////////////// _SpriteText /////////
 
@@ -52,7 +53,7 @@ static void sprtx_preProcessNode(Node* thisNode)
         {
             if(currChar != ' ')
             {
-                mvaddch(orig.y + line, orig.x + col, ' ');
+                mvaddch(lrintf(orig.y) + line, lrintf(orig.x) + col, ' ');
             }
             col++;
             //currChar = lineString[col];
@@ -80,7 +81,7 @@ static void sprtx_postProcessNode(Node* thisNode)
     for(int line = 0; line < thisSpriteText->nbLines; line++)
     {
         //mvaddstr(orig.y + line, orig.x, (char*)(thisSpriteText->text[line]));
-        mvaddstr(orig.y + line, orig.x, lineString);
+        mvaddstr(lrintf(orig.y) + line, lrintf(orig.x), lineString);
         lineString += strlen(lineString) + 1;
     }
 }
@@ -143,6 +144,10 @@ static void sprtx_setText(SpriteText* thisSpriteText, const char* newText)
             thisSpriteText->text[i] = '\0';
             thisSpriteText->nbLines++;
         }
+    }
+    if(totalLength > 0)
+    {
+        thisSpriteText->nbLines++;
     }
 }
 

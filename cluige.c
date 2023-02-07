@@ -17,6 +17,18 @@ static void* clg_checkedMalloc(size_t s)
     return res;
 }
 
+static Vector2 clg_getScreenSize()
+{
+    int w, h;
+    //TODO : make it work !
+    if(is_termresized())
+    {
+        resize_term(0, 0);
+    }
+    getmaxyx(stdscr, h, w);
+    return (Vector2){ w, h };
+}
+
 
 /////////////////////////////////// Cluige //////////
 
@@ -26,6 +38,7 @@ struct iiCluige iCluige;
 void cluigeInit()
 {
     iCluige.checkedMalloc = clg_checkedMalloc;
+    iCluige.getScreenSize = clg_getScreenSize;
     iCluige.wantedFrameSeconds = .0666;//15 fps by default
     iCluige.quitAsked = false;
 

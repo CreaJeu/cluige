@@ -51,6 +51,15 @@ static void nde_processNode(Node* thisNode)
     }
 }
 
+static void nde_enterTree(Node* thisNode)
+{
+    //TODO enterTree in Script
+//    if((thisNode->script != NULL) && (thisNode->script->enterTree != NULL))
+//    {
+//        thisNode->script->enterTree(thisNode->script);
+//    }
+}
+
 
 ////////////////////////////////// iiNode /////////
 
@@ -70,6 +79,7 @@ static Node* nde_newNode()
     iCluige.iStringBuilder.append(&sb, "Node");
 
     node->deleteNode = nde_deleteNode;
+    node->enterTree = nde_enterTree;
     node->preProcessNode = NULL;
     node->processNode = nde_processNode;
     node->postProcessNode = NULL;
@@ -165,9 +175,17 @@ static void nde_addChild(Node* parent, Node* child)
     }
 
     //if script, call ready (not yet enterTree())
-    if((child->script != NULL) && (child->script->ready != NULL))
+    if(!child->_alreadyEnteredTree)
     {
-        child->script->ready(child->script);
+        child->_alreadyEnteredTree = true;
+        if((child->script != NULL) && (child->script->ready != NULL))
+        {
+            child->script->ready(child->script);
+        }
+    }
+    if(child->enterTree != NULL)
+    {
+        child->enterTree(child);
     }
 }
 

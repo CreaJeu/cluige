@@ -23,6 +23,7 @@ struct _Node2D
 	//virtual methods
 	void (*deleteNode)(Node*);
 	void (*deleteNode2D)(Node*);
+	void (*enterTreeNode)(Node*);
 	//in .c : void preProcessNode(Node*);
 	//in .c : void postProcessNode(Node*);
 };
@@ -35,6 +36,7 @@ struct iiNode2D
 	void (*show)(Node2D*);
 	void (*hide)(Node2D*);
 	void (*moveLocal)(Node2D*, Vector2);
+	void (*setLocalPosition)(Node2D*, Vector2);
 	//later : moveGlobal
 };
 //iNode2D : in iiCluige

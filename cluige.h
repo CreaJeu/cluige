@@ -41,6 +41,9 @@ struct iiCluige
 
 	//void* checkedMalloc(size_t)
 	void* (*checkedMalloc)(size_t);
+
+//	Vector2 getScreenSize();
+	Vector2 (*getScreenSize)();
 };
 extern struct iiCluige iCluige;
 

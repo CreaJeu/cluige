@@ -69,6 +69,14 @@ static void n2d_postProcessNode(Node* thisNode)
     }
 }
 
+static void n2d_enterTreeNode2D(Node* thisNode)
+{
+    struct _Node2D* thisNode2D = (struct _Node2D*)(thisNode->_subClass);
+    thisNode2D->_localPositionChanged = true;
+    n2d_postProcessNode(thisNode);//compute _tmpGlobalPosition
+    thisNode2D->enterTreeNode(thisNode);//calls script.enterTree()
+}
+
 
 ////////////////////////////////// iiNode2D /////////
 
@@ -86,6 +94,8 @@ static struct _Node2D* n2d_newNode2D()
     newNode2D->_subClass = NULL;
     newNode2D->deleteNode = newNode->deleteNode;
     newNode2D->deleteNode2D = n2d_deleteNode2D;
+    newNode2D->enterTreeNode = newNode->enterTree;
+    newNode->enterTree = n2d_enterTreeNode2D;
 
     newNode->_subClass = newNode2D;
 
@@ -122,6 +132,12 @@ static void n2d_moveLocal(Node2D* thisNode2D, Vector2 depl)
     thisNode2D->_localPositionChanged = true;
 }
 
+static void n2d_setLocalPosition(Node2D* thisNode2D, Vector2 newPos)
+{
+    thisNode2D->position = newPos;
+    thisNode2D->_localPositionChanged = true;
+}
+
 /////////////////////////////////// Node //////////
 
 void iiNode2DInit()
@@ -130,5 +146,6 @@ void iiNode2DInit()
     iCluige.iNode2D.show = n2d_show;
     iCluige.iNode2D.hide = n2d_hide;
     iCluige.iNode2D.moveLocal = n2d_moveLocal;
+    iCluige.iNode2D.setLocalPosition = n2d_setLocalPosition;
 }
 

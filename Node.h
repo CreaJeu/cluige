@@ -18,12 +18,16 @@ struct _Node
 
 	//TODO : get child by name, get node by path, _draw, queue_free
 
+	//private
+	bool _alreadyEnteredTree;
+
 	//for inheritance
 	char* _className;
 	void* _subClass;
 
 	//virtual methods
 	void (*deleteNode)(Node*);
+	void (*enterTree)(Node*);
 	void (*preProcessNode)(Node*);
 	void (*processNode)(Node*);
 	void (*postProcessNode)(Node*);

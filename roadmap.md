@@ -10,22 +10,26 @@
 
 **tâches actuelles** 
 
-- game jam
+ o
+'U`
+ "   
+- sprite text : transparent characters
+- first collections : Deque, Map
 
 
 **Futures tâches**
 
-
+- node2D (et autre?) : meilleur test ~instanceof
 - queue_free, remove child
 - get node by name/path
 - _className static par classe
-- process/main loop : BFS instead of BFS, simplify Node2D::postProcessNode()
+- process/main loop : BFS instead of DFS, simplify Node2D::postProcessNode()
 
 
 
 **FUTURS CHANTIERS**
 
-- first collections
+- suite textraster avec code Ulrich
 - sprite svg (no anim)
 - camera
 - inputs

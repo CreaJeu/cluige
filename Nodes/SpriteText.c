@@ -34,11 +34,16 @@ static void sprtx_preProcessNode(Node* thisNode)
     //call super()
     thisSpriteText->preProcessNode2D(thisNode);
 
+    if(!(thisNode2D->visible))
+    {
+        return;
+    }
+
     //clear old one (unless immobile? => no, because other masking things
     //could have moved and made this sprite visible again;
     //and curses already has characters cache)
     Vector2 orig;
-    iCluige.iVector2.add(
+    iCluige.iVector2.substract(
             &(thisNode2D->_tmpGlobalPosition),
             &(thisSpriteText->offset),
             &orig);
@@ -71,9 +76,14 @@ static void sprtx_postProcessNode(Node* thisNode)
     //call super()
     thisSpriteText->postProcessNode2D(thisNode);
 
+    if(!(thisNode2D->visible))
+    {
+        return;
+    }
+
     //draw new one
     Vector2 orig;
-    iCluige.iVector2.add(
+    iCluige.iVector2.substract(
             &(thisNode2D->_tmpGlobalPosition),
             &(thisSpriteText->offset),
             &orig);

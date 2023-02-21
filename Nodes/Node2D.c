@@ -32,13 +32,13 @@ static void n2d_postProcessNode(Node* thisNode)
     bool mustUpdateGlobalPos = false;
     while((n->parent != NULL) && !mustUpdateGlobalPos)
     {
-        void* nSubclass = thisNode->_subClass;
+        void* nSubclass = n->_subClass;
         if(nSubclass != NULL)
         {
             char* found = strstr(n->_className, "NodeNode2D");
             if(found == n->_className) //n is a Node2D
             {
-                Node2D* n2d = (Node2D*)(thisNode->_subClass);
+                Node2D* n2d = (Node2D*)(n->_subClass);
                 mustUpdateGlobalPos = n2d->_localPositionChanged;
             }
         }
@@ -47,16 +47,16 @@ static void n2d_postProcessNode(Node* thisNode)
     if(mustUpdateGlobalPos)
     {
         n = thisNode;
-        thisNode2D->_tmpGlobalPosition = thisNode2D->position;
+        thisNode2D->_tmpGlobalPosition = (Vector2){0, 0};
         while(n->parent != NULL)
         {
-            void* nSubclass = thisNode->_subClass;
+            void* nSubclass = n->_subClass;
             if(nSubclass != NULL)
             {
                 char* found = strstr(n->_className, "NodeNode2D");
                 if(found == n->_className) //n is a Node2D
                 {
-                    Node2D* n2d = (Node2D*)(thisNode->_subClass);
+                    Node2D* n2d = (Node2D*)(n->_subClass);
                     iCluige.iVector2.add(
                         &(thisNode2D->_tmpGlobalPosition),
                         &(n2d->position),

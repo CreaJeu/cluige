@@ -64,6 +64,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="StringBuilder.h" />
+		<Unit filename="Variant.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Variant.h" />
 		<Unit filename="Vector2.c">
 			<Option compilerVar="CC" />
 		</Unit>

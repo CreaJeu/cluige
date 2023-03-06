@@ -42,6 +42,7 @@ void cluigeInit()
     iCluige.wantedFrameSeconds = .0666;//15 fps by default
     iCluige.quitAsked = false;
 
+    iiVariantInit();
     iiStringBuilderInit();
     iiNodeInit();
     iCluige.privateRoot2D = iCluige.iNode.newNode();

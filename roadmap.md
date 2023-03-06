@@ -1,10 +1,6 @@
 **fini récemment**
-- node inner process, main loop
-- clock/deltaTime/wantedFPS
-- script : process, enterTree, delete
+
 (chantier : minimal usable Node/Script/main loop)
-- position 2D (only translation?)
-- sprite text : recup code from textbird
 (chantier sprite text (no anim))
 
 
@@ -13,12 +9,14 @@
  o
 'U`
  "   
-- sprite text : transparent characters
 - first collections : Deque, Map
+- MVC pour affichage : modèle/back-buffer côté cluige, vue à part ("server" en vocabulaire Godot docs.godotengine.org/en/stable/tutorials/performance/using_servers.html )
+- sprite text : transparent characters
 
 
 **Futures tâches**
 
+- tous les membres en snake_case? (types peuvent rester PascalCase)
 - node2D (et autre?) : meilleur test ~instanceof
 - queue_free, remove child
 - get node by name/path

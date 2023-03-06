@@ -9,6 +9,7 @@
 #include "Node.h"
 #include "StringBuilder.h"
 
+#include "Variant.h"
 #include "Nodes/Clock.h"
 #include "Script.h"
 #include "Vector2.h"
@@ -18,6 +19,7 @@
 //just a kind of namespace to prevent name collisions
 struct iiCluige
 {
+    struct iiVariant iVariant;
 	struct iiStringBuilder iStringBuilder;
 	struct iiNode iNode;
 	struct iiClock iClock;

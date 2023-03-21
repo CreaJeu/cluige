@@ -10,6 +10,7 @@
 #include "StringBuilder.h"
 
 #include "Variant.h"
+#include "Deque.h"
 #include "Nodes/Clock.h"
 #include "Script.h"
 #include "Vector2.h"
@@ -20,6 +21,7 @@
 struct iiCluige
 {
     struct iiVariant iVariant;
+    struct iiDeque iDeque;
 	struct iiStringBuilder iStringBuilder;
 	struct iiNode iNode;
 	struct iiClock iClock;

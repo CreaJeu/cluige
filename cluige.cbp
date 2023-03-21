@@ -40,6 +40,10 @@
 			<Add option="-std=c11" />
 			<Add directory="../PDCurses" />
 		</Compiler>
+		<Unit filename="Deque.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Deque.h" />
 		<Unit filename="Node.c">
 			<Option compilerVar="CC" />
 		</Unit>

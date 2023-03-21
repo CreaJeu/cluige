@@ -4,6 +4,8 @@
 //#include "Node.h" //already in cluige.h
 #include "Clock.h"
 
+#include <string.h> //TODO static instead of malloc'ed class name
+
 ////////////////////////////////// _Clock /////////
 
 static void clk_deleteClock(Node* thisNode)

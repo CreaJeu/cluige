@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 typedef union _Variant Variant;
 typedef enum _VariantType VariantType;
@@ -38,6 +39,8 @@ union _Variant
 
 struct iiVariant
 {
+    Variant (*fromVal)(VariantType valType, ...);
+    Variant (*fromArgs)(VariantType valType, va_list args);
     //void (*add)(const Variant* v1, const Variant* v2, Variant *result);
 };
 

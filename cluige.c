@@ -43,6 +43,7 @@ void cluigeInit()
     iCluige.quitAsked = false;
 
     iiVariantInit();
+    iiDequeInit();
     iiStringBuilderInit();
     iiNodeInit();
     iCluige.privateRoot2D = iCluige.iNode.newNode();

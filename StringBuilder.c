@@ -13,6 +13,7 @@ static char* sbr_stringAlloc(StringBuilder* sb, size_t maxSize)
 {
     sb->builtString = iCluige.checkedMalloc((maxSize + 1) * sizeof(char));
     sb->nextChar = sb->builtString;
+    sb->nextChar[0] = 0;
     sb->remainingSize = maxSize;
     return sb->nextChar;
 }

@@ -233,7 +233,7 @@ static void dq_remove(Deque* thisDeque, int i)
 static void dq_clear(Deque* thisDeque)
 {
     thisDeque->_nbElems = 0;
-    int _frontI = 0;//useless unless maybe for debug
+    thisDeque->_frontI = 0;//useless unless maybe for debug
 }
 
 ////////////////////////////////// iDeque /////////

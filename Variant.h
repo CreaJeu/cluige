@@ -41,7 +41,7 @@ struct iiVariant
 {
     Variant (*fromVal)(VariantType valType, ...);
     Variant (*fromArgs)(VariantType valType, va_list args);
-    //void (*add)(const Variant* v1, const Variant* v2, Variant *result);
+    int (*compare)(VariantType valType, Variant v1, Variant v2);//like in java
 };
 
 void iiVariantInit();

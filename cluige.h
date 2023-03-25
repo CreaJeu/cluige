@@ -16,6 +16,7 @@
 #include "Vector2.h"
 #include "Nodes/Node2D.h"
 #include "Nodes/SpriteText.h"
+#include "Nodes/Input.h"
 
 //just a kind of namespace to prevent name collisions
 struct iiCluige
@@ -26,6 +27,8 @@ struct iiCluige
 	struct iiNode iNode;
 	struct iiClock iClock;
 	struct _Clock* clock;
+	struct iiInput iInput;
+	struct _Input* input;
 	struct iiScript iScript;
 	struct iiVector2 iVector2;
 	struct iiNode2D iNode2D;

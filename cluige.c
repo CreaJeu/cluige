@@ -58,6 +58,10 @@ void cluigeInit()
     iCluige.clock = iCluige.iClock.newClock();
     iCluige.iNode.addChild(iCluige.privateRoot2D, iCluige.clock->_thisNode);
 
+    iiInputInit();
+    iCluige.input = iCluige.iInput.newInput();
+    iCluige.iNode.addChild(iCluige.privateRoot2D, iCluige.input->_thisNode);
+
     iCluige.publicRoot2D = iCluige.iNode.newNode();
     iCluige.iNode.setName(iCluige.publicRoot2D, "publicRoot2D");
     iCluige.iNode.addChild(iCluige.privateRoot2D, iCluige.publicRoot2D);
@@ -68,13 +72,15 @@ void cluigeInit()
     //...
     //...
 
-    //curses
+    //curses  //TODO separate from core cluige via 'display server'
     initscr();
+    nodelay(stdscr, true);
+    cbreak();
     //nl();//?
     noecho();
     curs_set(0);
-    timeout(-1);// for getch()
-    keypad(stdscr, TRUE);
+    timeout(0);// for getch() : 0=blocking 0=return ERR/...
+    keypad(stdscr, true);
 }
 
 enum ProcessPass

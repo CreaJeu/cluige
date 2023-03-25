@@ -11,8 +11,10 @@
 static void clk_deleteClock(Node* thisNode)
 {
     struct _Clock* thisClock = (struct _Clock*)(thisNode->_subClass);
+    void (*deleteNode)(Node*) = thisClock->deleteNode;
     free(thisClock);
     thisNode->_subClass = NULL;
+    deleteNode(thisNode);
 }
 
 static void clk_preProcessClock(Node* thisNode)

@@ -52,6 +52,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Nodes/Clock.h" />
+		<Unit filename="Nodes/Input.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Nodes/Input.h" />
 		<Unit filename="Nodes/Node2D.c">
 			<Option compilerVar="CC" />
 		</Unit>

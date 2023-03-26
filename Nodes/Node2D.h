@@ -26,6 +26,7 @@ struct _Node2D
 	void (*enterTreeNode)(Node*);
 	//in .c : void preProcessNode(Node*);
 	//in .c : void postProcessNode(Node*);
+	//in .c : void onLoopStartingNode2D(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

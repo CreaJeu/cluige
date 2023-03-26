@@ -28,6 +28,7 @@ struct _Node
 	//virtual methods
 	void (*deleteNode)(Node*);
 	void (*enterTree)(Node*);
+	void (*onLoopStarting)(Node*);
 	void (*preProcessNode)(Node*);
 	void (*processNode)(Node*);
 	void (*postProcessNode)(Node*);

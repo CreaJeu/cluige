@@ -34,6 +34,7 @@ static void sbr_append(StringBuilder* sb, const char* formattedTail, ...)
 
     sb->remainingSize -= written;
     sb->nextChar += written;
+    *(sb->nextChar) = '\0';
 
     va_end(args);
 }

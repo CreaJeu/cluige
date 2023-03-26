@@ -85,6 +85,7 @@ void cluigeInit()
 
 enum ProcessPass
 {
+    STARTING_LOOP_PASS,
     PRE_PROCESS_PASS,
     PROCESS_PASS,
     POST_PROCESS_PASS
@@ -100,6 +101,12 @@ static void processTree(Node* root, enum ProcessPass pass)
 
     switch(pass)
     {
+    case STARTING_LOOP_PASS:
+        if(root->onLoopStarting != NULL)
+        {
+            root->onLoopStarting(root);
+        }
+        break;
     case PRE_PROCESS_PASS:
         if(root->preProcessNode != NULL)
         {
@@ -128,6 +135,8 @@ static void processTree(Node* root, enum ProcessPass pass)
 
 void cluigeRun()
 {
+    processTree(iCluige.privateRoot2D, STARTING_LOOP_PASS);
+
     //game loop
     while(!(iCluige.quitAsked))
     {

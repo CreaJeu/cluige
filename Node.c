@@ -53,7 +53,7 @@ static void nde_processNode(Node* thisNode)
 
 static void nde_enterTree(Node* thisNode)
 {
-    //TODO enterTree in Script
+    //TODO enterTree in Script?
 //    if((thisNode->script != NULL) && (thisNode->script->enterTree != NULL))
 //    {
 //        thisNode->script->enterTree(thisNode->script);
@@ -80,6 +80,7 @@ static Node* nde_newNode()
 
     node->deleteNode = nde_deleteNode;
     node->enterTree = nde_enterTree;
+    node->onLoopStarting = NULL;
     node->preProcessNode = NULL;
     node->processNode = nde_processNode;
     node->postProcessNode = NULL;

@@ -72,9 +72,14 @@ static void n2d_postProcessNode(Node* thisNode)
 static void n2d_enterTreeNode2D(Node* thisNode)
 {
     struct _Node2D* thisNode2D = (struct _Node2D*)(thisNode->_subClass);
+    thisNode2D->enterTreeNode(thisNode);//calls script.enterTree()
+}
+
+static void n2d_onLoopStartingNode2D(Node* thisNode)
+{
+    struct _Node2D* thisNode2D = (struct _Node2D*)(thisNode->_subClass);
     thisNode2D->_localPositionChanged = true;
     n2d_postProcessNode(thisNode);//compute _tmpGlobalPosition
-    thisNode2D->enterTreeNode(thisNode);//calls script.enterTree()
 }
 
 
@@ -108,6 +113,7 @@ static struct _Node2D* n2d_newNode2D()
     newNode->deleteNode = n2d_deleteNode2D;
     newNode->preProcessNode = n2d_preProcessNode;
     newNode->postProcessNode = n2d_postProcessNode;
+    newNode->onLoopStarting = n2d_onLoopStartingNode2D;
 
     return newNode2D;
 }

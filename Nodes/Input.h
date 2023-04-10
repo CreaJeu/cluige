@@ -11,7 +11,7 @@
 
 struct _InputAction
 {
-    char* name;
+    char* name;//usefull apart from debug?
     int nb_pressed;
 //    bool just_pressed;//tmp lists instead
 //    bool just_released;
@@ -52,12 +52,15 @@ struct iiInput
 	struct _Input* (*newInput)();
 //	struct _InputAction* (*newAction)(const char* name);
 //	struct _InputKey* (*newKey)(int charVal);
-	int (*add_action)(struct _Input* thisInput, char* action_name);
-	void (*bind_key)(struct _Input* thisInput, int action_id, int keyCharVal);
-//	bool (*is_action_pressed)(const struct _Input* thisInput, int action_id);
-	bool (*is_action_just_pressed)(const struct _Input* thisInput, int action_id);
-//	bool (*is_key_pressed)(const struct _Input* thisInput, int charVal);
-//	bool (*is_key_just_pressed)(const struct _Input* thisInput, int charVal);
+
+    //action_name will be copied, can be freed afterward or stack allocated
+	int (*add_action)(char* action_name);
+
+	void (*bind_key)(int action_id, int keyCharVal);
+//	bool (*is_action_pressed)(int action_id);
+	bool (*is_action_just_pressed)(int action_id);
+//	bool (*is_key_pressed)(int charVal);
+//	bool (*is_key_just_pressed)(int charVal);
 };
 //iInput : in iiCluige
 

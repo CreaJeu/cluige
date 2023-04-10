@@ -141,7 +141,7 @@ static struct _Input* inp_newInput()
 static struct _InputAction* inp__newAction(char* name)
 {
     struct _InputAction* newAction = iCluige.checkedMalloc(sizeof(struct _InputAction));
-    newAction->name = name;
+    newAction->name = iCluige.iStringBuilder.stack_to_heap(name);
     newAction->nb_pressed = 0;
 //    newAction->just_pressed = false;
 //    newAction->just_released = false;
@@ -159,39 +159,37 @@ static struct _InputKey* inp__newKey(int charVal)
     return newKey;
 }
 
-static int inp_add_action(struct _Input* thisInput, char* action_name)
+static int inp_add_action(char* action_name)
 {
-    int res = iCluige.iDeque.size(&(thisInput->available_actions));
+    int res = iCluige.iDeque.size(&(iCluige.input->available_actions));
     struct _InputAction* newAction = inp__newAction(action_name);
-    iCluige.iDeque.push_back(&(thisInput->available_actions), newAction);
+    iCluige.iDeque.push_back(&(iCluige.input->available_actions), newAction);
     return res;
 }
 
-static void inp_bind_key(struct _Input* thisInput, int action_id, int keyCharVal)
+static void inp_bind_key(int action_id, int keyCharVal)
 {
+    //TODO check action_id exists in available_actions
     struct _InputKey* key;
-    int key_index = inp__findKey(&(thisInput->bound_keys), keyCharVal);
+    int key_index = inp__findKey(&(iCluige.input->bound_keys), keyCharVal);
     if(key_index == -1)
     {
         key = inp__newKey(keyCharVal);
-        key_index = iCluige.iDeque.size(&(thisInput->bound_keys));
-        iCluige.iDeque.push_back(&(thisInput->bound_keys), key);
+        key_index = iCluige.iDeque.size(&(iCluige.input->bound_keys));
+        iCluige.iDeque.push_back(&(iCluige.input->bound_keys), key);
     }
     else
     {
-        key = iCluige.iDeque.at(&(thisInput->bound_keys), key_index).ptr;
+        key = iCluige.iDeque.at(&(iCluige.input->bound_keys), key_index).ptr;
     }
     iCluige.iDeque.push_back(&(key->bound_actions), (int32_t)action_id);
 }
 
-//    iCluige.iInput.is_action_pressed = inp_is_action_pressed;
-static bool inp_is_action_just_pressed(const struct _Input* thisInput, int action_id)
+static bool inp_is_action_just_pressed(int action_id)
 {
-    int found_at = inp__findAction(&(thisInput->just_pressed_actions), action_id);
+    int found_at = inp__findAction(&(iCluige.input->just_pressed_actions), action_id);
     return (found_at != -1);
 }
-//    iCluige.iInput.is_key_pressed = inp_is_key_pressed;
-//    iCluige.iInput.is_key_just_pressed = inp_is_key_just_pressed;
 
 /////////////////////////////////// Node //////////
 

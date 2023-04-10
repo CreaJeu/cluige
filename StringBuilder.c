@@ -25,17 +25,19 @@ static void sbr_connectExistingString(StringBuilder* sb, char* dest)
     sb->remainingSize = strlen(dest);
 }
 
+static void sbr__append_from_args(StringBuilder* sb, const char* formattedTail, va_list args)
+{
+    int written = vsnprintf(sb->nextChar, sb->remainingSize, formattedTail, args);
+    sb->remainingSize -= written;
+    sb->nextChar += written;
+    *(sb->nextChar) = '\0';
+}
+
 static void sbr_append(StringBuilder* sb, const char* formattedTail, ...)
 {
     va_list args;
     va_start(args, formattedTail);
-
-    int written = vsnprintf(sb->nextChar, sb->remainingSize, formattedTail, args);
-
-    sb->remainingSize -= written;
-    sb->nextChar += written;
-    *(sb->nextChar) = '\0';
-
+    sbr__append_from_args(sb, formattedTail, args);
     va_end(args);
 }
 
@@ -51,6 +53,28 @@ static void sbr_replace(StringBuilder* sb, const char* formattedTail, ...)
     sb->nextChar = sb->builtString + written;
 
     va_end(args);
+}
+
+static char* sbr_stack_to_heap(const char* source)
+{
+//    StringBuilder sb;
+//    char* res = iCluige.iStringBuilder.stringAlloc(&sb, strlen(source));
+//    sbr_append(&sb, source);
+    char* res = iCluige.checkedMalloc((strlen(source) + 1) * sizeof(char));
+    strcpy(res, source);
+    return res;
+}
+
+static char* sbr_formatted_to_heap(size_t maxSize, const char* formattedTail, ...)
+{
+    StringBuilder sb;
+    char* res = iCluige.iStringBuilder.stringAlloc(&sb, maxSize);
+    //same as append() :
+    va_list args;
+    va_start(args, formattedTail);
+    sbr__append_from_args(&sb, formattedTail, args);
+    va_end(args);
+    return res;
 }
 
 //char** sbr_split(const char* text, const char* separator, int* outNbSegments)
@@ -110,6 +134,8 @@ void iiStringBuilderInit()
     iCluige.iStringBuilder.connectExistingString = sbr_connectExistingString;
     iCluige.iStringBuilder.append = sbr_append;
     iCluige.iStringBuilder.replace = sbr_replace;
+    iCluige.iStringBuilder.stack_to_heap = sbr_stack_to_heap;
+    iCluige.iStringBuilder.formatted_to_heap = sbr_formatted_to_heap;
     //iCluige.iStringBuilder.split = sbr_split;
 
     //+1 because of truncated results of log10

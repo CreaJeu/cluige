@@ -19,7 +19,7 @@ enum _VariantType
     VT_FLOAT,
     VT_DOUBLE,
     VT_POINTER
-    //TODO : Cell, Deque, Map
+    //TODO : Cell, Deque, Map, char*?
 };
 
 union _Variant

@@ -5,10 +5,6 @@
 #include <assert.h>
 #include <stdarg.h>
 
-//Variant makeVariant(VariantType T, ...)
-//{
-//
-//}
 
 ////////////////////////////////// iiDeque /////////
 
@@ -236,6 +232,14 @@ static void dq_clear(Deque* thisDeque)
     thisDeque->_frontI = 0;//useless unless maybe for debug
 }
 
+
+//search
+
+//static int (*find)(const Deque* thisDeque, ...)
+//{
+//
+//}
+
 ////////////////////////////////// iDeque /////////
 
 void iiDequeInit()
@@ -255,5 +259,6 @@ void iiDequeInit()
     iCluige.iDeque.pop_front = dq_pop_front;
     iCluige.iDeque.remove = dq_remove;
     iCluige.iDeque.clear = dq_clear;
+//    iCluige.iDeque.find = dq_find;
 }
 

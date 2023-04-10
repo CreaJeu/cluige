@@ -28,6 +28,14 @@ struct iiStringBuilder
 	//void replace(StringBuilder* sb, const char* formattedTail, ...)
 	void (*replace)(StringBuilder* sb, const char* formattedTail, ...);
 
+	//shortcut function to use stringAlloc+append
+	//source can be allocated on stack
+	//user is responsible to free the returned char*
+	//char* stack_to_heap(const char* source)
+	//char* formatted_to_heap(size_t maxSize, const char* formattedTail, ...)
+	char* (*stack_to_heap)(const char* source);
+	char* (*formatted_to_heap)(size_t maxSize, const char* formattedTail, ...);
+
 //	//utility function, like java String.split()
 //	//does all malloc's to build the result
 //	//char** split(const char* text, char separator);

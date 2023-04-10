@@ -40,7 +40,8 @@ static void vct2_computeLineEquation(const Vector2* v1, const Vector2* v2, float
 
 static float vct2_length(const Vector2* v)
 {
-	return sqrtf(v->x * v->x + v->y * v->y);
+	//return sqrtf(v->x * v->x + v->y * v->y);
+	return hypotf(v->x, v->y);
 }
 
 static float vct2_length_squared(const Vector2* v)

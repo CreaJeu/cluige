@@ -3,6 +3,12 @@
 
 #include "../Deque.h"
 
+//"keys" may be:
+// - characters like 'a' or ' '
+// - other buttons represented by KEY_... constants from curses.h
+//   (KEY_LEFT, KEY_RIGHT, KEY_ENTER, KEY_END...)
+//Those are values returned by curses getch()
+
 struct _InputAction
 {
     char* name;

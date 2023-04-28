@@ -141,7 +141,7 @@ static struct _Input* inp_newInput()
 static struct _InputAction* inp__newAction(char* name)
 {
     struct _InputAction* newAction = iCluige.checkedMalloc(sizeof(struct _InputAction));
-    newAction->name = iCluige.iStringBuilder.stack_to_heap(name);
+    newAction->name = iCluige.iStringBuilder.clone(name);
     newAction->nb_pressed = 0;
 //    newAction->just_pressed = false;
 //    newAction->just_released = false;

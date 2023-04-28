@@ -55,7 +55,7 @@ static void sbr_replace(StringBuilder* sb, const char* formattedTail, ...)
     va_end(args);
 }
 
-static char* sbr_stack_to_heap(const char* source)
+static char* sbr_clone(const char* source)
 {
 //    StringBuilder sb;
 //    char* res = iCluige.iStringBuilder.stringAlloc(&sb, strlen(source));
@@ -65,7 +65,7 @@ static char* sbr_stack_to_heap(const char* source)
     return res;
 }
 
-static char* sbr_formatted_to_heap(size_t maxSize, const char* formattedTail, ...)
+static char* sbr_clone_formatted(size_t maxSize, const char* formattedTail, ...)
 {
     StringBuilder sb;
     char* res = iCluige.iStringBuilder.stringAlloc(&sb, maxSize);
@@ -134,8 +134,8 @@ void iiStringBuilderInit()
     iCluige.iStringBuilder.connectExistingString = sbr_connectExistingString;
     iCluige.iStringBuilder.append = sbr_append;
     iCluige.iStringBuilder.replace = sbr_replace;
-    iCluige.iStringBuilder.stack_to_heap = sbr_stack_to_heap;
-    iCluige.iStringBuilder.formatted_to_heap = sbr_formatted_to_heap;
+    iCluige.iStringBuilder.clone = sbr_clone;
+    iCluige.iStringBuilder.clone_formatted = sbr_clone_formatted;
     //iCluige.iStringBuilder.split = sbr_split;
 
     //+1 because of truncated results of log10

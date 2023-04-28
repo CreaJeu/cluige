@@ -31,10 +31,10 @@ struct iiStringBuilder
 	//shortcut function to use stringAlloc+append
 	//source can be allocated on stack
 	//user is responsible to free the returned char*
-	//char* stack_to_heap(const char* source)
-	//char* formatted_to_heap(size_t maxSize, const char* formattedTail, ...)
-	char* (*stack_to_heap)(const char* source);
-	char* (*formatted_to_heap)(size_t maxSize, const char* formattedTail, ...);
+	//char* clone(const char* source)
+	//char* clone_formatted(size_t maxSize, const char* formattedTail, ...)
+	char* (*clone)(const char* source);
+	char* (*clone_formatted)(size_t maxSize, const char* formattedTail, ...);
 
 //	//utility function, like java String.split()
 //	//does all malloc's to build the result

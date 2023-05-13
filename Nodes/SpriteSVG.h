@@ -12,6 +12,8 @@ struct _SpriteSVG
     //Node2D.position - offset
     Vector2 offset;
 
+    Vector2 scale;//tmp before general Node2D scale
+
     Deque paths;//all paths of the svg Deque<Deque<Vector2*>* >
 
 	//private
@@ -34,6 +36,8 @@ struct iiSpriteSVG
 
 	//copies the points from the array
 	void (*add_path_from_array)(SpriteSVG*, Vector2*, int nbPoints);
+	//copies the points from the array
+	void (*add_path_from_array_relative)(SpriteSVG*, Vector2*, int nbPoints);
 };
 //iSpriteSVG : in iiCluige
 

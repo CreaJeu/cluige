@@ -64,6 +64,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Nodes/Node2D.h" />
+		<Unit filename="Nodes/SpriteSVG.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Nodes/SpriteSVG.h" />
 		<Unit filename="Nodes/SpriteText.c">
 			<Option compilerVar="CC" />
 		</Unit>

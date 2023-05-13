@@ -54,6 +54,7 @@ void cluigeInit()
     iiNode2DInit();
     iiSpriteTextInit();
     iiLineDrawerThin_init();
+    iiSpriteSVGInit();
 
     iiClockInit();
     iCluige.clock = iCluige.iClock.newClock();

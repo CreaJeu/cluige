@@ -140,9 +140,9 @@ void iiLineDrawerThin_init()
     iCluige.iLineDrawerThin.hasFinished = ldt_hasFinished;
     iCluige.iLineDrawerThin.next = ldt_next;
     iCluige.iLineDrawerThin.glyph = ldt_glyph;
-    iCluige.iLineDrawerThin.glyphs[0] = "|";
-    iCluige.iLineDrawerThin.glyphs[1] = "/";
+    iCluige.iLineDrawerThin.glyphs[0] = ":";
+    iCluige.iLineDrawerThin.glyphs[1] = ",";// "/";
     iCluige.iLineDrawerThin.glyphs[2] = "-";
-    iCluige.iLineDrawerThin.glyphs[3] = "\\";
+    iCluige.iLineDrawerThin.glyphs[3] = "`";//"\\";
 }
 

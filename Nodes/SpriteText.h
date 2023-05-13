@@ -8,7 +8,7 @@ typedef struct _SpriteText SpriteText;
 struct _SpriteText
 {
     //first character of first line will be drawn at
-    //Node2D.position + offset
+    //Node2D.position - offset
     Vector2 offset;
 
     //char** text;//array of text lines, the ASCII art / unicode art

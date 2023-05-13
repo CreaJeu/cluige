@@ -44,6 +44,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Deque.h" />
+		<Unit filename="LineDrawerThin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="LineDrawerThin.h" />
 		<Unit filename="Node.c">
 			<Option compilerVar="CC" />
 		</Unit>

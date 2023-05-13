@@ -53,6 +53,7 @@ void cluigeInit()
     iiVector2Init();
     iiNode2DInit();
     iiSpriteTextInit();
+    iiLineDrawerThin_init();
 
     iiClockInit();
     iCluige.clock = iCluige.iClock.newClock();

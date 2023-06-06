@@ -6,29 +6,29 @@
 struct _Clock
 {
 	float scale;
-	float elapsedSeconds;
+	float elapsed_seconds;
 
 	//private
-	clock_t _lastTick;
-	Node* _thisNode;
+	clock_t _last_tick;
+	Node* _this_Node;
 
 	//virtual methods
-	void (*deleteNode)(Node*);
-	//in .c : void (*deleteClock)(Node*);
+	void (*delete_Node)(Node*);
+	//in .c : void (*delete_Clock)(Node*);
 
-	//in .c : void (*preProcessClock)(Node*);
+	//in .c : void (*preprocess_Clock)(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiClock
 {
-	//Clock* newClock()
-	struct _Clock* (*newClock)();
+	//Clock* new_Clock()
+	struct _Clock* (*new_Clock)();
 };
 //iClock : in iiCluige
 
-//to be called only by cluigeInit() to set iNode functions pointers
-void iiClockInit();
+//to be called only by cluige_init() to set iNode functions pointers
+void iiClock_init();
 
 
 #endif // CLOCK_H_INCLUDED

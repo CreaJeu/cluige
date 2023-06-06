@@ -37,20 +37,20 @@ struct _Input
     Deque just_released_keys;//Deque<InputKey>
 
 	//private
-	Node* _thisNode;
+	Node* _this_Node;
 
 	//virtual methods
-	void (*deleteNode)(Node*);
-	//in .c : void (*deleteInput)(Node*);
-	//in .c : void (*preProcessInput)(Node*);
+	void (*delete_Node)(Node*);
+	//in .c : void (*delete_Input)(Node*);
+	//in .c : void (*pre_process_Input)(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiInput
 {
-	//Input* newInput()
-	struct _Input* (*newInput)();
-//	struct _InputAction* (*newAction)(const char* name);
+	//Input* new_Input()
+	struct _Input* (*new_Input)();
+//	struct _InputAction* (*new_Action)(const char* name);
 //	struct _InputKey* (*newKey)(int charVal);
 
     //action_name will be copied, can be freed afterward or stack allocated
@@ -64,8 +64,8 @@ struct iiInput
 };
 //iInput : in iiCluige
 
-//to be called only by cluigeInit() to set iNode functions pointers
-void iiInputInit();
+//to be called only by cluige_init() to set iNode functions pointers
+void iiInput_init();
 
 
 #endif // INPUT_H_INCLUDED

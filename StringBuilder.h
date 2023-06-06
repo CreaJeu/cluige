@@ -5,9 +5,9 @@ typedef struct _StringBuilder StringBuilder;
 
 struct _StringBuilder
 {
-    char* builtString;
-    size_t remainingSize;
-	char* nextChar;
+    char* built_string;
+    size_t remaining_size;
+	char* next_char;
 };
 
 //~namespace
@@ -16,25 +16,25 @@ struct iiStringBuilder
     int DECIMAL_DIGITS_FOR_INT;
     int DECIMAL_DIGITS_FOR_POINTER;
 
-    //char* stringAlloc(StringBuilder* sb, size_t maxSize)
-	char* (*stringAlloc)(StringBuilder* sb, size_t maxSize);
+    //char* string_alloc(StringBuilder* sb, size_t max_size)
+	char* (*string_alloc)(StringBuilder* sb, size_t max_size);
 
-	//void connectExistingString(StringBuilder* sb, char* dest)
-	void (*connectExistingString)(StringBuilder* sb, char* dest);
+	//void connect_existing_string(StringBuilder* sb, char* dest)
+	void (*connect_existing_string)(StringBuilder* sb, char* dest);
 
-	//void append(StringBuilder* sb, const char* formattedTail, ...)
-	void (*append)(StringBuilder* sb, const char* formattedTail, ...);
+	//void append(StringBuilder* sb, const char* formatted_tail, ...)
+	void (*append)(StringBuilder* sb, const char* formatted_tail, ...);
 
-	//void replace(StringBuilder* sb, const char* formattedTail, ...)
-	void (*replace)(StringBuilder* sb, const char* formattedTail, ...);
+	//void replace(StringBuilder* sb, const char* formatted_tail, ...)
+	void (*replace)(StringBuilder* sb, const char* formatted_tail, ...);
 
-	//shortcut function to use stringAlloc+append
+	//shortcut function to use string_alloc+append
 	//source can be allocated on stack
 	//user is responsible to free the returned char*
 	//char* clone(const char* source)
-	//char* clone_formatted(size_t maxSize, const char* formattedTail, ...)
+	//char* clone_formatted(size_t max_size, const char* formatted_tail, ...)
 	char* (*clone)(const char* source);
-	char* (*clone_formatted)(size_t maxSize, const char* formattedTail, ...);
+	char* (*clone_formatted)(size_t max_size, const char* formatted_tail, ...);
 
 //	//utility function, like java String.split()
 //	//does all malloc's to build the result
@@ -44,7 +44,7 @@ struct iiStringBuilder
 };
 //iStringBuilder : in iiCluige
 
-//to be called only by cluigeInit() to set iStringBuilder functions pointers
-void iiStringBuilderInit();
+//to be called only by cluige_init() to set iStringBuilder functions pointers
+void iiStringBuilder_init();
 
 #endif // STRINGBUILDER_H_INCLUDED

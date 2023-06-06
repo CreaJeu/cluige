@@ -11,30 +11,30 @@
 
 ////////////////////////////////// _SpriteText /////////
 
-static void sprtx_deleteSpriteText(Node* thisNode)
+static void sprtx_delete_SpriteText(Node* this_Node)
 {
-    Node2D* thisNode2D = (Node2D*)(thisNode->_subClass);
-    SpriteText* thisSpriteText = (SpriteText*)(thisNode2D->_subClass);
-    void (*deleteNode2D)(Node*) = thisSpriteText->deleteNode2D;
-//    for(int i=0; i<thisSpriteText->nbLines; i++)
+    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+    SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
+    void (*delete_Node2D)(Node*) = this_SpriteText->delete_Node2D;
+//    for(int i=0; i<this_SpriteText->nb_lines; i++)
 //    {
-//        free(thisSpriteText->text[i]);
+//        free(this_SpriteText->text[i]);
 //    }
-    free(thisSpriteText->text);
-    assert(thisSpriteText->_subClass == NULL);
-    free(thisSpriteText);
-    thisNode2D->_subClass = NULL;
-    deleteNode2D(thisNode);
+    free(this_SpriteText->text);
+    assert(this_SpriteText->_sub_class == NULL);
+    free(this_SpriteText);
+    this_Node2D->_sub_class = NULL;
+    delete_Node2D(this_Node);
 }
 
-static void sprtx_preProcessNode(Node* thisNode)
+static void sprtx_pre_process_Node(Node* this_Node)
 {
-    Node2D* thisNode2D = (Node2D*)(thisNode->_subClass);
-    SpriteText* thisSpriteText = (SpriteText*)(thisNode2D->_subClass);
+    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+    SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
     //call super()
-    thisSpriteText->preProcessNode2D(thisNode);
+    this_SpriteText->pre_process_Node2D(this_Node);
 
-    if(!(thisNode2D->visible))
+    if(!(this_Node2D->visible))
     {
         return;
     }
@@ -44,39 +44,39 @@ static void sprtx_preProcessNode(Node* thisNode)
     //and curses already has characters cache)
     Vector2 orig;
     iCluige.iVector2.substract(
-            &(thisNode2D->_tmpGlobalPosition),
-            &(thisSpriteText->offset),
+            &(this_Node2D->_tmp_global_position),
+            &(this_SpriteText->offset),
             &orig);
-    int flatI = 0;
-    for(int line = 0; line < thisSpriteText->nbLines; line++)
+    int flat_i = 0;
+    for(int line = 0; line < this_SpriteText->nb_lines; line++)
     {
         int col = 0;
-        //char* lineString = (char*)(thisSpriteText->text[line]);
-        //char currChar = lineString[col];
-        char currChar = thisSpriteText->text[flatI];
-        while(currChar != 0)
+        //char* lineString = (char*)(this_SpriteText->text[line]);
+        //char curr_char = lineString[col];
+        char curr_char = this_SpriteText->text[flat_i];
+        while(curr_char != 0)
         {
-            if(currChar != ' ')
+            if(curr_char != ' ')
             {
                 mvaddch(lrintf(orig.y) + line, lrintf(orig.x) + col, ' ');
             }
             col++;
-            //currChar = lineString[col];
-            flatI++;
-            currChar = thisSpriteText->text[flatI];
+            //curr_char = lineString[col];
+            flat_i++;
+            curr_char = this_SpriteText->text[flat_i];
         }
-        flatI++;
+        flat_i++;
     }
 }
 
-static void sprtx_postProcessNode(Node* thisNode)
+static void sprtx_post_process_Node(Node* this_Node)
 {
-    Node2D* thisNode2D = (Node2D*)(thisNode->_subClass);
-    SpriteText* thisSpriteText = (SpriteText*)(thisNode2D->_subClass);
+    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+    SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
     //call super()
-    thisSpriteText->postProcessNode2D(thisNode);
+    this_SpriteText->post_process_Node2D(this_Node);
 
-    if(!(thisNode2D->visible))
+    if(!(this_Node2D->visible))
     {
         return;
     }
@@ -84,88 +84,88 @@ static void sprtx_postProcessNode(Node* thisNode)
     //draw new one
     Vector2 orig;
     iCluige.iVector2.substract(
-            &(thisNode2D->_tmpGlobalPosition),
-            &(thisSpriteText->offset),
+            &(this_Node2D->_tmp_global_position),
+            &(this_SpriteText->offset),
             &orig);
-    char* lineString = thisSpriteText->text;
-    for(int line = 0; line < thisSpriteText->nbLines; line++)
+    char* line_string = this_SpriteText->text;
+    for(int line = 0; line < this_SpriteText->nb_lines; line++)
     {
-        //mvaddstr(orig.y + line, orig.x, (char*)(thisSpriteText->text[line]));
-        mvaddstr(lrintf(orig.y) + line, lrintf(orig.x), lineString);
-        lineString += strlen(lineString) + 1;
+        //mvaddstr(orig.y + line, orig.x, (char*)(this_SpriteText->text[line]));
+        mvaddstr(lrintf(orig.y) + line, lrintf(orig.x), line_string);
+        line_string += strlen(line_string) + 1;
     }
 }
 
 
 ////////////////////////////////// iiSpriteText /////////
 
-static SpriteText* sprtx_newSpriteText()
+static SpriteText* sprtx_new_SpriteText()
 {
-	Node2D* newNode2D = iCluige.iNode2D.newNode2D();
-	Node* newNode = newNode2D->_thisNode;
-    SpriteText* newSpriteText = iCluige.checkedMalloc(sizeof(SpriteText));
+	Node2D* new_Node2D = iCluige.iNode2D.new_Node2D();
+	Node* new_Node = new_Node2D->_this_Node;
+    SpriteText* new_SpriteText = iCluige.checked_malloc(sizeof(SpriteText));
 
-    newSpriteText->offset = (Vector2) { 0., 0. };
-    newSpriteText->text = NULL;//the ASCII art / unicode art
-    newSpriteText->nbLines = 0;
-	newSpriteText->_thisNode2D = newNode2D;
-	newSpriteText->_subClass = NULL;
-	newSpriteText->deleteNode2D = newNode->deleteNode;
-	newSpriteText->preProcessNode2D = newNode->preProcessNode;
-	newSpriteText->postProcessNode2D = newNode->postProcessNode;
+    new_SpriteText->offset = (Vector2) { 0., 0. };
+    new_SpriteText->text = NULL;//the ASCII art / unicode art
+    new_SpriteText->nb_lines = 0;
+	new_SpriteText->_this_Node2D = new_Node2D;
+	new_SpriteText->_sub_class = NULL;
+	new_SpriteText->delete_Node2D = new_Node->delete_Node;
+	new_SpriteText->pre_process_Node2D = new_Node->pre_process_Node;
+	new_SpriteText->post_process_Node2D = new_Node->post_process_Node;
 
-    newNode2D->_subClass = newSpriteText;
+    new_Node2D->_sub_class = new_SpriteText;
 
-    free(newNode->_className); //TODO static value to avoid free
+    free(new_Node->_class_name); //TODO static value to avoid free
     StringBuilder sb;
-    newNode->_className = iCluige.iStringBuilder.stringAlloc(
+    new_Node->_class_name = iCluige.iStringBuilder.string_alloc(
             &sb, strlen("NodeNode2DSpriteText"));
     iCluige.iStringBuilder.append(&sb, "NodeNode2DSpriteText");
-    newNode2D->_subClass = newSpriteText;
+    new_Node2D->_sub_class = new_SpriteText;
 
-    newNode->deleteNode = sprtx_deleteSpriteText;
-    newNode->preProcessNode = sprtx_preProcessNode;
-    newNode->postProcessNode = sprtx_postProcessNode;
+    new_Node->delete_Node = sprtx_delete_SpriteText;
+    new_Node->pre_process_Node = sprtx_pre_process_Node;
+    new_Node->post_process_Node = sprtx_post_process_Node;
 
-    return newSpriteText;
+    return new_SpriteText;
 }
 
-static void sprtx_setText(SpriteText* thisSpriteText, const char* newText)
+static void sprtx_set_text(SpriteText* this_SpriteText, const char* new_text)
 {
-    if(thisSpriteText->text != NULL)
+    if(this_SpriteText->text != NULL)
     {
-//        for(int i=0; i<thisSpriteText->nbLines; i++)
+//        for(int i=0; i<this_SpriteText->nb_lines; i++)
 //        {
-//            free(thisSpriteText->text[i]);
+//            free(this_SpriteText->text[i]);
 //        }
-        free(thisSpriteText->text);
+        free(this_SpriteText->text);
     }
-//    thisSpriteText->text =
-//        iCluige.iStringBuilder.split(newText, "\n", &(thisSpriteText->nbLines));
-    int totalLength = strlen(newText);
-    thisSpriteText->nbLines = 0;
+//    this_SpriteText->text =
+//        iCluige.iStringBuilder.split(new_text, "\n", &(this_SpriteText->nb_lines));
+    int total_length = strlen(new_text);
+    this_SpriteText->nb_lines = 0;
     StringBuilder sb;
-    thisSpriteText->text = iCluige.iStringBuilder.stringAlloc(&sb, strlen(newText));
-    iCluige.iStringBuilder.append(&sb, newText);
-    for(int i=0; i<totalLength; i++)
+    this_SpriteText->text = iCluige.iStringBuilder.string_alloc(&sb, total_length);
+    iCluige.iStringBuilder.append(&sb, new_text);
+    for(int i=0; i<total_length; i++)
     {
-        if(newText[i] == '\n')
+        if(new_text[i] == '\n')
         {
-            thisSpriteText->text[i] = '\0';
-            thisSpriteText->nbLines++;
+            this_SpriteText->text[i] = '\0';
+            this_SpriteText->nb_lines++;
         }
     }
-    if(totalLength > 0)
+    if(total_length > 0)
     {
-        thisSpriteText->nbLines++;
+        this_SpriteText->nb_lines++;
     }
 }
 
 /////////////////////////////////// Node //////////
 
-void iiSpriteTextInit()
+void iiSpriteText_init()
 {
-    iCluige.iSpriteText.newSpriteText = sprtx_newSpriteText;
-    iCluige.iSpriteText.setText = sprtx_setText;
+    iCluige.iSpriteText.new_SpriteText = sprtx_new_SpriteText;
+    iCluige.iSpriteText.set_text = sprtx_set_text;
 }
 

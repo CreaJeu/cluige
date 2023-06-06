@@ -6,29 +6,29 @@
 
 /////////////////////////////////// iiLineDrawerThin //////////
 
-void ldt_start(struct _LineDrawerThin* drawer, const Vector2* vStart, const Vector2* vEnd)
+void ldt_start(struct _LineDrawerThin* drawer, const Vector2* v_start, const Vector2* v_end)
 {
-    drawer->current_position = *vStart;
-    drawer->_start_position = *vStart;
-    drawer->_end_position = *vEnd;
+    drawer->current_position = *v_start;
+    drawer->_start_position = *v_start;
+    drawer->_end_position = *v_end;
 
     drawer->_abs_amplitude.x = fabsf(drawer->_end_position.x - drawer->_start_position.x);
     drawer->_abs_amplitude.y = fabsf(drawer->_end_position.y - drawer->_start_position.y);
 
-    iCluige.iVector2.computeLineEquation(&(drawer->_start_position), &(drawer->_end_position), &(drawer->_a), &(drawer->_b), &(drawer->_c));
+    iCluige.iVector2.compute_line_equation(&(drawer->_start_position), &(drawer->_end_position), &(drawer->_a), &(drawer->_b), &(drawer->_c));
 
     // Compute amplitude vector
-    Vector2 amplitudeVector;
-    iCluige.iVector2.substract(vEnd, vStart, &amplitudeVector);
+    Vector2 amplitude_vector;
+    iCluige.iVector2.substract(v_end, v_start, &amplitude_vector);
 
-    drawer->_steep = fabsf(amplitudeVector.x) < fabsf(amplitudeVector.y);
+    drawer->_steep = fabsf(amplitude_vector.x) < fabsf(amplitude_vector.y);
 
     // Compute lateral increments
     if (drawer->_steep)
     {
         drawer->_lateral_incr.x = 0;
-        drawer->_glyphIndex = 0;
-        if (amplitudeVector.y < 0)
+        drawer->_glyph_index = 0;
+        if (amplitude_vector.y < 0)
         {
             drawer->_lateral_incr.y = -1;
         }
@@ -40,8 +40,8 @@ void ldt_start(struct _LineDrawerThin* drawer, const Vector2* vStart, const Vect
     else
     {
         drawer->_lateral_incr.y = 0;
-        drawer->_glyphIndex = 2;
-        if (amplitudeVector.x < 0)
+        drawer->_glyph_index = 2;
+        if (amplitude_vector.x < 0)
         {
             drawer->_lateral_incr.x = -1;
         }
@@ -52,7 +52,7 @@ void ldt_start(struct _LineDrawerThin* drawer, const Vector2* vStart, const Vect
     }
 
     // Compute diagonal increments
-    if (amplitudeVector.x < 0)
+    if (amplitude_vector.x < 0)
     {
         drawer->_diagonal_incr.x = -1;
     }
@@ -61,7 +61,7 @@ void ldt_start(struct _LineDrawerThin* drawer, const Vector2* vStart, const Vect
         drawer->_diagonal_incr.x = 1;
     }
 
-    if (amplitudeVector.y < 0)
+    if (amplitude_vector.y < 0)
     {
         drawer->_diagonal_incr.y = -1;
     }
@@ -71,7 +71,7 @@ void ldt_start(struct _LineDrawerThin* drawer, const Vector2* vStart, const Vect
     }
 }
 
-bool ldt_hasFinished(struct _LineDrawerThin* drawer)
+bool ldt_has_finished(struct _LineDrawerThin* drawer)
 {
     // Projection Y
     if(drawer->_steep)
@@ -102,11 +102,11 @@ void ldt_next(struct _LineDrawerThin* drawer)
         drawer->curr_dist = distance_lateral;
         if(drawer->_steep)
         {
-            drawer->_glyphIndex = 0;
+            drawer->_glyph_index = 0;
         }
         else
         {
-            drawer->_glyphIndex = 2;
+            drawer->_glyph_index = 2;
         }
     }
     else
@@ -117,18 +117,18 @@ void ldt_next(struct _LineDrawerThin* drawer)
         float incr_y_sign = copysignf(1.0, drawer->_diagonal_incr.y);
         if(incr_x_sign == incr_y_sign)
         {
-            drawer->_glyphIndex = 3;
+            drawer->_glyph_index = 3;
         }
         else
         {
-            drawer->_glyphIndex = 1;
+            drawer->_glyph_index = 1;
         }
     }
 }
 
 const char* ldt_glyph(struct _LineDrawerThin* drawer)
 {
-    return iCluige.iLineDrawerThin.glyphs[drawer->_glyphIndex];
+    return iCluige.iLineDrawerThin.glyphs[drawer->_glyph_index];
 }
 
 
@@ -137,7 +137,7 @@ const char* ldt_glyph(struct _LineDrawerThin* drawer)
 void iiLineDrawerThin_init()
 {
     iCluige.iLineDrawerThin.start = ldt_start;
-    iCluige.iLineDrawerThin.hasFinished = ldt_hasFinished;
+    iCluige.iLineDrawerThin.has_finished = ldt_has_finished;
     iCluige.iLineDrawerThin.next = ldt_next;
     iCluige.iLineDrawerThin.glyph = ldt_glyph;
     iCluige.iLineDrawerThin.glyphs[0] = ":";

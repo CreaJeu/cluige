@@ -8,26 +8,26 @@ struct _Script
 	Node* node;
 
 	//for inheritance
-	//char* _className;
-	void* _subClass;
+	//char* _class_name;
+	void* _sub_class;
 
 	//virtual methods
-	void (*deleteScript)(Script*);
+	void (*delete_Script)(Script*);
 	void (*ready)(Script*);
-	//TODO enterTree()
-	void (*process)(Script* thisScript, float delta);
+	//TODO enter_tree()
+	void (*process)(Script* this_Script, float delta);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiScript
 {
-	//Script* newScript(Node* node)
-	Script* (*newScript)(Node* node);
+	//Script* new_Script(Node* node)
+	Script* (*new_Script)(Node* node);
 };
 //iScript : in iiCluige
 
-//to be called only by cluigeInit() to set iNode functions pointers
-void iiScriptInit();
+//to be called only by cluige_init() to set iNode functions pointers
+void iiScript_init();
 
 
 #endif // SCRIPT_H_INCLUDED

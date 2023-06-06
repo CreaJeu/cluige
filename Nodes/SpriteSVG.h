@@ -17,32 +17,32 @@ struct _SpriteSVG
     Deque paths;//all paths of the svg Deque<Deque<Vector2*>* >
 
 	//private
-	Node2D* _thisNode2D;
-	void* _subClass;
+	Node2D* _this_Node2D;
+	void* _sub_class;
 
 	//virtual methods
-	void (*deleteNode2D)(Node*);
-	void (*preProcessNode2D)(Node*);
-	void (*postProcessNode2D)(Node*);
-	//in .c : void preProcessNode(Node*);
-	//in .c : void postProcessNode(Node*);
+	void (*delete_Node2D)(Node*);
+	void (*pre_process_Node2D)(Node*);
+	void (*post_process_Node2D)(Node*);
+	//in .c : void pre_process_Node(Node*);
+	//in .c : void post_process_Node(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiSpriteSVG
 {
-	//SpriteSVG* newSpriteSVG()
-	SpriteSVG* (*newSpriteSVG)();
+	//SpriteSVG* new_SpriteSVG()
+	SpriteSVG* (*new_SpriteSVG)();
 
 	//copies the points from the array
-	void (*add_path_from_array)(SpriteSVG*, Vector2*, int nbPoints);
+	void (*add_path_from_array)(SpriteSVG*, Vector2*, int nb_points);
 	//copies the points from the array
-	void (*add_path_from_array_relative)(SpriteSVG*, Vector2*, int nbPoints);
+	void (*add_path_from_array_relative)(SpriteSVG*, Vector2*, int nb_points);
 };
 //iSpriteSVG : in iiCluige
 
-//to be called only by cluigeInit() to set iNode functions pointers
-void iiSpriteSVGInit();
+//to be called only by cluige_init() to set iNode functions pointers
+void iiSpriteSVG_init();
 
 
 #endif // SPRITE_SVG_H_INCLUDED

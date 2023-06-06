@@ -39,29 +39,29 @@ struct iiCluige
 	struct iiSpriteSVG iSpriteSVG;
 
 	//for target FPS, 15 fps by default
-	float wantedFrameSeconds;
+	float wanted_frame_seconds;
 
 	//to quit a game
-	bool quitAsked;
+	bool quit_asked;
 
 	//for cluige nodes like clock
-	Node* privateRoot2D;
+	Node* private_root_2D;
 
 	//for user nodes
-	Node* publicRoot2D;
+	Node* public_root_2D;
 
-	//void* checkedMalloc(size_t)
-	void* (*checkedMalloc)(size_t);
+	//void* checked_malloc(size_t)
+	void* (*checked_malloc)(size_t);
 
-//	Vector2 getScreenSize();
-	Vector2 (*getScreenSize)();
+//	Vector2 get_screen_size();
+	Vector2 (*get_screen_size)();
 };
 extern struct iiCluige iCluige;
 
-void cluigeInit();
+void cluige_init();
 
-void cluigeRun();
+void cluige_run();
 
-int cluigeFinish();
+int cluige_finish();
 
 #endif // CLUIGE_H_INCLUDED

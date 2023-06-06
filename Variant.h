@@ -39,11 +39,11 @@ union _Variant
 
 struct iiVariant
 {
-    Variant (*fromVal)(VariantType valType, ...);
-    Variant (*fromArgs)(VariantType valType, va_list args);
-    int (*compare)(VariantType valType, Variant v1, Variant v2);//like in java
+    Variant (*from_val)(VariantType val_type, ...);
+    Variant (*from_args)(VariantType val_type, va_list args);
+    int (*compare)(VariantType val_type, Variant v1, Variant v2);//like in java
 };
 
-void iiVariantInit();
+void iiVariant_init();
 
 #endif //VARIANT_H_INCLUDED

@@ -10,28 +10,28 @@ struct _Node
 {
 	// ... position/transform
 	Node* parent;
-	Node* nextSibling;
+	Node* next_sibling;
 	Node* children;
 	Script* script;
-	char* name;//must not point to the stack, see setName()
+	char* name;//must not point to the stack, see set_name()
 	bool active;
 
 	//TODO : get child by name, get node by path, _draw, queue_free
 
 	//private
-	bool _alreadyEnteredTree;
+	bool _already_entered_tree;
 
 	//for inheritance
-	char* _className;
-	void* _subClass;
+	char* _class_name;
+	void* _sub_class;
 
 	//virtual methods
-	void (*deleteNode)(Node*);
-	void (*enterTree)(Node*);
-	void (*onLoopStarting)(Node*);
-	void (*preProcessNode)(Node*);
-	void (*processNode)(Node*);
-	void (*postProcessNode)(Node*);
+	void (*delete_Node)(Node*);
+	void (*enter_tree)(Node*);
+	void (*on_loop_starting)(Node*);
+	void (*pre_process_Node)(Node*);
+	void (*process_Node)(Node*);
+	void (*post_process_Node)(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
@@ -40,37 +40,37 @@ struct iiNode
     //void initZero(Node* node)
 //	void (*initZero)(Node*);// no : would encourage not freeable nodes on the stack
 
-	//Node* newNode()
-	Node* (*newNode)();
+	//Node* new_Node()
+	Node* (*new_Node)();
 
-	//void deleteNode(Node*)
-	//void (*deleteNode)(Node*); //see struct _Node (virtual method)
+	//void delete_Node(Node*)
+	//void (*delete_Node)(Node*); //see struct _Node (virtual method)
 
-	//int getIndex(Node*)
-	int (*getIndex)(const Node*);
+	//int get_index(Node*)
+	int (*get_index)(const Node*);
 
-	//int getDepth(Node*)
-	int (*getDepth)(const Node*);
+	//int get_depth(Node*)
+	int (*get_depth)(const Node*);
 
-	//use setName(n, "bob") instead of n->name = "bob"
+	//use set_name(n, "bob") instead of n->name = "bob"
 	//previous name is automatically freed
-	//void setName(Node*, char* newName)
-	void (*setName)(Node*, const char* newName);
+	//void set_name(Node*, char* new_name)
+	void (*set_name)(Node*, const char* new_name);
 
 	//asserts that wanted child doesn't have already a parent
-	//void addChild(Node* p, Node* c)
-	void (*addChild)(Node* p, Node* c);
+	//void add_child(Node* p, Node* c)
+	void (*add_child)(Node* p, Node* c);
 
-	//void printTreePretty(Node*)
-	void (*printTreePretty)(const Node*);
+	//void print_tree_pretty(Node*)
+	void (*print_tree_pretty)(const Node*);
 
 	//TODO removeChild()
 	//TODO queueFree()
 };
 //iNode : in iiCluige
 
-//to be called only by cluigeInit() to set iNode functions pointers
-void iiNodeInit();
+//to be called only by cluige_init() to set iNode functions pointers
+void iiNode_init();
 
 
 #endif // NODE_H_INCLUDED

@@ -9,58 +9,58 @@
 
 ////////////////////////////////// _Node2D /////////
 
-static void n2d_deleteNode2D(Node* thisNode)
+static void n2d_delete_Node2D(Node* this_Node)
 {
-    struct _Node2D* thisNode2D = (struct _Node2D*)(thisNode->_subClass);
-    void (*deleteNode)(Node*) = thisNode2D->deleteNode;
-    assert(thisNode2D->_subClass == NULL);
-    free(thisNode2D);
-    thisNode->_subClass = NULL;
-    deleteNode(thisNode);
+    struct _Node2D* this_Node2D = (struct _Node2D*)(this_Node->_sub_class);
+    void (*delete_Node)(Node*) = this_Node2D->delete_Node;
+    assert(this_Node2D->_sub_class == NULL);
+    free(this_Node2D);
+    this_Node->_sub_class = NULL;
+    delete_Node(this_Node);
 }
 
-static void n2d_preProcessNode(Node* thisNode)
+static void n2d_pre_process_Node(Node* this_Node)
 {
-    Node2D* thisNode2D = (Node2D*)(thisNode->_subClass);
-    thisNode2D->_localPositionChanged = false;
+    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+    this_Node2D->_local_position_changed = false;
 }
 
-static void n2d_postProcessNode(Node* thisNode)
+static void n2d_post_process_Node(Node* this_Node)
 {
-    Node2D* thisNode2D = (Node2D*)(thisNode->_subClass);
-    Node* n = thisNode;
-    bool mustUpdateGlobalPos = false;
-    while((n->parent != NULL) && !mustUpdateGlobalPos)
+    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+    Node* n = this_Node;
+    bool must_update_global_pos = false;
+    while((n->parent != NULL) && !must_update_global_pos)
     {
-        void* nSubclass = n->_subClass;
-        if(nSubclass != NULL)
+        void* n_subclass = n->_sub_class;
+        if(n_subclass != NULL)
         {
-            char* found = strstr(n->_className, "NodeNode2D");
-            if(found == n->_className) //n is a Node2D
+            char* found = strstr(n->_class_name, "NodeNode2D");
+            if(found == n->_class_name) //n is a Node2D
             {
-                Node2D* n2d = (Node2D*)(n->_subClass);
-                mustUpdateGlobalPos = n2d->_localPositionChanged;
+                Node2D* n2d = (Node2D*)(n->_sub_class);
+                must_update_global_pos = n2d->_local_position_changed;
             }
         }
         n = n->parent;
     }
-    if(mustUpdateGlobalPos)
+    if(must_update_global_pos)
     {
-        n = thisNode;
-        thisNode2D->_tmpGlobalPosition = (Vector2){0, 0};
+        n = this_Node;
+        this_Node2D->_tmp_global_position = (Vector2){0, 0};
         while(n->parent != NULL)
         {
-            void* nSubclass = n->_subClass;
-            if(nSubclass != NULL)
+            void* n_subclass = n->_sub_class;
+            if(n_subclass != NULL)
             {
-                char* found = strstr(n->_className, "NodeNode2D");
-                if(found == n->_className) //n is a Node2D
+                char* found = strstr(n->_class_name, "NodeNode2D");
+                if(found == n->_class_name) //n is a Node2D
                 {
-                    Node2D* n2d = (Node2D*)(n->_subClass);
+                    Node2D* n2d = (Node2D*)(n->_sub_class);
                     iCluige.iVector2.add(
-                        &(thisNode2D->_tmpGlobalPosition),
+                        &(this_Node2D->_tmp_global_position),
                         &(n2d->position),
-                        &(thisNode2D->_tmpGlobalPosition)
+                        &(this_Node2D->_tmp_global_position)
                         );
                 }
             }
@@ -69,89 +69,89 @@ static void n2d_postProcessNode(Node* thisNode)
     }
 }
 
-static void n2d_enterTreeNode2D(Node* thisNode)
+static void n2d_enter_tree_Node2D(Node* this_Node)
 {
-    struct _Node2D* thisNode2D = (struct _Node2D*)(thisNode->_subClass);
-    thisNode2D->enterTreeNode(thisNode);//calls script.enterTree()
+    struct _Node2D* this_Node2D = (struct _Node2D*)(this_Node->_sub_class);
+    this_Node2D->enter_tree_Node(this_Node);//calls script.enter_tree()
 }
 
-static void n2d_onLoopStartingNode2D(Node* thisNode)
+static void n2d_on_loop_starting_Node2D(Node* this_Node)
 {
-    struct _Node2D* thisNode2D = (struct _Node2D*)(thisNode->_subClass);
-    thisNode2D->_localPositionChanged = true;
-    n2d_postProcessNode(thisNode);//compute _tmpGlobalPosition
+    struct _Node2D* this_Node2D = (struct _Node2D*)(this_Node->_sub_class);
+    this_Node2D->_local_position_changed = true;
+    n2d_post_process_Node(this_Node);//compute _tmp_global_position
 }
 
 
 ////////////////////////////////// iiNode2D /////////
 
-static struct _Node2D* n2d_newNode2D()
+static struct _Node2D* n2d_new_Node2D()
 {
-    Node* newNode = iCluige.iNode.newNode();
-    struct _Node2D* newNode2D = iCluige.checkedMalloc(sizeof(Node2D));
+    Node* new_node = iCluige.iNode.new_Node();
+    struct _Node2D* new_node2D = iCluige.checked_malloc(sizeof(Node2D));
 
-    newNode2D->visible = true;
-    newNode2D->position = (Vector2){0., 0.};
-    newNode2D->_tmpGlobalPosition = (Vector2){0., 0.};
-    newNode2D->_localPositionChanged = false;
+    new_node2D->visible = true;
+    new_node2D->position = (Vector2){0., 0.};
+    new_node2D->_tmp_global_position = (Vector2){0., 0.};
+    new_node2D->_local_position_changed = false;
 
-    newNode2D->_thisNode = newNode;
-    newNode2D->_subClass = NULL;
-    newNode2D->deleteNode = newNode->deleteNode;
-    newNode2D->deleteNode2D = n2d_deleteNode2D;
-    newNode2D->enterTreeNode = newNode->enterTree;
-    newNode->enterTree = n2d_enterTreeNode2D;
+    new_node2D->_this_Node = new_node;
+    new_node2D->_sub_class = NULL;
+    new_node2D->delete_Node = new_node->delete_Node;
+    new_node2D->delete_Node2D = n2d_delete_Node2D;
+    new_node2D->enter_tree_Node = new_node->enter_tree;
+    new_node->enter_tree = n2d_enter_tree_Node2D;
 
-    newNode->_subClass = newNode2D;
+    new_node->_sub_class = new_node2D;
 
-    free(newNode->_className); //TODO static value to avoid free
+    free(new_node->_class_name); //TODO static value to avoid free
     StringBuilder sb;
-    newNode->_className = iCluige.iStringBuilder.stringAlloc(&sb, strlen("NodeNode2D"));
+    new_node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, strlen("NodeNode2D"));
     iCluige.iStringBuilder.append(&sb, "NodeNode2D");
-    newNode->_subClass = newNode2D;
+    new_node->_sub_class = new_node2D;
 
-    newNode->deleteNode = n2d_deleteNode2D;
-    newNode->preProcessNode = n2d_preProcessNode;
-    newNode->postProcessNode = n2d_postProcessNode;
-    newNode->onLoopStarting = n2d_onLoopStartingNode2D;
+    new_node->delete_Node = n2d_delete_Node2D;
+    new_node->pre_process_Node = n2d_pre_process_Node;
+    new_node->post_process_Node = n2d_post_process_Node;
+    new_node->on_loop_starting = n2d_on_loop_starting_Node2D;
 
-    return newNode2D;
+    return new_node2D;
 }
 
-static void n2d_show(Node2D* thisNode2D)
+static void n2d_show(Node2D* this_Node2D)
 {
-    thisNode2D->visible = true;
+    this_Node2D->visible = true;
 }
 
-static void n2d_hide(Node2D* thisNode2D)
+static void n2d_hide(Node2D* this_Node2D)
 {
-    thisNode2D->visible = false;
+    this_Node2D->visible = false;
 }
 
-static void n2d_moveLocal(Node2D* thisNode2D, Vector2 depl)
+static void n2d_move_local(Node2D* this_Node2D, Vector2 depl)
 {
     iCluige.iVector2.add(
-        &(thisNode2D->position),
+        &(this_Node2D->position),
         &(depl),
-        &(thisNode2D->position)
+        &(this_Node2D->position)
         );
-    thisNode2D->_localPositionChanged = true;
+    this_Node2D->_local_position_changed = true;
 }
 
-static void n2d_setLocalPosition(Node2D* thisNode2D, Vector2 newPos)
+static void n2d_set_local_position(Node2D* this_Node2D, Vector2 new_pos)
 {
-    thisNode2D->position = newPos;
-    thisNode2D->_localPositionChanged = true;
+    this_Node2D->position = new_pos;
+    this_Node2D->_local_position_changed = true;
 }
 
 /////////////////////////////////// Node //////////
 
-void iiNode2DInit()
+void iiNode2D_init()
 {
-    iCluige.iNode2D.newNode2D = n2d_newNode2D;
+    iCluige.iNode2D.new_Node2D = n2d_new_Node2D;
     iCluige.iNode2D.show = n2d_show;
     iCluige.iNode2D.hide = n2d_hide;
-    iCluige.iNode2D.moveLocal = n2d_moveLocal;
-    iCluige.iNode2D.setLocalPosition = n2d_setLocalPosition;
+    iCluige.iNode2D.move_local = n2d_move_local;
+    iCluige.iNode2D.set_local_position = n2d_set_local_position;
 }
 

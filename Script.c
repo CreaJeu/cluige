@@ -6,34 +6,34 @@
 
 ////////////////////////////////// _Script /////////
 
-static void nde_deleteScript(Script* thisScript)
+static void scpt_delete_Script(Script* this_Script)
 {
-    free(thisScript);
+    free(this_Script);
 }
 
 
 ////////////////////////////////// iiScript /////////
 
-static Script* nde_newScript(Node* node)
+static Script* scpt_new_Script(Node* node)
 {
-    Script* thisScript = iCluige.checkedMalloc(sizeof(Script));
-    thisScript->node = node;
+    Script* this_Script = iCluige.checked_malloc(sizeof(Script));
+    this_Script->node = node;
 
 //    StringBuilder sb;
-//    thisScript->_className = iCluige.iStringBuilder.stringAlloc(&sb, 6);
+//    this_Script->_class_name = iCluige.iStringBuilder.string_alloc(&sb, 6);
 //    iCluige.iStringBuilder.append(&sb, "Script");
-    thisScript->_subClass = NULL;
+    this_Script->_sub_class = NULL;
 
-    thisScript->deleteScript = nde_deleteScript;
-    thisScript->ready = NULL;
-    thisScript->process = NULL;
-    return thisScript;
+    this_Script->delete_Script = scpt_delete_Script;
+    this_Script->ready = NULL;
+    this_Script->process = NULL;
+    return this_Script;
 }
 
 /////////////////////////////////// iScript //////////
 
-void iiScriptInit()
+void iiScript_init()
 {
-    iCluige.iScript.newScript = nde_newScript;
+    iCluige.iScript.new_Script = scpt_new_Script;
 }
 

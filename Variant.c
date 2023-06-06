@@ -7,11 +7,11 @@
 
 ////////////////////////////////// _Variant /////////
 
-static Variant vrt_fromArgs(VariantType valType, va_list args)
+static Variant vrt_from_args(VariantType val_type, va_list args)
 {
     Variant res;
 
-    switch(valType)
+    switch(val_type)
     {
     case VT_BOOL:
         res.b = (bool)(va_arg(args, int));
@@ -47,25 +47,25 @@ static Variant vrt_fromArgs(VariantType valType, va_list args)
         res.ptr = va_arg(args, void*);
         break;
     default:
-        assert(false);//wrong type given to Variant.fromArgs(t,...)
+        assert(false);//wrong type given to Variant.from_args(t,...)
     }
 
     return res;
 }
 
-static Variant vrt_fromVal(VariantType valType, ...)
+static Variant vrt_from_val(VariantType val_type, ...)
 {
     va_list args;
-    va_start(args, valType);
-    Variant res = vrt_fromArgs(valType, args);
+    va_start(args, val_type);
+    Variant res = vrt_from_args(val_type, args);
     va_end(args);
     return res;
 }
 
-static int vrt_compare(VariantType valType, Variant v1, Variant v2)
+static int vrt_compare(VariantType val_type, Variant v1, Variant v2)
 {
     int res = 0;
-    switch(valType)
+    switch(val_type)
     {
     case VT_BOOL:
         if((v1.b) < (v2.b))
@@ -158,7 +158,7 @@ static int vrt_compare(VariantType valType, Variant v1, Variant v2)
         }
         break;
     default:
-        assert(false);//wrong type given to Variant.fromArgs(t,...)
+        assert(false);//wrong type given to Variant.from_args(t,...)
     }
     return res;
 }
@@ -168,10 +168,10 @@ static int vrt_compare(VariantType valType, Variant v1, Variant v2)
 
 ////////////////////////////////// Variant /////////
 
-void iiVariantInit()
+void iiVariant_init()
 {
-    iCluige.iVariant.fromVal = vrt_fromVal;
-    iCluige.iVariant.fromArgs = vrt_fromArgs;
+    iCluige.iVariant.from_val = vrt_from_val;
+    iCluige.iVariant.from_args = vrt_from_args;
     iCluige.iVariant.compare = vrt_compare;
 }
 

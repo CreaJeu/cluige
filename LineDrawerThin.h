@@ -18,7 +18,7 @@ struct _LineDrawerThin
     Vector2 _end_position;
     Vector2 _abs_amplitude;
     bool _steep;
-    int _glyphIndex;
+    int _glyph_index;
 
     // Line equation
     float _a, _b, _c;
@@ -28,13 +28,13 @@ struct _LineDrawerThin
 struct iiLineDrawerThin
 {
     void (*start)(struct _LineDrawerThin* drawer, const Vector2* v_start, const Vector2* v_end);
-    _Bool (*hasFinished)(struct _LineDrawerThin* drawer);
+    _Bool (*has_finished)(struct _LineDrawerThin* drawer);
     void (*next)(struct _LineDrawerThin* drawer);
     const char* (*glyph)(struct _LineDrawerThin* drawer);
     char* glyphs[4]; // '|' '/' '-' '\'
 };
 
-//to be called by cluigeInit(), to set iLineDrawerThin functions pointers
+//to be called by cluige_init(), to set iLineDrawerThin functions pointers
 void iiLineDrawerThin_init();
 
 

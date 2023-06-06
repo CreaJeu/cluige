@@ -7,52 +7,52 @@
 
 ////////////////////////////////// _Input /////////
 
-static void inp_deleteInput(Node* thisNode)
+static void inp_delete_Input(Node* this_Node)
 {
-    struct _Input* thisInput = (struct _Input*)(thisNode->_subClass);
-    void (*deleteNode)(Node*) = thisInput->deleteNode;
+    struct _Input* this_Input = (struct _Input*)(this_Node->_sub_class);
+    void (*delete_Node)(Node*) = this_Input->delete_Node;
 
-    for(int i=0; i < iCluige.iDeque.size(&(thisInput->available_actions)); i++)
+    for(int i=0; i < iCluige.iDeque.size(&(this_Input->available_actions)); i++)
     {
-        Variant v = iCluige.iDeque.at(&(thisInput->available_actions), i);
+        Variant v = iCluige.iDeque.at(&(this_Input->available_actions), i);
         struct _InputAction* va = (struct _InputAction*)(v.ptr);
         free(va->name);
         free(v.ptr);
     }
-    iCluige.iDeque.deleteDeque(&(thisInput->available_actions));
+    iCluige.iDeque.delete_Deque(&(this_Input->available_actions));
 
-    for(int i=0; i < iCluige.iDeque.size(&(thisInput->bound_keys)); i++)
+    for(int i=0; i < iCluige.iDeque.size(&(this_Input->bound_keys)); i++)
     {
-        Variant v = iCluige.iDeque.at(&(thisInput->bound_keys), i);
+        Variant v = iCluige.iDeque.at(&(this_Input->bound_keys), i);
         free(v.ptr);
     }
-    iCluige.iDeque.deleteDeque(&(thisInput->bound_keys));
+    iCluige.iDeque.delete_Deque(&(this_Input->bound_keys));
 
-    iCluige.iDeque.deleteDeque(&(thisInput->just_pressed_actions));
-    iCluige.iDeque.deleteDeque(&(thisInput->just_released_actions));
-    iCluige.iDeque.deleteDeque(&(thisInput->just_pressed_keys));
-    iCluige.iDeque.deleteDeque(&(thisInput->just_released_keys));
+    iCluige.iDeque.delete_Deque(&(this_Input->just_pressed_actions));
+    iCluige.iDeque.delete_Deque(&(this_Input->just_released_actions));
+    iCluige.iDeque.delete_Deque(&(this_Input->just_pressed_keys));
+    iCluige.iDeque.delete_Deque(&(this_Input->just_released_keys));
 
-    free(thisInput);
-    thisNode->_subClass = NULL;
-    deleteNode(thisNode);
+    free(this_Input);
+    this_Node->_sub_class = NULL;
+    delete_Node(this_Node);
 }
 
 // private utility functions
-static int inp__findKey(const Deque* keys, int charVal)
+static int inp__find_key(const Deque* keys, int char_val)
 {
     for(int i=0; i < iCluige.iDeque.size(keys); i++)
     {
         Variant v = iCluige.iDeque.at(keys, i);
         struct _InputKey* vk = (struct _InputKey*)(v.ptr);
-        if(vk->unicode_char == charVal)
+        if(vk->unicode_char == char_val)
         {
             return i;
         }
     }
     return -1;
 }
-static int inp__findAction(const Deque* action_ids, int32_t id_action)
+static int inp__find_action(const Deque* action_ids, int32_t id_action)
 {
     for(int i=0; i < iCluige.iDeque.size(action_ids); i++)
     {
@@ -65,38 +65,38 @@ static int inp__findAction(const Deque* action_ids, int32_t id_action)
     return -1;
 }
 
-static void inp_preProcessInput(Node* thisNode)
+static void inp_pre_process_Input(Node* this_Node)
 {
-    struct _Input* thisInput = (struct _Input*)(thisNode->_subClass);
+    struct _Input* this_Input = (struct _Input*)(this_Node->_sub_class);
     //reinit all "just_XXX"
-    iCluige.iDeque.clear(&(thisInput->just_pressed_actions));
-    iCluige.iDeque.clear(&(thisInput->just_released_actions));
-    iCluige.iDeque.clear(&(thisInput->just_pressed_actions));
-    iCluige.iDeque.clear(&(thisInput->just_released_keys));
+    iCluige.iDeque.clear(&(this_Input->just_pressed_actions));
+    iCluige.iDeque.clear(&(this_Input->just_released_actions));
+    iCluige.iDeque.clear(&(this_Input->just_pressed_actions));
+    iCluige.iDeque.clear(&(this_Input->just_released_keys));
 
     int gotch = getch();
     while(gotch != ERR)
     {
-        int boundKeyIndex = inp__findKey(&(thisInput->bound_keys), gotch);
-        if(boundKeyIndex != -1)
+        int bound_key_index = inp__find_key(&(this_Input->bound_keys), gotch);
+        if(bound_key_index != -1)
         {
-            struct _InputKey* key = iCluige.iDeque.at(&(thisInput->bound_keys), boundKeyIndex).ptr;
+            struct _InputKey* key = iCluige.iDeque.at(&(this_Input->bound_keys), bound_key_index).ptr;
 //            if(!(key->pressed))
 //            {
                 for(int i=0; i < iCluige.iDeque.size(&(key->bound_actions)); i++)
                 {
-                    int32_t actionId = iCluige.iDeque.at(&(key->bound_actions), i).i32;
+                    int32_t action_id = iCluige.iDeque.at(&(key->bound_actions), i).i32;
                     struct _InputAction* action = iCluige.iDeque.at(
-                            &(thisInput->available_actions), i).ptr;
+                            &(this_Input->available_actions), i).ptr;
                     action->nb_pressed++;
 //                    action->just_pressed = true;
                     iCluige.iDeque.push_back(
-                            &(thisInput->just_pressed_actions), (int32_t)actionId);
+                            &(this_Input->just_pressed_actions), (int32_t)action_id);
                 }
                 key->pressed = true;
 //                key->just_pressed = true;
                 iCluige.iDeque.push_back(
-                        &(thisInput->just_pressed_keys), key);
+                        &(this_Input->just_pressed_keys), key);
 //            }
         }
         //TODO non-bound keys, for is_key_pressed()
@@ -108,73 +108,73 @@ static void inp_preProcessInput(Node* thisNode)
 
 ////////////////////////////////// iiInput /////////
 
-static struct _Input* inp_newInput()
+static struct _Input* inp_new_Input()
 {
-    Node* newNode = iCluige.iNode.newNode();
-    struct _Input* newInput = iCluige.checkedMalloc(sizeof(struct _Input));
+    Node* new_node = iCluige.iNode.new_Node();
+    struct _Input* new_input = iCluige.checked_malloc(sizeof(struct _Input));
     //...
 
-    newNode->_subClass = newInput;
-    newInput->_thisNode = newNode;
+    new_node->_sub_class = new_input;
+    new_input->_this_Node = new_node;
 
-    free(newNode->_className); //TODO static value to avoid free
+    free(new_node->_class_name); //TODO static value to avoid free
     StringBuilder sb;
-    newNode->_className = iCluige.iStringBuilder.stringAlloc(&sb, strlen("NodeInput"));
+    new_node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, strlen("NodeInput"));
     iCluige.iStringBuilder.append(&sb, "NodeInput");
 
-    newInput->deleteNode = newNode->deleteNode;
-    newNode->deleteNode = inp_deleteInput;
-    newNode->preProcessNode = inp_preProcessInput;
+    new_input->delete_Node = new_node->delete_Node;
+    new_node->delete_Node = inp_delete_Input;
+    new_node->pre_process_Node = inp_pre_process_Input;
 
-    iCluige.iDeque.dequeAlloc(&(newInput->available_actions), VT_POINTER, 20);
-    iCluige.iDeque.dequeAlloc(&(newInput->bound_keys), VT_POINTER, 40);
+    iCluige.iDeque.deque_alloc(&(new_input->available_actions), VT_POINTER, 20);
+    iCluige.iDeque.deque_alloc(&(new_input->bound_keys), VT_POINTER, 40);
     ///// TODO     standard actions? //ui_accept ui_cancel ui_left ui_right ui_up ui_down
 
-    iCluige.iDeque.dequeAlloc(&(newInput->just_pressed_actions), VT_INT32, 9);
-    iCluige.iDeque.dequeAlloc(&(newInput->just_released_actions), VT_INT32, 9);
-    iCluige.iDeque.dequeAlloc(&(newInput->just_pressed_keys), VT_POINTER, 9);
-    iCluige.iDeque.dequeAlloc(&(newInput->just_released_keys), VT_POINTER, 9);
+    iCluige.iDeque.deque_alloc(&(new_input->just_pressed_actions), VT_INT32, 9);
+    iCluige.iDeque.deque_alloc(&(new_input->just_released_actions), VT_INT32, 9);
+    iCluige.iDeque.deque_alloc(&(new_input->just_pressed_keys), VT_POINTER, 9);
+    iCluige.iDeque.deque_alloc(&(new_input->just_released_keys), VT_POINTER, 9);
 
-    return newInput;
+    return new_input;
 }
 
-static struct _InputAction* inp__newAction(char* name)
+static struct _InputAction* inp__new_action(char* name)
 {
-    struct _InputAction* newAction = iCluige.checkedMalloc(sizeof(struct _InputAction));
-    newAction->name = iCluige.iStringBuilder.clone(name);
-    newAction->nb_pressed = 0;
-//    newAction->just_pressed = false;
-//    newAction->just_released = false;
-    return newAction;
+    struct _InputAction* new_action = iCluige.checked_malloc(sizeof(struct _InputAction));
+    new_action->name = iCluige.iStringBuilder.clone(name);
+    new_action->nb_pressed = 0;
+//    new_action->just_pressed = false;
+//    new_action->just_released = false;
+    return new_action;
 }
 
-static struct _InputKey* inp__newKey(int charVal)
+static struct _InputKey* inp__new_key(int char_val)
 {
-    struct _InputKey* newKey = iCluige.checkedMalloc(sizeof(struct _InputKey));
-    newKey->unicode_char = charVal;
-    newKey->pressed = 0;
-//    newKey->just_pressed = 0;
-//    newKey->just_released = 0;
-    iCluige.iDeque.dequeAlloc(&(newKey->bound_actions), VT_INT32, 3);
-    return newKey;
+    struct _InputKey* new_key = iCluige.checked_malloc(sizeof(struct _InputKey));
+    new_key->unicode_char = char_val;
+    new_key->pressed = 0;
+//    new_key->just_pressed = 0;
+//    new_key->just_released = 0;
+    iCluige.iDeque.deque_alloc(&(new_key->bound_actions), VT_INT32, 3);
+    return new_key;
 }
 
 static int inp_add_action(char* action_name)
 {
     int res = iCluige.iDeque.size(&(iCluige.input->available_actions));
-    struct _InputAction* newAction = inp__newAction(action_name);
-    iCluige.iDeque.push_back(&(iCluige.input->available_actions), newAction);
+    struct _InputAction* new_action = inp__new_action(action_name);
+    iCluige.iDeque.push_back(&(iCluige.input->available_actions), new_action);
     return res;
 }
 
-static void inp_bind_key(int action_id, int keyCharVal)
+static void inp_bind_key(int action_id, int key_char_val)
 {
     //TODO check action_id exists in available_actions
     struct _InputKey* key;
-    int key_index = inp__findKey(&(iCluige.input->bound_keys), keyCharVal);
+    int key_index = inp__find_key(&(iCluige.input->bound_keys), key_char_val);
     if(key_index == -1)
     {
-        key = inp__newKey(keyCharVal);
+        key = inp__new_key(key_char_val);
         key_index = iCluige.iDeque.size(&(iCluige.input->bound_keys));
         iCluige.iDeque.push_back(&(iCluige.input->bound_keys), key);
     }
@@ -187,17 +187,17 @@ static void inp_bind_key(int action_id, int keyCharVal)
 
 static bool inp_is_action_just_pressed(int action_id)
 {
-    int found_at = inp__findAction(&(iCluige.input->just_pressed_actions), action_id);
+    int found_at = inp__find_action(&(iCluige.input->just_pressed_actions), action_id);
     return (found_at != -1);
 }
 
 /////////////////////////////////// Node //////////
 
-void iiInputInit()
+void iiInput_init()
 {
-    iCluige.iInput.newInput = inp_newInput;
-//    iCluige.iInput.newAction = inp_newAction;
-//    iCluige.iInput.newKey = inp_newKey;
+    iCluige.iInput.new_Input = inp_new_Input;
+//    iCluige.iInput.new_action = inp_new_action;
+//    iCluige.iInput.new_key = inp_new_key;
     iCluige.iInput.add_action = inp_add_action;
     iCluige.iInput.bind_key = inp_bind_key;
 

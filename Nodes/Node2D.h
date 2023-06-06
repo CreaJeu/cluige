@@ -14,36 +14,36 @@ struct _Node2D
 	//later : colorModulate, transform2D, rotation
 
 	//private
-	Vector2 _tmpGlobalPosition;//don't change directly, use methods
-	bool _localPositionChanged;
+	Vector2 _tmp_global_position;//don't change directly, use methods
+	bool _local_position_changed;
 
-	Node* _thisNode;
-	void* _subClass;
+	Node* _this_Node;
+	void* _sub_class;
 
 	//virtual methods
-	void (*deleteNode)(Node*);
-	void (*deleteNode2D)(Node*);
-	void (*enterTreeNode)(Node*);
-	//in .c : void preProcessNode(Node*);
-	//in .c : void postProcessNode(Node*);
-	//in .c : void onLoopStartingNode2D(Node*);
+	void (*delete_Node)(Node*);
+	void (*delete_Node2D)(Node*);
+	void (*enter_tree_Node)(Node*);
+	//in .c : void pre_process_Node(Node*);
+	//in .c : void post_process_Node(Node*);
+	//in .c : void on_loop_starting_Node2D(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiNode2D
 {
-	//Node2D* newNode2D()
-	Node2D* (*newNode2D)();
+	//Node2D* new_Node2D()
+	Node2D* (*new_Node2D)();
 	void (*show)(Node2D*);
 	void (*hide)(Node2D*);
-	void (*moveLocal)(Node2D*, Vector2);
-	void (*setLocalPosition)(Node2D*, Vector2);
+	void (*move_local)(Node2D*, Vector2);
+	void (*set_local_position)(Node2D*, Vector2);
 	//later : moveGlobal
 };
 //iNode2D : in iiCluige
 
-//to be called only by cluigeInit() to set iNode functions pointers
-void iiNode2DInit();
+//to be called only by cluige_init() to set iNode functions pointers
+void iiNode2D_init();
 
 
 #endif // NODE2D_H_INCLUDED

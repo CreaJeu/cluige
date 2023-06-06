@@ -6,7 +6,7 @@
 
 ////////////////////////////////// iiCluige /////////
 
-static void* clg_checkedMalloc(size_t s)
+static void* clg_checked_malloc(size_t s)
 {
     void* res = malloc(s);
     if(res == NULL)
@@ -17,7 +17,7 @@ static void* clg_checkedMalloc(size_t s)
     return res;
 }
 
-static Vector2 clg_getScreenSize()
+static Vector2 clg_get_screen_size()
 {
     int w, h;
     //TODO : make it work !
@@ -35,38 +35,38 @@ static Vector2 clg_getScreenSize()
 //redeclaration because of extern (like static members in c++)
 struct iiCluige iCluige;
 
-void cluigeInit()
+void cluige_init()
 {
-    iCluige.checkedMalloc = clg_checkedMalloc;
-    iCluige.getScreenSize = clg_getScreenSize;
-    iCluige.wantedFrameSeconds = .0666;//15 fps by default
-    iCluige.quitAsked = false;
+    iCluige.checked_malloc = clg_checked_malloc;
+    iCluige.get_screen_size = clg_get_screen_size;
+    iCluige.wanted_frame_seconds = .0666;//15 fps by default
+    iCluige.quit_asked = false;
 
-    iiVariantInit();
-    iiDequeInit();
-    iiStringBuilderInit();
-    iiNodeInit();
-    iCluige.privateRoot2D = iCluige.iNode.newNode();
-    iCluige.iNode.setName(iCluige.privateRoot2D, "privateRoot2D");
+    iiVariant_init();
+    iiDeque_init();
+    iiStringBuilder_init();
+    iiNode_init();
+    iCluige.private_root_2D = iCluige.iNode.new_Node();
+    iCluige.iNode.set_name(iCluige.private_root_2D, "private_root_2D");
 
-    iiScriptInit();
-    iiVector2Init();
-    iiNode2DInit();
-    iiSpriteTextInit();
+    iiScript_init();
+    iiVector2_init();
+    iiNode2D_init();
+    iiSpriteText_init();
     iiLineDrawerThin_init();
-    iiSpriteSVGInit();
+    iiSpriteSVG_init();
 
-    iiClockInit();
-    iCluige.clock = iCluige.iClock.newClock();
-    iCluige.iNode.addChild(iCluige.privateRoot2D, iCluige.clock->_thisNode);
+    iiClock_init();
+    iCluige.clock = iCluige.iClock.new_Clock();
+    iCluige.iNode.add_child(iCluige.private_root_2D, iCluige.clock->_this_Node);
 
-    iiInputInit();
-    iCluige.input = iCluige.iInput.newInput();
-    iCluige.iNode.addChild(iCluige.privateRoot2D, iCluige.input->_thisNode);
+    iiInput_init();
+    iCluige.input = iCluige.iInput.new_Input();
+    iCluige.iNode.add_child(iCluige.private_root_2D, iCluige.input->_this_Node);
 
-    iCluige.publicRoot2D = iCluige.iNode.newNode();
-    iCluige.iNode.setName(iCluige.publicRoot2D, "publicRoot2D");
-    iCluige.iNode.addChild(iCluige.privateRoot2D, iCluige.publicRoot2D);
+    iCluige.public_root_2D = iCluige.iNode.new_Node();
+    iCluige.iNode.set_name(iCluige.public_root_2D, "public_root_2D");
+    iCluige.iNode.add_child(iCluige.private_root_2D, iCluige.public_root_2D);
 
     //...
     //...
@@ -93,75 +93,75 @@ enum ProcessPass
     POST_PROCESS_PASS
 };
 
-static void processTree(Node* root, enum ProcessPass pass)
+static void process_tree(Node* root, enum ProcessPass pass)
 {
     //recursion mode : DFS
     if(root->children != NULL)
     {
-        processTree(root->children, pass);
+        process_tree(root->children, pass);
     }
 
     switch(pass)
     {
     case STARTING_LOOP_PASS:
-        if(root->onLoopStarting != NULL)
+        if(root->on_loop_starting != NULL)
         {
-            root->onLoopStarting(root);
+            root->on_loop_starting(root);
         }
         break;
     case PRE_PROCESS_PASS:
-        if(root->preProcessNode != NULL)
+        if(root->pre_process_Node != NULL)
         {
-            root->preProcessNode(root);
+            root->pre_process_Node(root);
         }
         break;
     case PROCESS_PASS:
-        if(root->processNode != NULL)
+        if(root->process_Node != NULL)
         {
-            root->processNode(root);
+            root->process_Node(root);
         }
         break;
     case POST_PROCESS_PASS:
-        if(root->postProcessNode != NULL)
+        if(root->post_process_Node != NULL)
         {
-            root->postProcessNode(root);
+            root->post_process_Node(root);
         }
         break;
     }
 
-    if(root->nextSibling != NULL)
+    if(root->next_sibling != NULL)
     {
-        processTree(root->nextSibling, pass);
+        process_tree(root->next_sibling, pass);
     }
 }
 
-void cluigeRun()
+void cluige_run()
 {
-    processTree(iCluige.privateRoot2D, STARTING_LOOP_PASS);
+    process_tree(iCluige.private_root_2D, STARTING_LOOP_PASS);
 
     //game loop
-    while(!(iCluige.quitAsked))
+    while(!(iCluige.quit_asked))
     {
-        processTree(iCluige.privateRoot2D, PRE_PROCESS_PASS);
-        processTree(iCluige.privateRoot2D, PROCESS_PASS);
-        processTree(iCluige.privateRoot2D, POST_PROCESS_PASS);
+        process_tree(iCluige.private_root_2D, PRE_PROCESS_PASS);
+        process_tree(iCluige.private_root_2D, PROCESS_PASS);
+        process_tree(iCluige.private_root_2D, POST_PROCESS_PASS);
 
         //curses
-        int sleepFrameMilliseconds = 1;
-        if(iCluige.clock->elapsedSeconds < iCluige.wantedFrameSeconds)
+        int sleep_frame_milliseconds = 1;
+        if(iCluige.clock->elapsed_seconds < iCluige.wanted_frame_seconds)
         {
-            float sleepFrameSeconds = iCluige.wantedFrameSeconds - iCluige.clock->elapsedSeconds;
-            sleepFrameMilliseconds = (int)(sleepFrameSeconds * 1000);
+            float sleep_frame_seconds = iCluige.wanted_frame_seconds - iCluige.clock->elapsed_seconds;
+            sleep_frame_milliseconds = (int)(sleep_frame_seconds * 1000);
         }
         refresh();
-        napms(sleepFrameMilliseconds);//sleep to avoid 100% CPU
+        napms(sleep_frame_milliseconds);//sleep to avoid 100% CPU
     }
 }
 
-int cluigeFinish()
+int cluige_finish()
 {
-    //iCluige.iNode.deleteNode(iCluige.privateRoot2D);
-    iCluige.privateRoot2D->deleteNode(iCluige.privateRoot2D);
+    //iCluige.iNode.delete_Node(iCluige.private_root_2D);
+    iCluige.private_root_2D->delete_Node(iCluige.private_root_2D);
     //close files
     //free tmp locks
     //...

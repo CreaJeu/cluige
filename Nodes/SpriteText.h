@@ -13,33 +13,33 @@ struct _SpriteText
 
     //char** text;//array of text lines, the ASCII art / unicode art
     char* text;//text with all \n replaced by \0, the ASCII art / unicode art
-    int nbLines;//TODO collection instead
+    int nb_lines;//TODO collection instead
 
 	//private
-	Node2D* _thisNode2D;
-	void* _subClass;
+	Node2D* _this_Node2D;
+	void* _sub_class;
 
 	//virtual methods
-	void (*deleteNode2D)(Node*);
-	void (*preProcessNode2D)(Node*);
-	void (*postProcessNode2D)(Node*);
-	//in .c : void preProcessNode(Node*);
-	//in .c : void postProcessNode(Node*);
+	void (*delete_Node2D)(Node*);
+	void (*pre_process_Node2D)(Node*);
+	void (*post_process_Node2D)(Node*);
+	//in .c : void pre_process_Node(Node*);
+	//in .c : void post_process_Node(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiSpriteText
 {
-	//SpriteText* newSpriteText()
-	SpriteText* (*newSpriteText)();
+	//SpriteText* new_SpriteText()
+	SpriteText* (*new_SpriteText)();
 
-	//void setText(const char*)
-	void (*setText)(SpriteText*, const char*);
+	//void set_text(const char*)
+	void (*set_text)(SpriteText*, const char*);
 };
 //iSpriteText : in iiCluige
 
-//to be called only by cluigeInit() to set iNode functions pointers
-void iiSpriteTextInit();
+//to be called only by cluige_init() to set iNode functions pointers
+void iiSpriteText_init();
 
 
 #endif // SPRITE_TEXT_H_INCLUDED

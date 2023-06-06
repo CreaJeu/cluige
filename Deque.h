@@ -8,7 +8,7 @@
 // Functions arguments can be variadic instead of Variant values,
 // so users can write for example ...push_back(i+2);
 // instead of ...push_back((Variant){i64 = i+2});
-// Don't forget to call dequeAlloc() on your new instances of Deque
+// Don't forget to call deque_alloc() on your new instances of Deque
 
 typedef struct _Deque Deque;
 
@@ -16,62 +16,62 @@ struct _Deque
 {
     //all private (users should use only functions/methods)
     int _capacity;
-    int _frontI;
-    int _nbElems;
+    int _front_i;
+    int _nb_elems;
     Variant* _elems;
-    VariantType _elemsType;
+    VariantType _elems_type;
     bool _sorted;
-    int (*_compareFunc)(Variant va, Variant vb);
+    int (*_compare_func)(Variant va, Variant vb);
 };
 
 struct iiDeque
 {
     //constructor/destructor (don't forget to use them)
 
-    void (*dequeAlloc)(Deque* thisDeque, VariantType elemsType, int capacity);
-    void (*deleteDeque)(Deque* thisDeque);
+    void (*deque_alloc)(Deque* this_Deque, VariantType elems_type, int capacity);
+    void (*delete_Deque)(Deque* this_Deque);
 
     //read
 
     //(assert if out of bound)
-    Variant (*at)(const Deque* thisDeque, int i);
-    Variant (*back)(const Deque* thisDeque);
-    Variant (*front)(const Deque* thisDeque);
-    int (*size)(const Deque* thisDeque);
-    bool (*empty)(const Deque* thisDeque);
+    Variant (*at)(const Deque* this_Deque, int i);
+    Variant (*back)(const Deque* this_Deque);
+    Variant (*front)(const Deque* this_Deque);
+    int (*size)(const Deque* this_Deque);
+    bool (*empty)(const Deque* this_Deque);
 
     //insertion
 
-    void (*push_back)(Deque* thisDeque, ...);//variadic for easier use than Variant
-    void (*push_front)(Deque* thisDeque, ...);
-    void (*append)(Deque* thisDeque, ...);//same as push_back()
-    void (*insert)(Deque* thisDeque, int i, ...);
-    //TODO void (*insertSorted)(Deque* thisDeque, ...);
+    void (*push_back)(Deque* this_Deque, ...);//variadic for easier use than Variant
+    void (*push_front)(Deque* this_Deque, ...);
+    void (*append)(Deque* this_Deque, ...);//same as push_back()
+    void (*insert)(Deque* this_Deque, int i, ...);
+    //TODO void (*insertSorted)(Deque* this_Deque, ...);
     //one day? append_array()
 
     //deletion
 
-    Variant (*pop_back)(Deque* thisDeque);
-    Variant (*pop_front)(Deque* thisDeque);
-    void (*remove)(Deque* thisDeque, int i);
-    void (*clear)(Deque* thisDeque);
+    Variant (*pop_back)(Deque* this_Deque);
+    Variant (*pop_front)(Deque* this_Deque);
+    void (*remove)(Deque* this_Deque, int i);
+    void (*clear)(Deque* this_Deque);
     //TODO
 //    //one day? shuffle(), slice(iMin, iMax)
 //
 //    //search
 //
-//    int (*bsearch)(const Deque* thisDeque, ...);
-//    int (*find)(const Deque* thisDeque, ...);
-//    int (*rsearch)(const Deque* thisDeque, ...);//find last occurence
-//    bool (*has)(const Deque* thisDeque, ...);
+//    int (*bsearch)(const Deque* this_Deque, ...);
+//    int (*find)(const Deque* this_Deque, ...);
+//    int (*rsearch)(const Deque* this_Deque, ...);//find last occurence
+//    bool (*has)(const Deque* this_Deque, ...);
 //    //one day? min(), max()
 
     //sort
 
-    //TODO void (*sort)(Deque* thisDeque);
-    //TODO void (*sort_custom)(Deque* thisDeque, int (*compareFunc)(Variant, Variant));
+    //TODO void (*sort)(Deque* this_Deque);
+    //TODO void (*sort_custom)(Deque* this_Deque, int (*compare_func)(Variant, Variant));
 };
 
-void iiDequeInit();
+void iiDeque_init();
 
 #endif //DEQUE_H_INCLUDED

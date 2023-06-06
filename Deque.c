@@ -10,95 +10,95 @@
 
 //constructor/destructor (don't forget to use them)
 
-static void dq_dequeAlloc(Deque* thisDeque, VariantType elemsType, int capacity)
+static void dq_deque_alloc(Deque* this_Deque, VariantType elems_type, int capacity)
 {
-    thisDeque->_capacity = capacity;
-    thisDeque->_frontI = 0;
-    thisDeque->_nbElems = 0;
-    thisDeque->_elemsType = elemsType;
-    thisDeque->_sorted = false;
-    thisDeque->_compareFunc = NULL;
-    thisDeque->_elems = iCluige.checkedMalloc(capacity * sizeof(Variant));
+    this_Deque->_capacity = capacity;
+    this_Deque->_front_i = 0;
+    this_Deque->_nb_elems = 0;
+    this_Deque->_elems_type = elems_type;
+    this_Deque->_sorted = false;
+    this_Deque->_compare_func = NULL;
+    this_Deque->_elems = iCluige.checked_malloc(capacity * sizeof(Variant));
 }
 
-static void dq_deleteDeque(Deque* thisDeque)
+static void dq_delete_Deque(Deque* this_Deque)
 {
     //if elements are pointers, they must be deleted outside of this function,
     //according to the user needs
-    free(thisDeque->_elems);
+    free(this_Deque->_elems);
 }
 
 //private utils
 
-static int dq__iArray(const Deque* thisDeque, int iDeque)
+static int dq__i_array(const Deque* this_Deque, int i_deque)
 {
-    // iArray from iDeque:
-    return (thisDeque->_frontI + iDeque) % thisDeque->_capacity;
+    // i_array from i_deque:
+    return (this_Deque->_front_i + i_deque) % this_Deque->_capacity;
 }
 
-static int dq__iArrayPrev(const Deque* thisDeque, int iDeque)
+static int dq__i_array_prev(const Deque* this_Deque, int i_deque)
 {
-    //previous iArray (one-step closer to front) from iDeque
-    int iPrevArray = thisDeque->_frontI + iDeque - 1;
-    if(iPrevArray < 0)
+    //previous i_array (one-step closer to front) from i_deque
+    int i_prev_array = this_Deque->_front_i + i_deque - 1;
+    if(i_prev_array < 0)
     {
         //loop to other end of the array
-        iPrevArray = thisDeque->_capacity - 1;
+        i_prev_array = this_Deque->_capacity - 1;
     }
-    return iPrevArray;
+    return i_prev_array;
 }
 
-static Variant* dq__atPtr(const Deque* thisDeque, int i)
+static Variant* dq__at_ptr(const Deque* this_Deque, int i)
 {
-    int iArray = dq__iArray(thisDeque, i);
-    return &(thisDeque->_elems[iArray]);
+    int i_array = dq__i_array(this_Deque, i);
+    return &(this_Deque->_elems[i_array]);
 }
 
-static void dq__grow(Deque* thisDeque)
+static void dq__grow(Deque* this_Deque)
 {
-    int newCap = thisDeque->_capacity * 2;
-    Variant* grown = iCluige.checkedMalloc(newCap * sizeof(Variant));
-    for(int i=0; i < thisDeque->_nbElems; i++)
+    int new_cap = this_Deque->_capacity * 2;
+    Variant* grown = iCluige.checked_malloc(new_cap * sizeof(Variant));
+    for(int i=0; i < this_Deque->_nb_elems; i++)
     {
-        int iOld = (thisDeque->_frontI + i) % thisDeque->_capacity;
-        grown[i] = thisDeque->_elems[iOld];
+        int i_old = (this_Deque->_front_i + i) % this_Deque->_capacity;
+        grown[i] = this_Deque->_elems[i_old];
     }
 
-    thisDeque->_capacity = newCap;
-    thisDeque->_frontI = 0;
-    thisDeque->_elems = grown;
+    this_Deque->_capacity = new_cap;
+    this_Deque->_front_i = 0;
+    this_Deque->_elems = grown;
 }
 
 //read
 
-static Variant dq_at(const Deque* thisDeque, int i)
+static Variant dq_at(const Deque* this_Deque, int i)
 {
-    assert((0 <= i) && (i < thisDeque->_nbElems));
-    int iArray = dq__iArray(thisDeque, i);
-    return thisDeque->_elems[iArray];
+    assert((0 <= i) && (i < this_Deque->_nb_elems));
+    int i_array = dq__i_array(this_Deque, i);
+    return this_Deque->_elems[i_array];
 }
 
-static Variant dq_back(const Deque* thisDeque)
+static Variant dq_back(const Deque* this_Deque)
 {
-    assert(thisDeque->_nbElems > 0);
-    int iArray = dq__iArray(thisDeque, thisDeque->_nbElems - 1);
-    return thisDeque->_elems[iArray];
+    assert(this_Deque->_nb_elems > 0);
+    int i_array = dq__i_array(this_Deque, this_Deque->_nb_elems - 1);
+    return this_Deque->_elems[i_array];
 }
 
-static Variant dq_front(const Deque* thisDeque)
+static Variant dq_front(const Deque* this_Deque)
 {
-    assert(thisDeque->_nbElems > 0);
-    return thisDeque->_elems[thisDeque->_frontI];
+    assert(this_Deque->_nb_elems > 0);
+    return this_Deque->_elems[this_Deque->_front_i];
 }
 
-static int dq_size(const Deque* thisDeque)
+static int dq_size(const Deque* this_Deque)
 {
-    return thisDeque->_nbElems;
+    return this_Deque->_nb_elems;
 }
 
-static bool dq_empty(const Deque* thisDeque)
+static bool dq_empty(const Deque* this_Deque)
 {
-    return (thisDeque->_nbElems) == 0;
+    return (this_Deque->_nb_elems) == 0;
 }
 
 //insertion
@@ -106,146 +106,146 @@ static bool dq_empty(const Deque* thisDeque)
 //variadic for easier use than Variant
 
 //private util
-static void dq__insert_va_list(Deque* thisDeque, int i, va_list args_elemValue)
+static void dq__insert_va_list(Deque* this_Deque, int i, va_list args_elem_value)
 {
-    //va_start(args_elemValue, i); must be called outside
+    //va_start(args_elem_value, i); must be called outside
     //assert((0 <= i) &&...); relevant assert must be called outside
-    if(thisDeque->_nbElems == thisDeque->_capacity)
+    if(this_Deque->_nb_elems == this_Deque->_capacity)
     {
-        dq__grow(thisDeque);
+        dq__grow(this_Deque);
     }
 
-    Variant newElem = iCluige.iVariant.fromArgs(thisDeque->_elemsType, args_elemValue);
+    Variant new_elem = iCluige.iVariant.from_args(this_Deque->_elems_type, args_elem_value);
 
     //shift to left or right
-    if(i < (thisDeque->_nbElems / 2))
+    if(i < (this_Deque->_nb_elems / 2))
     {
         //shift i first elems to the left
-        for(int iDeque = 0; iDeque < i; iDeque++)
+        for(int i_deque = 0; i_deque < i; i_deque++)
         {
-            int prevI_array = dq__iArrayPrev(thisDeque, iDeque);
-            int i_array = dq__iArray(thisDeque, iDeque);
-            thisDeque->_elems[prevI_array] = thisDeque->_elems[i_array];
+            int prev_i_array = dq__i_array_prev(this_Deque, i_deque);
+            int i_array = dq__i_array(this_Deque, i_deque);
+            this_Deque->_elems[prev_i_array] = this_Deque->_elems[i_array];
         }
-        thisDeque->_frontI = dq__iArrayPrev(thisDeque, 0);
+        this_Deque->_front_i = dq__i_array_prev(this_Deque, 0);
     }
     else
     {
         //shift i last elems to the right
-        for(int iDeque = thisDeque->_nbElems - 1; iDeque >= i; iDeque--)
+        for(int i_deque = this_Deque->_nb_elems - 1; i_deque >= i; i_deque--)
         {
-            int nextI_array = dq__iArray(thisDeque, iDeque + 1);
-            int i_array = dq__iArray(thisDeque, iDeque);
-            thisDeque->_elems[nextI_array] = thisDeque->_elems[i_array];
+            int next_i_array = dq__i_array(this_Deque, i_deque + 1);
+            int i_array = dq__i_array(this_Deque, i_deque);
+            this_Deque->_elems[next_i_array] = this_Deque->_elems[i_array];
         }
     }
-    thisDeque->_elems[dq__iArray(thisDeque, i)] = newElem;
-    thisDeque->_nbElems++;
-    //va_end(args_elemValue); call outside
+    this_Deque->_elems[dq__i_array(this_Deque, i)] = new_elem;
+    this_Deque->_nb_elems++;
+    //va_end(args_elem_value); call outside
 }
 
-static void dq_push_back(Deque* thisDeque, ...)
+static void dq_push_back(Deque* this_Deque, ...)
 {
-    va_list args_elemValue;
-    va_start(args_elemValue, thisDeque);
-    dq__insert_va_list(thisDeque, thisDeque->_nbElems, args_elemValue);
-    va_end(args_elemValue);
+    va_list args_elem_value;
+    va_start(args_elem_value, this_Deque);
+    dq__insert_va_list(this_Deque, this_Deque->_nb_elems, args_elem_value);
+    va_end(args_elem_value);
 }
 
-static void dq_push_front(Deque* thisDeque, ...)
+static void dq_push_front(Deque* this_Deque, ...)
 {
-    va_list args_elemValue;
-    va_start(args_elemValue, thisDeque);
-    dq__insert_va_list(thisDeque, 0, args_elemValue);
-    va_end(args_elemValue);
+    va_list args_elem_value;
+    va_start(args_elem_value, this_Deque);
+    dq__insert_va_list(this_Deque, 0, args_elem_value);
+    va_end(args_elem_value);
 }
 
 //same as push_back()
-static void dq_append(Deque* thisDeque, ...)
+static void dq_append(Deque* this_Deque, ...)
 {
-    va_list args_elemValue;
-    va_start(args_elemValue, thisDeque);
-    dq__insert_va_list(thisDeque, thisDeque->_nbElems, args_elemValue);
-    va_end(args_elemValue);
+    va_list args_elem_value;
+    va_start(args_elem_value, this_Deque);
+    dq__insert_va_list(this_Deque, this_Deque->_nb_elems, args_elem_value);
+    va_end(args_elem_value);
 }
 
-static void dq_insert(Deque* thisDeque, int i, ...)
+static void dq_insert(Deque* this_Deque, int i, ...)
 {
-    assert((0 <= i) && (i <= thisDeque->_nbElems));
-    va_list args_elemValue;
-    va_start(args_elemValue, i);
-    dq__insert_va_list(thisDeque, i, args_elemValue);
-    va_end(args_elemValue);
+    assert((0 <= i) && (i <= this_Deque->_nb_elems));
+    va_list args_elem_value;
+    va_start(args_elem_value, i);
+    dq__insert_va_list(this_Deque, i, args_elem_value);
+    va_end(args_elem_value);
 }
 
 
 //deletion
 
-static Variant dq_pop_back(Deque* thisDeque)
+static Variant dq_pop_back(Deque* this_Deque)
 {
-    assert(thisDeque->_nbElems > 0);
-    Variant* res = dq__atPtr(thisDeque, thisDeque->_nbElems - 1);
-    thisDeque->_nbElems--;
+    assert(this_Deque->_nb_elems > 0);
+    Variant* res = dq__at_ptr(this_Deque, this_Deque->_nb_elems - 1);
+    this_Deque->_nb_elems--;
     return *res;
 }
 
-static Variant dq_pop_front(Deque* thisDeque)
+static Variant dq_pop_front(Deque* this_Deque)
 {
-    assert(thisDeque->_nbElems > 0);
-    Variant* res = dq__atPtr(thisDeque, 0);
-    thisDeque->_nbElems--;
-    thisDeque->_frontI = dq__iArray(thisDeque, 1);
+    assert(this_Deque->_nb_elems > 0);
+    Variant* res = dq__at_ptr(this_Deque, 0);
+    this_Deque->_nb_elems--;
+    this_Deque->_front_i = dq__i_array(this_Deque, 1);
     return *res;
 }
 
-static void dq_remove(Deque* thisDeque, int i)
+static void dq_remove(Deque* this_Deque, int i)
 {
-    assert((0 <= i) && (i < thisDeque->_nbElems));
+    assert((0 <= i) && (i < this_Deque->_nb_elems));
     //shift to left or right
-    if(i < (thisDeque->_nbElems / 2))
+    if(i < (this_Deque->_nb_elems / 2))
     {
         //shift i first elems to the right
-        for(int iDeque = i; iDeque > 0; iDeque--)
+        for(int i_deque = i; i_deque > 0; i_deque--)
         {
-            int prevI_array = dq__iArrayPrev(thisDeque, iDeque);
-            int i_array = dq__iArray(thisDeque, iDeque);
-            thisDeque->_elems[i_array] = thisDeque->_elems[prevI_array];
+            int prev_i_array = dq__i_array_prev(this_Deque, i_deque);
+            int i_array = dq__i_array(this_Deque, i_deque);
+            this_Deque->_elems[i_array] = this_Deque->_elems[prev_i_array];
         }
-        thisDeque->_frontI = dq__iArray(thisDeque, 1);
+        this_Deque->_front_i = dq__i_array(this_Deque, 1);
     }
     else
     {
         //shift i last elems to the left
-        for(int iDeque = i; iDeque < thisDeque->_nbElems - 1; iDeque++)
+        for(int i_deque = i; i_deque < this_Deque->_nb_elems - 1; i_deque++)
         {
-            int nextI_array = dq__iArray(thisDeque, iDeque + 1);
-            int i_array = dq__iArray(thisDeque, iDeque);
-            thisDeque->_elems[i_array] = thisDeque->_elems[nextI_array];
+            int next_i_array = dq__i_array(this_Deque, i_deque + 1);
+            int i_array = dq__i_array(this_Deque, i_deque);
+            this_Deque->_elems[i_array] = this_Deque->_elems[next_i_array];
         }
     }
-    thisDeque->_nbElems--;
+    this_Deque->_nb_elems--;
 }
 
-static void dq_clear(Deque* thisDeque)
+static void dq_clear(Deque* this_Deque)
 {
-    thisDeque->_nbElems = 0;
-    thisDeque->_frontI = 0;//useless unless maybe for debug
+    this_Deque->_nb_elems = 0;
+    this_Deque->_front_i = 0;//useless unless maybe for debug
 }
 
 
 //search
 
-//static int (*find)(const Deque* thisDeque, ...)
+//static int (*find)(const Deque* this_Deque, ...)
 //{
 //
 //}
 
 ////////////////////////////////// iDeque /////////
 
-void iiDequeInit()
+void iiDeque_init()
 {
-    iCluige.iDeque.dequeAlloc = dq_dequeAlloc;
-    iCluige.iDeque.deleteDeque = dq_deleteDeque;
+    iCluige.iDeque.deque_alloc = dq_deque_alloc;
+    iCluige.iDeque.delete_Deque = dq_delete_Deque;
     iCluige.iDeque.at = dq_at;
     iCluige.iDeque.back = dq_back;
     iCluige.iDeque.front = dq_front;

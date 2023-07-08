@@ -16,21 +16,17 @@ static void ssvg_delete_SpriteSVG(Node* this_Node)
     SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
     void (*delete_Node2D)(Node*) = this_SpriteSVG->delete_Node2D;
     //delete my attributes
-    //Deque<Deque<Vector2*>* > paths
+    //Deque<Path2D* > paths
     Deque* paths = &(this_SpriteSVG->paths);
     int nb_paths = iCluige.iDeque.size(paths);
     for(int i=0; i<nb_paths; i++)
     {
-        Deque* path_i = iCluige.iDeque.at(paths, i).ptr;
-        int nb_points = iCluige.iDeque.size(path_i);
-        for(int j=0; j<nb_points; j++)
-        {
-            Vector2* point_j = iCluige.iDeque.at(path_i, j).ptr;
-            free(point_j);
-        }
-        iCluige.iDeque.delete_Deque(path_i);
+        Path2D* path_i = iCluige.iDeque.at(paths, i).ptr;
+        iCluige.iPath2D.pre_delete_Path2D(path_i);
+        free(path_i);
     }
-    iCluige.iDeque.delete_Deque(paths);
+    iCluige.iDeque.pre_delete_Deque(paths);
+    //free(paths);
 
     assert(this_SpriteSVG->_sub_class == NULL);
     free(this_SpriteSVG);
@@ -67,14 +63,13 @@ static void ssvg_draw_line(const float start_x, const float start_y, const float
 static void ssvg_pre_process_Node(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
-    SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
-    //call super()
-    this_SpriteSVG->pre_process_Node2D(this_Node);
-
     if(!(this_Node2D->visible))
     {
         return;
     }
+    SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
+    //call super()
+    this_SpriteSVG->pre_process_Node2D(this_Node);
 
     //clear old one (unless immobile? => no, because other masking things
     //could have moved and made this sprite visible again;
@@ -90,12 +85,12 @@ static void ssvg_pre_process_Node(Node* this_Node)
     int nb_paths = iCluige.iDeque.size(paths);
     for(int i=0; i<nb_paths; i++)
     {
-        Deque* path_i = iCluige.iDeque.at(paths, i).ptr;
-        int nb_points = iCluige.iDeque.size(path_i);
+        Path2D* path_i = iCluige.iDeque.at(paths, i).ptr;
+        int nb_points = iCluige.iPath2D.size(path_i);
         for(int j=0; j<(nb_points-1); j++)
         {
-            Vector2* p1 = iCluige.iDeque.at(path_i, j).ptr;
-            Vector2* p2 = iCluige.iDeque.at(path_i, j+1).ptr;
+            Vector2* p1 = iCluige.iPath2D.at(path_i, j);
+            Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
             ssvg_draw_line(
                 orig.x + ((p1->x) * sX), orig.y + ((p1->y) * sY),
                 orig.x + ((p2->x) * sX), orig.y + ((p2->y) * sY),
@@ -128,12 +123,12 @@ static void ssvg_post_process_Node(Node* this_Node)
     int nb_paths = iCluige.iDeque.size(paths);
     for(int i=0; i<nb_paths; i++)
     {
-        Deque* path_i = iCluige.iDeque.at(paths, i).ptr;
-        int nb_points = iCluige.iDeque.size(path_i);
+        Path2D* path_i = iCluige.iDeque.at(paths, i).ptr;
+        int nb_points = iCluige.iPath2D.size(path_i);
         for(int j=0; j<(nb_points-1); j++)
         {
-            Vector2* p1 = iCluige.iDeque.at(path_i, j).ptr;
-            Vector2* p2 = iCluige.iDeque.at(path_i, j+1).ptr;
+            Vector2* p1 = iCluige.iPath2D.at(path_i, j);
+            Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
             ssvg_draw_line(
                 orig.x + ((p1->x) * sX), orig.y + ((p1->y) * sY),
                 orig.x + ((p2->x) * sX), orig.y + ((p2->y) * sY),
@@ -178,29 +173,15 @@ static SpriteSVG* ssvg_new_SpriteSVG()
 
 static void ssvg_add_path_from_array(SpriteSVG* this_SpriteSVG, Vector2* points, int nb_points)
 {
-    Deque* new_path = iCluige.checked_malloc(sizeof(Deque));
-    iCluige.iDeque.deque_alloc(new_path, VT_POINTER, nb_points);
-    for(int i=0; i<nb_points; i++)
-    {
-        Vector2* pointI = iCluige.checked_malloc(sizeof(Vector2));
-        *pointI = points[i];
-        iCluige.iDeque.push_back(new_path, pointI);
-    }
+    Path2D* new_path = iCluige.checked_malloc(sizeof(Path2D));
+    iCluige.iPath2D.path2D_alloc(new_path, points, nb_points, true);
     iCluige.iDeque.push_back(&(this_SpriteSVG->paths), new_path);
 }
 
 static void ssvg_add_path_from_array_relative(SpriteSVG* this_SpriteSVG, Vector2* points, int nb_points)
 {
-    Deque* new_path = iCluige.checked_malloc(sizeof(Deque));
-    iCluige.iDeque.deque_alloc(new_path, VT_POINTER, nb_points);
-    Vector2 prev = (Vector2){0,0};
-    for(int i=0; i<nb_points; i++)
-    {
-        Vector2* pointI = iCluige.checked_malloc(sizeof(Vector2));
-        iCluige.iVector2.add(&prev, &(points[i]), pointI);
-        prev = *pointI;
-        iCluige.iDeque.push_back(new_path, pointI);
-    }
+    Path2D* new_path = iCluige.checked_malloc(sizeof(Path2D));
+    iCluige.iPath2D.path2D_alloc(new_path, points, nb_points, false);
     iCluige.iDeque.push_back(&(this_SpriteSVG->paths), new_path);
 }
 

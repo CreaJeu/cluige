@@ -18,6 +18,7 @@
 #include "Nodes/SpriteText.h"
 #include "Nodes/Input.h"
 #include "LineDrawerThin.h"
+#include "Path2D.h"
 #include "Nodes/SpriteSvg.h"
 
 //just a kind of namespace to prevent name collisions
@@ -36,6 +37,7 @@ struct iiCluige
 	struct iiNode2D iNode2D;
 	struct iiSpriteText iSpriteText;
     struct iiLineDrawerThin iLineDrawerThin;
+	struct iiPath2D iPath2D;
 	struct iiSpriteSVG iSpriteSVG;
 
 	//for target FPS, 15 fps by default

@@ -14,7 +14,7 @@ struct _SpriteSVG
 
     Vector2 scale;//tmp before general Node2D scale
 
-    Deque paths;//all paths of the svg Deque<Deque<Vector2*>* >
+    Deque paths;//all paths of the svg Deque<Path2D* >
 
 	//private
 	Node2D* _this_Node2D;

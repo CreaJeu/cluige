@@ -21,7 +21,7 @@ static void dq_deque_alloc(Deque* this_Deque, VariantType elems_type, int capaci
     this_Deque->_elems = iCluige.checked_malloc(capacity * sizeof(Variant));
 }
 
-static void dq_delete_Deque(Deque* this_Deque)
+static void dq_pre_delete_Deque(Deque* this_Deque)
 {
     //if elements are pointers, they must be deleted outside of this function,
     //according to the user needs
@@ -245,7 +245,7 @@ static void dq_clear(Deque* this_Deque)
 void iiDeque_init()
 {
     iCluige.iDeque.deque_alloc = dq_deque_alloc;
-    iCluige.iDeque.delete_Deque = dq_delete_Deque;
+    iCluige.iDeque.pre_delete_Deque = dq_pre_delete_Deque;
     iCluige.iDeque.at = dq_at;
     iCluige.iDeque.back = dq_back;
     iCluige.iDeque.front = dq_front;

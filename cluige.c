@@ -54,6 +54,7 @@ void cluige_init()
     iiNode2D_init();
     iiSpriteText_init();
     iiLineDrawerThin_init();
+    iiPath2D_init();
     iiSpriteSVG_init();
 
     iiClock_init();

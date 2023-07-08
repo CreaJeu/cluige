@@ -19,19 +19,19 @@ static void inp_delete_Input(Node* this_Node)
         free(va->name);
         free(v.ptr);
     }
-    iCluige.iDeque.delete_Deque(&(this_Input->available_actions));
+    iCluige.iDeque.pre_delete_Deque(&(this_Input->available_actions));
 
     for(int i=0; i < iCluige.iDeque.size(&(this_Input->bound_keys)); i++)
     {
         Variant v = iCluige.iDeque.at(&(this_Input->bound_keys), i);
         free(v.ptr);
     }
-    iCluige.iDeque.delete_Deque(&(this_Input->bound_keys));
+    iCluige.iDeque.pre_delete_Deque(&(this_Input->bound_keys));
 
-    iCluige.iDeque.delete_Deque(&(this_Input->just_pressed_actions));
-    iCluige.iDeque.delete_Deque(&(this_Input->just_released_actions));
-    iCluige.iDeque.delete_Deque(&(this_Input->just_pressed_keys));
-    iCluige.iDeque.delete_Deque(&(this_Input->just_released_keys));
+    iCluige.iDeque.pre_delete_Deque(&(this_Input->just_pressed_actions));
+    iCluige.iDeque.pre_delete_Deque(&(this_Input->just_released_actions));
+    iCluige.iDeque.pre_delete_Deque(&(this_Input->just_pressed_keys));
+    iCluige.iDeque.pre_delete_Deque(&(this_Input->just_released_keys));
 
     free(this_Input);
     this_Node->_sub_class = NULL;

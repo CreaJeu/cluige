@@ -29,7 +29,7 @@ struct iiDeque
     //constructor/destructor (don't forget to use them)
 
     void (*deque_alloc)(Deque* this_Deque, VariantType elems_type, int capacity);
-    void (*delete_Deque)(Deque* this_Deque);
+    void (*pre_delete_Deque)(Deque* this_Deque);
 
     //read
 

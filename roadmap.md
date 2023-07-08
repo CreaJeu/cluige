@@ -10,6 +10,7 @@
 
 **tâches actuelles**
 
+- sprite svg (no anim) : true file parsing
 - node2D (et autre?) : meilleur test ~instanceof / _className static par classe
 
 **Futures tâches**
@@ -22,7 +23,6 @@
 
 **FUTURS CHANTIERS**
 
-- sprite svg (no anim)
 - MVC pour affichage : modèle/back-buffer côté cluige, vue à part ("server" en vocabulaire Godot docs.godotengine.org/en/stable/tutorials/performance/using_servers.html )
 - sprite text : transparent characters, utiliser split et Deque
 - camera

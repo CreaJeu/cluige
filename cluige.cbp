@@ -78,6 +78,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Path2D.h" />
+		<Unit filename="SVGParser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="SVGParser.h" />
 		<Unit filename="Script.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -2,6 +2,7 @@
 //#include <stddef.h> //already in cluige.h
 #include "../cluige.h"
 #include "SpriteSVG.h"
+#include "../SVGParser.h"
 
 //#include <string.h>
 #include <assert.h>
@@ -9,6 +10,9 @@
 //#include <math.h>
 
 ////////////////////////////////// _SpriteSVG /////////
+
+// ~private static
+struct _SVGParser _svg_parser;
 
 static void ssvg_delete_SpriteSVG(Node* this_Node)
 {
@@ -86,15 +90,18 @@ static void ssvg_pre_process_Node(Node* this_Node)
     for(int i=0; i<nb_paths; i++)
     {
         Path2D* path_i = iCluige.iDeque.at(paths, i).ptr;
-        int nb_points = iCluige.iPath2D.size(path_i);
-        for(int j=0; j<(nb_points-1); j++)
+        if(path_i->_visible)
         {
-            Vector2* p1 = iCluige.iPath2D.at(path_i, j);
-            Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
-            ssvg_draw_line(
-                orig.x + ((p1->x) * sX), orig.y + ((p1->y) * sY),
-                orig.x + ((p2->x) * sX), orig.y + ((p2->y) * sY),
-                false);
+            int nb_points = iCluige.iPath2D.size(path_i);
+            for(int j=0; j<(nb_points-1); j++)
+            {
+                Vector2* p1 = iCluige.iPath2D.at(path_i, j);
+                Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
+                ssvg_draw_line(
+                    orig.x + ((p1->x) * sX), orig.y + ((p1->y) * sY),
+                    orig.x + ((p2->x) * sX), orig.y + ((p2->y) * sY),
+                    false);
+            }
         }
     }
 }
@@ -124,15 +131,18 @@ static void ssvg_post_process_Node(Node* this_Node)
     for(int i=0; i<nb_paths; i++)
     {
         Path2D* path_i = iCluige.iDeque.at(paths, i).ptr;
-        int nb_points = iCluige.iPath2D.size(path_i);
-        for(int j=0; j<(nb_points-1); j++)
+        if(path_i->_visible)
         {
-            Vector2* p1 = iCluige.iPath2D.at(path_i, j);
-            Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
-            ssvg_draw_line(
-                orig.x + ((p1->x) * sX), orig.y + ((p1->y) * sY),
-                orig.x + ((p2->x) * sX), orig.y + ((p2->y) * sY),
-                true);
+            int nb_points = iCluige.iPath2D.size(path_i);
+            for(int j=0; j<(nb_points-1); j++)
+            {
+                Vector2* p1 = iCluige.iPath2D.at(path_i, j);
+                Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
+                ssvg_draw_line(
+                    orig.x + ((p1->x) * sX), orig.y + ((p1->y) * sY),
+                    orig.x + ((p2->x) * sX), orig.y + ((p2->y) * sY),
+                    true);
+            }
         }
     }
 }
@@ -185,6 +195,31 @@ static void ssvg_add_path_from_array_relative(SpriteSVG* this_SpriteSVG, Vector2
     iCluige.iDeque.push_back(&(this_SpriteSVG->paths), new_path);
 }
 
+static void ssvg_add_path_from_parsed_deque(SpriteSVG* this_SpriteSVG, Deque* coordinates_sequence)
+{
+    if(iCluige.iDeque.size(coordinates_sequence) > 0)
+    {
+        Path2D* new_path = iCluige.checked_malloc(sizeof(Path2D));
+        iCluige.iPath2D.path2D_alloc_from_parsed(new_path, coordinates_sequence);
+        iCluige.iDeque.push_back(&(this_SpriteSVG->paths), new_path);
+    }
+}
+
+static void ssvg_parse_file(SpriteSVG* this_SpriteSVG, char* file_path)
+{
+    iCluige.iSpriteSVG.iSVGParser.prepare_parsing(
+            &_svg_parser, file_path);
+
+    while(
+        iCluige.iSpriteSVG.iSVGParser.parse_path(&_svg_parser)
+          )
+    {
+        iCluige.iSpriteSVG.add_path_from_parsed_deque(this_SpriteSVG, &(_svg_parser.coordinates_sequence));
+    }
+
+    iCluige.iSpriteSVG.iSVGParser.end_parsing(&_svg_parser);
+}
+
 /////////////////////////////////// Node //////////
 
 void iiSpriteSVG_init()
@@ -192,5 +227,10 @@ void iiSpriteSVG_init()
     iCluige.iSpriteSVG.new_SpriteSVG = ssvg_new_SpriteSVG;
     iCluige.iSpriteSVG.add_path_from_array = ssvg_add_path_from_array;
     iCluige.iSpriteSVG.add_path_from_array_relative = ssvg_add_path_from_array_relative;
+    iCluige.iSpriteSVG.add_path_from_parsed_deque = ssvg_add_path_from_parsed_deque;
+    iCluige.iSpriteSVG.parse_file = ssvg_parse_file;
+
+    iiSVGParser_init(&(iCluige.iSpriteSVG.iSVGParser));
+    iCluige.iSpriteSVG.iSVGParser.SVGParser_alloc(&_svg_parser);
 }
 

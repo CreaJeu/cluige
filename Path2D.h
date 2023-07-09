@@ -8,6 +8,8 @@ typedef struct _Path2D Path2D;
 struct _Path2D
 {
     Deque _points;//Deque<Vector2*>
+    bool _visible;
+
     //TODO color, thick/thin
 };
 
@@ -16,6 +18,8 @@ struct iiPath2D
 {
 	//void path2D_alloc(Vector2* points, int nb_points, bool absolute)
 	void (*path2D_alloc)(Path2D* this_Path2D, Vector2* points, int nb_points, bool absolute);
+	//void path2D_alloc(Vector2* points, int nb_points, bool absolute)
+	void (*path2D_alloc_from_parsed)(Path2D* this_Path2D, Deque* coordinates_sequence);
 	//Path2D* new_Path2D(Vector2* points, int nb_points, bool absolute)
 	Path2D* (*new_Path2D)(Vector2* points, int nb_points, bool absolute);
 

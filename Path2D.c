@@ -30,6 +30,25 @@ static void p2D_path2D_alloc(Path2D* this_Path2D, Vector2* points, int nb_points
         }
         iCluige.iDeque.push_back(new_path, pointI);
     }
+    this_Path2D->_visible = true;
+}
+
+static void p2D_path2D_alloc_from_parsed(Path2D* this_Path2D, Deque* coordinates_sequence)
+{
+    int nb_points = (iCluige.iDeque.size(coordinates_sequence)) / 2;
+    Deque* new_path = &(this_Path2D->_points);
+    iCluige.iDeque.deque_alloc(new_path, VT_POINTER, nb_points);
+
+    for(int i=0; i<nb_points; i++)
+    {
+        int i_x = 2 * i;
+        int i_y = (2 * i) + 1;
+        Vector2* pointI = iCluige.checked_malloc(sizeof(Vector2));
+        pointI->x = iCluige.iDeque.at(coordinates_sequence, i_x).f;
+        pointI->y = iCluige.iDeque.at(coordinates_sequence, i_y).f;
+        iCluige.iDeque.push_back(new_path, pointI);
+    }
+    this_Path2D->_visible = true;
 }
 
 static Path2D* p2D_new_Path2D(Vector2* points, int nb_points, bool absolute)
@@ -68,6 +87,7 @@ static int p2D_size(const Path2D* this_Path2D)
 void iiPath2D_init()
 {
 	iCluige.iPath2D.path2D_alloc = p2D_path2D_alloc;
+	iCluige.iPath2D.path2D_alloc_from_parsed = p2D_path2D_alloc_from_parsed;
 	iCluige.iPath2D.pre_delete_Path2D = p2D_pre_delete_Path2D;
     iCluige.iPath2D.new_Path2D = p2D_new_Path2D;
     iCluige.iPath2D.at = p2D_at;

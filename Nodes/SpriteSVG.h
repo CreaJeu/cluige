@@ -3,6 +3,7 @@
 
 #include "../Vector2.h"
 #include "../Deque.h"
+#include "../SVGParser.h"
 
 typedef struct _SpriteSVG SpriteSVG;
 
@@ -31,6 +32,9 @@ struct _SpriteSVG
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiSpriteSVG
 {
+    //too specific to be in iCluige
+    struct iiSVGParser iSVGParser;
+
 	//SpriteSVG* new_SpriteSVG()
 	SpriteSVG* (*new_SpriteSVG)();
 
@@ -38,6 +42,10 @@ struct iiSpriteSVG
 	void (*add_path_from_array)(SpriteSVG*, Vector2*, int nb_points);
 	//copies the points from the array
 	void (*add_path_from_array_relative)(SpriteSVG*, Vector2*, int nb_points);
+	//copies the points from the deque [x y x y x y...]
+	void (*add_path_from_parsed_deque)(SpriteSVG*, Deque*);
+
+	void (*parse_file)(SpriteSVG*, char* file_path);
 };
 //iSpriteSVG : in iiCluige
 

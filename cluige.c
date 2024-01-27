@@ -44,6 +44,7 @@ void cluige_init()
 
     iiVariant_init();
     iiDeque_init();
+    iiSortedDictionary_init();
     iiStringBuilder_init();
     iiNode_init();
     iCluige.private_root_2D = iCluige.iNode.new_Node();

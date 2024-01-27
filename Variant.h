@@ -7,6 +7,7 @@
 
 typedef union _Variant Variant;
 typedef enum _VariantType VariantType;
+typedef struct _Pair Pair;
 
 enum _VariantType
 {
@@ -37,8 +38,16 @@ union _Variant
     //TODO : Cell, Deque, Map
 };
 
+struct _Pair
+{
+    Variant first;
+    Variant second;
+};
+
 struct iiVariant
 {
+    Variant NULL_VARIANT;
+
     Variant (*from_val)(VariantType val_type, ...);
     Variant (*from_args)(VariantType val_type, va_list args);
     int (*compare)(VariantType val_type, Variant v1, Variant v2);//like in java

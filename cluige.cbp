@@ -86,6 +86,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Script.h" />
+		<Unit filename="SortedDictionary.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="SortedDictionary.h" />
 		<Unit filename="StringBuilder.c">
 			<Option compilerVar="CC" />
 		</Unit>

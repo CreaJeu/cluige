@@ -46,7 +46,7 @@ struct iiDeque
     void (*push_front)(Deque* this_Deque, ...);
     void (*append)(Deque* this_Deque, ...);//same as push_back()
     void (*insert)(Deque* this_Deque, int i, ...);
-    //TODO void (*insertSorted)(Deque* this_Deque, ...);
+    void (*insert_sorted)(Deque* this_Deque, ...);
     //one day? append_array()
 
     //deletion
@@ -60,7 +60,7 @@ struct iiDeque
 //
 //    //search
 //
-//    int (*bsearch)(const Deque* this_Deque, ...);
+    int (*bsearch)(const Deque* this_Deque, ...);
 //    int (*find)(const Deque* this_Deque, ...);
 //    int (*rsearch)(const Deque* this_Deque, ...);//find last occurence
 //    bool (*has)(const Deque* this_Deque, ...);

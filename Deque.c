@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 
 ////////////////////////////////// iiDeque /////////
@@ -178,6 +179,27 @@ static void dq_insert(Deque* this_Deque, int i, ...)
     va_end(args_elem_value);
 }
 
+//just forward declaration, see implentation below
+static int dq_bsearch_rec(const Deque* this_Deque, Variant searched_elem, int* i_min, int i_max);
+
+static void dq_insert_sorted(Deque* this_Deque, ...)
+{
+    assert(this_Deque->_sorted);
+    va_list args_elem_value;
+    va_start(args_elem_value, this_Deque);
+    int i_min = 0;
+    int i_max = iCluige.iDeque.size(this_Deque) - 1;
+    Variant new_elem = iCluige.iVariant.from_args(
+                this_Deque->_elems_type, args_elem_value);
+    va_end(args_elem_value);
+
+    //find insert pos, store it in i_min
+    dq_bsearch_rec(this_Deque, new_elem, &i_min, i_max);
+    va_start(args_elem_value, this_Deque);
+    dq__insert_va_list(this_Deque, i_min, args_elem_value);
+    va_end(args_elem_value);
+}
+
 
 //deletion
 
@@ -235,6 +257,95 @@ static void dq_clear(Deque* this_Deque)
 
 //search
 
+//private utility
+static int dq_compare(const Deque* this_Deque, Variant va, Variant vb)
+{
+    if((this_Deque->_compare_func) == NULL)
+    {
+        return iCluige.iVariant.compare(this_Deque->_elems_type, va, vb);
+    }
+    else
+    {
+        return this_Deque->_compare_func(va, vb);
+    }
+}
+
+//i_min is changed at the end of the search to be the
+// index at which searched_elem should be inserted if
+// needed for a sorted insertion
+static int dq_bsearch_rec(const Deque* this_Deque, Variant searched_elem, int* i_min, int i_max)
+{
+    int comp;
+
+    if(*i_min > i_max)
+    {
+        return -1;
+    }
+    Variant min_val = iCluige.iDeque.at(this_Deque, *i_min);
+    if(*i_min == i_max)
+    {
+        comp = dq_compare(this_Deque, min_val, searched_elem);
+        if(comp == 0)
+        {
+            (*i_min)++;
+            return i_max;
+        }
+        else if(comp < 0) //min_val < searched_elem
+        {
+            (*i_min)++;
+            return -1;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    //not really bsearch algo, optimisation for cases where big
+    //sorted deques are built by many appends already in right order
+    Variant max_val = iCluige.iDeque.at(this_Deque, i_max);
+    comp = dq_compare(this_Deque, searched_elem, max_val);
+    if(comp > 0) //searched_elem > max_val
+    {
+        (*i_min) = i_max + 1;
+        return -1;
+    }
+
+    //bsearch general algo
+    int i_middle = (*i_min + i_max) / 2;
+    Variant middle_val = iCluige.iDeque.at(this_Deque, i_middle);
+    comp = dq_compare(this_Deque, searched_elem, middle_val);
+    if(comp < 0) // searched_elem < middle_val
+    {
+        return dq_bsearch_rec(this_Deque, searched_elem, i_min, i_middle - 1);
+    }
+    else if(comp == 0) // searched_elem == middle_val
+    {
+        *i_min = i_middle + 1;
+        return i_middle;
+    }
+    else // middle_val < searched_elem
+    {
+        *i_min = i_middle + 1;//recursivity
+        return dq_bsearch_rec(this_Deque, searched_elem, i_min, i_max);
+    }
+}
+
+static int dq_bsearch(const Deque* this_Deque, ...)
+{
+    assert(this_Deque->_sorted);
+    va_list args_elem_value;
+    va_start(args_elem_value, this_Deque);
+    Variant searched_elem = iCluige.iVariant.from_args(this_Deque->_elems_type, args_elem_value);
+
+    //cannot use standard c language bsearch function
+    //because double-ended queue means i_start may be > i_end in the array
+    int i_min = 0;
+    int i_max = iCluige.iDeque.size(this_Deque) - 1;
+    int res = dq_bsearch_rec(this_Deque, searched_elem, &i_min, i_max);
+    va_end(args_elem_value);
+    return res;
+}
 //static int (*find)(const Deque* this_Deque, ...)
 //{
 //
@@ -255,10 +366,12 @@ void iiDeque_init()
     iCluige.iDeque.push_front = dq_push_front;
     iCluige.iDeque.append = dq_append;
     iCluige.iDeque.insert = dq_insert;
+    iCluige.iDeque.insert_sorted = dq_insert_sorted;
     iCluige.iDeque.pop_back = dq_pop_back;
     iCluige.iDeque.pop_front = dq_pop_front;
     iCluige.iDeque.remove = dq_remove;
     iCluige.iDeque.clear = dq_clear;
+    iCluige.iDeque.bsearch = dq_bsearch;
 //    iCluige.iDeque.find = dq_find;
 }
 

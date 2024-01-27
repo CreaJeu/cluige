@@ -70,91 +70,91 @@ static int vrt_compare(VariantType val_type, Variant v1, Variant v2)
     case VT_BOOL:
         if((v1.b) < (v2.b))
         {
-            res = 1;
+            res = -1;
         }
         else if((v1.b) > (v2.b))
         {
-            res = -1;
+            res = 1;
         }
         break;
     case VT_CHAR:
         if((v1.c) < (v2.c))
         {
-            res = 1;
+            res = -1;
         }
         else if((v1.c) > (v2.c))
         {
-            res = -1;
+            res = 1;
         }
         break;
     case VT_INT32:
         if((v1.i32) < (v2.i32))
         {
-            res = 1;
+            res = -1;
         }
         else if((v1.i32) > (v2.i32))
         {
-            res = -1;
+            res = 1;
         }
         break;
     case VT_UINT32:
         if((v1.ui32) < (v2.ui32))
         {
-            res = 1;
+            res = -1;
         }
         else if((v1.ui32) > (v2.ui32))
         {
-            res = -1;
+            res = 1;
         }
         break;
     case VT_INT64:
         if((v1.i64) < (v2.i64))
         {
-            res = 1;
+            res = -1;
         }
         else if((v1.i64) > (v2.i64))
         {
-            res = -1;
+            res = 1;
         }
         break;
     case VT_UINT64:
         if((v1.ui64) < (v2.ui64))
         {
-            res = 1;
+            res = -1;
         }
         else if((v1.ui64) > (v2.ui64))
         {
-            res = -1;
+            res = 1;
         }
         break;
     case VT_FLOAT:
         if((v1.f) < (v2.f))
         {
-            res = 1;
+            res = -1;
         }
         else if((v1.f) > (v2.f))
         {
-            res = -1;
+            res = 1;
         }
         break;
     case VT_DOUBLE:
         if((v1.d) < (v2.d))
         {
-            res = 1;
+            res = -1;
         }
         else if((v1.d) > (v2.d))
         {
-            res = -1;
+            res = 1;
         }
         break;
     case VT_POINTER:
         if((v1.ptr) < (v2.ptr))
         {
-            res = 1;
+            res = -1;
         }
         else if((v1.ptr) > (v2.ptr))
         {
-            res = -1;
+            res = 1;
         }
         break;
     default:
@@ -170,6 +170,9 @@ static int vrt_compare(VariantType val_type, Variant v1, Variant v2)
 
 void iiVariant_init()
 {
+    //iCluige.iVariant.NULL_VARIANT = (Variant)0;//not standard C
+    iCluige.iVariant.NULL_VARIANT.d = 0;
+    iCluige.iVariant.NULL_VARIANT.ptr = 0;///TODO better way to be sure to fill with 0?
     iCluige.iVariant.from_val = vrt_from_val;
     iCluige.iVariant.from_args = vrt_from_args;
     iCluige.iVariant.compare = vrt_compare;

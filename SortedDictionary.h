@@ -12,11 +12,10 @@ typedef struct _SortedDictionary SortedDictionary;
 
 struct _SortedDictionary
 {
-    //all private (users should use only functions/methods)
-    Deque _pairs;
+    //private (users should use only functions/methods)
+    Deque _pairs;//Deque< pair* >
     VariantType _keys_type;
     VariantType _values_type;
-    int (*compare_keys_func)(Variant v1, Variant v2);//like in java
 };
 
 struct iiSortedDictionary
@@ -25,16 +24,23 @@ struct iiSortedDictionary
     void (*sorted_dictionary_alloc)(SortedDictionary* this_SortedDictionary, VariantType keys_type, VariantType values_type, int capacity);
     void (*pre_delete_SortedDictionary)(SortedDictionary* this_SortedDictionary);
 
+    void (*set_compare_keys_func)(SortedDictionary* this_SortedDictionary, int (*)(const Deque*, Variant, Variant));
+
     //read
 
-    //(null if not found)
+    //(NULL_VARIANT if not found)
     Variant (*get)(const SortedDictionary* this_SortedDictionary, ...);
+    ///TODO at(i) for loops
+
     int (*size)(const SortedDictionary* this_SortedDictionary);
     bool (*is_empty)(const SortedDictionary* this_SortedDictionary);
 
     //insertion
 
-    void (*insert)(SortedDictionary* this_SortedDictionary, ...);
+    //automatically insert or replace if key already present
+    //returns a copy of replaced value, for example if you need to do some free/delete
+    //or NULL_VARIANT if no value was replaced
+    Variant (*insert)(SortedDictionary* this_SortedDictionary, ...);
 
     //deletion
 
@@ -43,7 +49,8 @@ struct iiSortedDictionary
 
     //search
 
-    bool (*has)(const SortedDictionary* this_SortedDictionary, ...);
+    //use get() instead
+    //bool (*has)(const SortedDictionary* this_SortedDictionary, ...);
 };
 
 void iiSortedDictionary_init();

@@ -9,6 +9,11 @@ typedef union _Variant Variant;
 typedef enum _VariantType VariantType;
 typedef struct _Pair Pair;
 
+struct _Structed_va_list
+{
+    va_list args;
+};
+
 enum _VariantType
 {
     VT_BOOL,
@@ -49,8 +54,10 @@ struct iiVariant
     Variant NULL_VARIANT;
 
     Variant (*from_val)(VariantType val_type, ...);
-    Variant (*from_args)(VariantType val_type, va_list args);
-    int (*compare)(VariantType val_type, Variant v1, Variant v2);//like in java
+    Variant (*from_s_args)(VariantType val_type, struct _Structed_va_list* sargs);
+    Pair (*pair_from_args)(VariantType first_type, VariantType second_type, struct _Structed_va_list* sargs);
+    int (*compare)(VariantType val_type, Variant v1, Variant v2);// res < 0  <=>  v1 < v2
+    bool (*is_null)(const Variant* v);
 };
 
 void iiVariant_init();

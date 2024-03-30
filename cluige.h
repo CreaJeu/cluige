@@ -27,7 +27,7 @@ struct iiCluige
 {
     struct iiVariant iVariant;
     struct iiDeque iDeque;
-    struct iiSortedDictionary;
+    struct iiSortedDictionary iSortedDictionary;
 	struct iiStringBuilder iStringBuilder;
 	struct iiNode iNode;
 	struct iiClock iClock;

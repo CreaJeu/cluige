@@ -12,6 +12,15 @@
 
 typedef struct _Deque Deque;
 
+struct _BSearchData
+{
+    int _i_min;
+    int _i_max;
+    bool _found;
+    int _found_deque_index;
+    int _found_insert_deque_index;
+};
+
 struct _Deque
 {
     //all private (users should use only functions/methods)
@@ -21,7 +30,10 @@ struct _Deque
     Variant* _elems;
     VariantType _elems_type;
     bool _sorted;
-    int (*_compare_func)(Variant va, Variant vb);
+
+    int (*_compare_func)(const Deque* this_Deque, Variant va, Variant vb);
+    //for use by custom _compare_func if needed (see example in SortedDictionary)
+    int (*_compare_sub_func)(const Deque* this_Deque, Variant sub_va, Variant sub_vb);
 };
 
 struct iiDeque
@@ -46,7 +58,10 @@ struct iiDeque
     void (*push_front)(Deque* this_Deque, ...);
     void (*append)(Deque* this_Deque, ...);//same as push_back()
     void (*insert)(Deque* this_Deque, int i, ...);
-    void (*insert_sorted)(Deque* this_Deque, ...);
+
+    //returns a copy of replaced elem, for example if you need to do some free/delete
+    //or NULL_VARIANT if no elem was replaced
+    Variant (*insert_or_replace_sorted)(Deque* this_Deque, bool replace, ...);
     //one day? append_array()
 
     //deletion
@@ -55,12 +70,17 @@ struct iiDeque
     Variant (*pop_front)(Deque* this_Deque);
     void (*remove)(Deque* this_Deque, int i);
     void (*clear)(Deque* this_Deque);
-    //TODO
-//    //one day? shuffle(), slice(iMin, iMax)
-//
-//    //search
-//
+    void (*replace)(Deque* this_Deque, int i, Variant new_v);
+    //TODO one day? shuffle(), slice(iMin, iMax)
+
+    //search
+
+    int (*default_compare_func)(const Deque* this_Deque, Variant va, Variant vb);
+    int (*default_compare_pair_key_func)(const Deque* this_Deque, Variant va, Variant vb);
+    int (*default_compare_string_func)(const Deque* this_Deque, Variant va, Variant vb);//for convenience
+
     int (*bsearch)(const Deque* this_Deque, ...);
+    void (*bsearch_rec)(const Deque* this_Deque, Variant searched_elem, struct _BSearchData* bsd);
 //    int (*find)(const Deque* this_Deque, ...);
 //    int (*rsearch)(const Deque* this_Deque, ...);//find last occurence
 //    bool (*has)(const Deque* this_Deque, ...);

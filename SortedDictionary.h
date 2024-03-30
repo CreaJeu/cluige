@@ -30,7 +30,9 @@ struct iiSortedDictionary
 
     //(NULL_VARIANT if not found)
     Variant (*get)(const SortedDictionary* this_SortedDictionary, ...);
-    ///TODO at(i) for loops
+
+    //for loops ; returned Variant .ptr is to the Pair at i
+    Variant (*at)(const SortedDictionary* this_SortedDictionary, int i);
 
     int (*size)(const SortedDictionary* this_SortedDictionary);
     bool (*is_empty)(const SortedDictionary* this_SortedDictionary);
@@ -41,6 +43,11 @@ struct iiSortedDictionary
     //returns a copy of replaced value, for example if you need to do some free/delete
     //or NULL_VARIANT if no value was replaced
     Variant (*insert)(SortedDictionary* this_SortedDictionary, ...);
+
+    //inserts without any existence check
+    void (*insert_first)(SortedDictionary* this_SortedDictionary, ...);
+    //inserts without any existence check
+    void (*insert_last)(SortedDictionary* this_SortedDictionary, ...);
 
     //deletion
 

@@ -18,6 +18,8 @@
 - fatal error => end loop + printf
 - queue_free, remove child
 - get node by name/path
+- prevent the user to set names with char such as '\'
+- project files to test every methods
 
 
 

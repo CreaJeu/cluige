@@ -129,6 +129,10 @@ static void nde_set_name(Node* n, const char* new_name)
     n->name = next_name;
 }
 
+
+
+
+
 //make unique name
 static void nde_auto_name(Node* node)
 {
@@ -150,6 +154,127 @@ static void nde_auto_name(Node* node)
     }
 }
 
+//return child at idx in current child else NULL
+static Node* nde_get_child(const Node* ths_node, int idx)
+{
+    if (ths_node == NULL ||ths_node->children == NULL)
+    {
+        return NULL;
+    }
+    Node* next_sib = ths_node->children;
+    while(next_sib != NULL && nde_get_index(next_sib) != idx  )
+    {
+        next_sib = next_sib->next_sibling;
+    }
+    return next_sib;
+}
+
+static int nde_get_child_count(const Node* ths_node)
+{
+    int count = 0;
+    if (ths_node == NULL ||ths_node->children == NULL)
+    {
+        return count;
+    }
+    Node* next_sib = ths_node->children;
+
+    while(next_sib != NULL){
+        count++;
+        next_sib = next_sib->next_sibling;
+    }
+    return count;
+}
+
+//auxiliary functions that return the node if there is on this level comparing with names
+static Node* nde_on_level(const Node* ths_node, char* last_word)
+{
+    Node* next_sib = ths_node;
+    while(next_sib != NULL)
+    {
+        if(strcmp(next_sib->name,last_word) == 0)
+        {
+            return next_sib;
+        }
+        next_sib = next_sib->next_sibling;
+    }
+    return NULL;
+}
+
+static Node* nde_get_node(const Node* ths_node, char* node_path )
+{
+    int i =0;
+    bool absolute = node_path[0] == '/';
+    char element[50];
+    Node* next_child;
+
+    if (absolute)next_child = iCluige.public_root_2D->children;
+    else next_child = ths_node->children;
+
+
+
+    if (!absolute)//this if is possibly useless
+    {
+        if (sscanf(node_path, "%[^/]/", element) == 1) {
+            Node* tmp = nde_on_level(next_child,element);
+            i += strlen(element) + 1;
+            if(tmp==NULL)
+            {
+                return NULL;
+            }
+            else if(i + 1 < strlen(node_path))
+            {
+                next_child = tmp->children;
+            }
+        }
+    }
+
+
+    while (sscanf(node_path + i, "/%[^/]", element) == 1)
+    {
+        Node* tmp = nde_on_level(next_child,element);  //search if a node matches the element and if so returns it
+        i += strlen(element) + 1;
+        if(tmp==NULL)                                  //If no node has been found it failed.
+        {
+            return NULL;
+        }
+        else if (i + 1 < strlen(node_path))
+        {
+            next_child = tmp->children;
+        }
+    }
+    return next_child;
+
+}
+
+static void nde_remove_child( Node* ths_node, Node* child)
+{
+    int pos = nde_get_index(child);
+
+    //link between parent and child
+    if(ths_node->children == child && child->next_sibling != NULL) //if there is more than one children to ths_node
+    {
+        ths_node->children = child->next_sibling;
+    }
+    else if((ths_node->children == child)&& child->next_sibling == NULL)
+    {
+        ths_node->children = NULL;
+    }
+
+    //link between children
+    if(pos > 0 )
+    {
+        Node* node_to_mod = ths_node->children;  //take the node before the one we want to remove
+        Node* node_to_point = child->next_sibling;           //take the node after we the one we want to remove
+        node_to_mod->next_sibling = node_to_point;          //link both
+
+    }
+    child->next_sibling = NULL;                         //remove the link between the child and the rest
+    child->parent = NULL;
+}
+
+
+
+
 //asserts that wanted child doesn't have already a parent
 static void nde_add_child(Node* parent, Node* child)
 {
@@ -161,12 +286,12 @@ static void nde_add_child(Node* parent, Node* child)
     }
     else
     {
-        Node* lastChild = parent->children;
-        while(lastChild->next_sibling != NULL)
+        Node* last_child = parent->children;
+        while(last_child->next_sibling != NULL)
         {
-            lastChild = lastChild->next_sibling;
+            last_child = last_child->next_sibling;
         }
-        lastChild->next_sibling = child;
+        last_child->next_sibling = child;
     }
     child->parent = parent;
 
@@ -224,5 +349,8 @@ void iiNode_init()
     iCluige.iNode.set_name = nde_set_name;
     iCluige.iNode.add_child = nde_add_child;
     iCluige.iNode.print_tree_pretty = nde_print_tree_pretty;
+    iCluige.iNode.get_child = nde_get_child;
+    iCluige.iNode.get_node = nde_get_node;
+    iCluige.iNode.remove_child = nde_remove_child;
 }
 

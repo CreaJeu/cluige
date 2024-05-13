@@ -148,14 +148,16 @@ void cluige_run()
         process_tree(iCluige.private_root_2D, PROCESS_PASS);
         process_tree(iCluige.private_root_2D, POST_PROCESS_PASS);
 
+        refresh();
+        iCluige.iNode.empty_dq_free();
         //curses
         int sleep_frame_milliseconds = 1;
+
         if(iCluige.clock->elapsed_seconds < iCluige.wanted_frame_seconds)
         {
             float sleep_frame_seconds = iCluige.wanted_frame_seconds - iCluige.clock->elapsed_seconds;
             sleep_frame_milliseconds = (int)(sleep_frame_seconds * 1000);
         }
-        refresh();
         napms(sleep_frame_milliseconds);//sleep to avoid 100% CPU
     }
 }

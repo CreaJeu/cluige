@@ -82,7 +82,12 @@ struct iiNode
     //The user have to save the Node manually in order to keep the node
     void (*remove_child)(Node* ths_node, Node* child);
 
-	//TODO queueFree()
+    char* (*get_path_mallocing)(Node* node);
+
+    //add the node in the list of node to be delete next frame
+    void (*queue_free)(Node* node);
+
+    void (*empty_dq_free)();
 };
 //iNode : in iiCluige
 

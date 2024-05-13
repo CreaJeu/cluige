@@ -16,10 +16,10 @@
 **Futures tâches**
 
 - fatal error => end loop + printf
-- queue_free, remove child
+- queue_free(delete_node ???), remove child
 - get node by name/path
-- prevent the user to set names with char such as '\'
 - project files to test every methods
+- get_path
 
 
 

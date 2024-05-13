@@ -15,6 +15,13 @@
 //    ...
 //}
 
+
+    //Deque to keep track of which malloc to free
+    Deque dq_free;
+
+
+
+
 static void nde_delete_Node(Node* node)
 {
     if(node->children != NULL)
@@ -115,10 +122,19 @@ static int nde_get_depth(const Node* node)
     return res;
 }
 
+//true if name is valid (do not contain of : / " % @ : .) else false
+static bool valid_name(const char* new_name)
+{
+    return  (strrchr(new_name,'/') == NULL) && (strrchr(new_name,'"') == NULL) && (strrchr(new_name,'%') == NULL) &&
+    (strrchr(new_name,'@') == NULL) && (strrchr(new_name,':') == NULL) && (strrchr(new_name,'.') != NULL);
+}
+
 static void nde_set_name(Node* n, const char* new_name)
 {
     //allocate new name to prevent pointing to the stack
     int size = strlen(new_name);
+
+    assert(!valid_name(new_name));
     char* next_name = iCluige.checked_malloc((size + 1) * sizeof(char));
     strcpy(next_name, new_name);
     //free old name
@@ -128,6 +144,7 @@ static void nde_set_name(Node* n, const char* new_name)
     }
     n->name = next_name;
 }
+
 
 
 
@@ -200,54 +217,62 @@ static Node* nde_on_level(const Node* ths_node, char* last_word)
     return NULL;
 }
 
-static Node* nde_get_node(const Node* ths_node, char* node_path )
+static Node* nde_get_node_rec(Node* ths_node, char* node_path )//Not completed
 {
+    assert(node_path != NULL);
     int i =0;
-    bool absolute = node_path[0] == '/';
     char element[50];
-    Node* next_child;
-
-    if (absolute)next_child = iCluige.public_root_2D->children;
-    else next_child = ths_node->children;
-
-
-
-    if (!absolute)//this if is possibly useless
+    int size = strlen(node_path);
+    if(sscanf(node_path, "%[^/]/", element) == 1)// "test/main" or "main" format
     {
-        if (sscanf(node_path, "%[^/]/", element) == 1) {
-            Node* tmp = nde_on_level(next_child,element);
-            i += strlen(element) + 1;
-            if(tmp==NULL)
-            {
-                return NULL;
-            }
-            else if(i + 1 < strlen(node_path))
-            {
-                next_child = tmp->children;
-            }
-        }
-    }
-
-
-    while (sscanf(node_path + i, "/%[^/]", element) == 1)
-    {
-        Node* tmp = nde_on_level(next_child,element);  //search if a node matches the element and if so returns it
         i += strlen(element) + 1;
-        if(tmp==NULL)                                  //If no node has been found it failed.
+        Node* tmp = nde_on_level(ths_node,element);
+        if(tmp == NULL)
         {
             return NULL;
         }
-        else if (i + 1 < strlen(node_path))
+        else if(i >= size)
         {
-            next_child = tmp->children;
+            return tmp;
+        }
+        else
+        {
+            return nde_get_node_rec(tmp->children,i + node_path);
         }
     }
-    return next_child;
+    else//HOW DO YOU GET HERE
+    {
+        return NULL;
+    }
+}
+
+
+static Node* nde_get_node(const Node* ths_node, char* node_path )//Not completed
+{
+    assert(node_path != NULL);
+    bool absolute = node_path[0] == '/';
+    Node* next_child;
+
+    if (absolute)
+    {
+        next_child = iCluige.public_root_2D;
+        node_path++;
+    }
+    else
+    {
+        if(ths_node->children == NULL) return NULL;
+        next_child = ths_node->children;
+    }
+    return nde_get_node_rec(next_child,node_path);
 
 }
 
+
 static void nde_remove_child( Node* ths_node, Node* child)
 {
+    assert(ths_node != NULL);
+    assert(child != NULL);
+    assert(nde_on_level(ths_node->children,child->name) != NULL);//verify that the child given is indeed a child of ths_node
     int pos = nde_get_index(child);
 
     //link between parent and child
@@ -271,6 +296,96 @@ static void nde_remove_child( Node* ths_node, Node* child)
     child->next_sibling = NULL;                         //remove the link between the child and the rest
     child->parent = NULL;
 }
+
+
+//auxilliary function for get_path
+void insert_string(char *str1, const char *str2) {//first string is the container and second the string you want to add before str1
+    int len1 = strlen(str1);
+    int len2 = strlen(str2);
+
+    // Shift the characters of str1 to the right to make space for str2
+    for (int i = len1; i >= 0; i--) {
+        str1[i + len2] = str1[i];
+    }
+
+    // Copy str2 into the beginning of str1
+    for (int i = 0; i < len2; i++) {
+        str1[i] = str2[i];
+    }
+}
+
+static char* nde_get_path_mallocing(Node* ths_node)
+{
+    StringBuilder sb;
+    int max_depth = nde_get_depth(ths_node);
+    char* pth = iCluige.iStringBuilder.string_alloc(&sb,max_depth + 100);
+
+    assert(ths_node != NULL);
+
+    int index = 1;
+    char bar[5] = "/";
+    Node* nxt_parent = ths_node;
+
+
+    while(nxt_parent != iCluige.public_root_2D)
+    {
+        insert_string(pth,nxt_parent->name);
+        index += strlen(nxt_parent->name); // Update index
+
+        insert_string(pth,&bar);
+        index += strlen(bar);
+
+        nxt_parent = nxt_parent->parent;
+    }
+    // Null-terminate the final string
+    pth[index] = '\0';
+    return pth;
+}
+
+
+static void nde_queue_free(Node* node)
+{
+    iCluige.iDeque.append(&dq_free,node);
+}
+
+void debug_dq()
+{
+    int size = iCluige.iDeque.size(&dq_free);
+    printf("dq_free: ");
+    for(int i = 0; i < size; i++)
+    {
+        Node* node = iCluige.iDeque.at(&dq_free,i).ptr;
+
+        printf(" %s |",node->name);
+    }
+    printf("\n");
+}
+
+static void nde_empty_dq_free()
+{
+    int size = iCluige.iDeque.size(&dq_free);
+    debug_dq();
+    for(int i = 0; i < size; size--)
+    {
+
+        Node* node = iCluige.iDeque.at(&dq_free,i).ptr;
+
+        if(node->next_sibling !=NULL)//removes the link between sibilings else delete_node will delete all siblings
+        {
+            node->parent->children = node->next_sibling;
+            node->next_sibling = NULL;
+        }
+        else
+        {
+            node->parent->children = NULL;
+        }
+
+        nde_delete_Node(node);
+        iCluige.iDeque.remove(&dq_free,i);
+        debug_dq();
+    }
+}
+
 
 
 
@@ -341,6 +456,9 @@ static void nde_print_tree_pretty(const Node* node)
 
 void iiNode_init()
 {
+    iCluige.iDeque.deque_alloc(&dq_free, VT_POINTER, 100);
+
+
     //iCluige.iNode.initZero = nde_initZero;
     iCluige.iNode.new_Node = nde_new_Node;
     //iCluige.iNode.delete_Node = nde_delete_Node;
@@ -352,5 +470,8 @@ void iiNode_init()
     iCluige.iNode.get_child = nde_get_child;
     iCluige.iNode.get_node = nde_get_node;
     iCluige.iNode.remove_child = nde_remove_child;
-}
+    iCluige.iNode.get_path_mallocing = nde_get_path_mallocing;
+    iCluige.iNode.queue_free = nde_queue_free;
+    iCluige.iNode.empty_dq_free = nde_empty_dq_free;
 
+}

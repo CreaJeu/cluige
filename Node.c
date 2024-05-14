@@ -16,9 +16,9 @@
 //}
 
 
-    //Deque to keep track of which malloc to free
-    Deque dq_free;
-
+//Deque to keep track of which malloc to free
+Deque _queue_freed_nodes;
+const int _MAX_NAME_LENGTH = 150;
 
 
 
@@ -125,8 +125,14 @@ static int nde_get_depth(const Node* node)
 //true if name is valid (do not contain of : / " % @ : .) else false
 static bool valid_name(const char* new_name)
 {
-    return  (strrchr(new_name,'/') == NULL) && (strrchr(new_name,'"') == NULL) && (strrchr(new_name,'%') == NULL) &&
-    (strrchr(new_name,'@') == NULL) && (strrchr(new_name,':') == NULL) && (strrchr(new_name,'.') != NULL);
+    const char *special_chars = "/: .@%";
+    for (int i = 0; new_name[i] != '\0'; i++) {
+        if (strchr(special_chars, new_name[i]) != NULL) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 static void nde_set_name(Node* n, const char* new_name)
@@ -134,7 +140,7 @@ static void nde_set_name(Node* n, const char* new_name)
     //allocate new name to prevent pointing to the stack
     int size = strlen(new_name);
 
-    assert(!valid_name(new_name));
+    assert(valid_name(new_name));
     char* next_name = iCluige.checked_malloc((size + 1) * sizeof(char));
     strcpy(next_name, new_name);
     //free old name
@@ -174,36 +180,36 @@ static void nde_auto_name(Node* node)
 //return child at idx in current child else NULL
 static Node* nde_get_child(const Node* ths_node, int idx)
 {
-    if (ths_node == NULL ||ths_node->children == NULL)
-    {
-        return NULL;
-    }
+    assert(ths_node != NULL);
+
     Node* next_sib = ths_node->children;
-    while(next_sib != NULL && nde_get_index(next_sib) != idx  )
+    int count = 0;
+
+    while(next_sib != NULL && count != idx  )
     {
         next_sib = next_sib->next_sibling;
+        count++;
     }
     return next_sib;
 }
 
 static int nde_get_child_count(const Node* ths_node)
 {
+    assert(ths_node != NULL);
+
     int count = 0;
-    if (ths_node == NULL ||ths_node->children == NULL)
-    {
-        return count;
-    }
     Node* next_sib = ths_node->children;
 
-    while(next_sib != NULL){
+    while(next_sib != NULL)
+    {
         count++;
         next_sib = next_sib->next_sibling;
     }
     return count;
 }
 
-//auxiliary functions that return the node if there is on this level comparing with names
-static Node* nde_on_level(const Node* ths_node, char* last_word)
+//auxiliary functions that returns the node if there is one on this level comparing with names
+static Node* nde_on_level(Node* ths_node,const char* last_word)
 {
     Node* next_sib = ths_node;
     while(next_sib != NULL)
@@ -217,17 +223,49 @@ static Node* nde_on_level(const Node* ths_node, char* last_word)
     return NULL;
 }
 
-static Node* nde_get_node_rec(Node* ths_node, char* node_path )//Not completed
+static Node* nde_get_node_rec(Node* ths_node,const char* node_path,bool absolute )//Not completed
 {
     assert(node_path != NULL);
     int i =0;
-    char element[50];
+    char element[_MAX_NAME_LENGTH];
     int size = strlen(node_path);
+    Node* tmp;
     if(sscanf(node_path, "%[^/]/", element) == 1)// "test/main" or "main" format
     {
         i += strlen(element) + 1;
-        Node* tmp = nde_on_level(ths_node,element);
-        if(tmp == NULL)
+
+        //for  "." case
+        if(strcmp(".",element) == 0)
+        {
+            return ths_node;
+        }
+
+
+        //for ".."
+        if(strcmp("..",element) == 0)
+        {
+            if(i>=size)
+            {
+                return ths_node->parent;
+            }
+            else
+            {
+                return nde_get_node_rec(ths_node->parent,i + node_path,absolute);
+            }
+        }
+
+
+        if(absolute)
+        {
+        	tmp = nde_on_level(ths_node,element);
+        }
+        else
+        {
+        	tmp = nde_on_level(ths_node->children,element);
+        }
+
+
+        if(tmp == NULL) //general cases like : "test" "root/test"
         {
             return NULL;
         }
@@ -237,7 +275,8 @@ static Node* nde_get_node_rec(Node* ths_node, char* node_path )//Not completed
         }
         else
         {
-            return nde_get_node_rec(tmp->children,i + node_path);
+            if(absolute) return nde_get_node_rec(tmp->children,i + node_path,absolute);
+            else         return nde_get_node_rec(tmp,i + node_path,absolute);
         }
     }
     else//HOW DO YOU GET HERE
@@ -247,23 +286,23 @@ static Node* nde_get_node_rec(Node* ths_node, char* node_path )//Not completed
 }
 
 
-static Node* nde_get_node(const Node* ths_node, char* node_path )//Not completed
+static Node* nde_get_node(Node* ths_node,const char* node_path )//Not completed
 {
     assert(node_path != NULL);
     bool absolute = node_path[0] == '/';
     Node* next_child;
+    char* tmp_path = node_path;
 
     if (absolute)
     {
         next_child = iCluige.public_root_2D;
-        node_path++;
+        tmp_path++;
     }
     else
     {
-        if(ths_node->children == NULL) return NULL;
-        next_child = ths_node->children;
+        next_child = ths_node;
     }
-    return nde_get_node_rec(next_child,node_path);
+    return nde_get_node_rec(next_child,tmp_path,absolute);
 
 }
 
@@ -272,20 +311,16 @@ static void nde_remove_child( Node* ths_node, Node* child)
 {
     assert(ths_node != NULL);
     assert(child != NULL);
-    assert(nde_on_level(ths_node->children,child->name) != NULL);//verify that the child given is indeed a child of ths_node
+    assert(child->parent == ths_node);//verify that the child given is indeed a child of ths_node
     int pos = nde_get_index(child);
 
     //link between parent and child
-    if(ths_node->children == child && child->next_sibling != NULL) //if there is more than one children to ths_node
+    if(ths_node->children == child) //if there is more than one children to ths_node
     {
         ths_node->children = child->next_sibling;
     }
-    else if((ths_node->children == child)&& child->next_sibling == NULL)
-    {
-        ths_node->children = NULL;
-    }
 
-    //link between children
+    //link between siblings
     if(pos > 0 )
     {
         Node* node_to_mod = ths_node->children;  //take the node before the one we want to remove
@@ -298,90 +333,110 @@ static void nde_remove_child( Node* ths_node, Node* child)
 }
 
 
-//auxilliary function for get_path
-void insert_string(char *str1, const char *str2) {//first string is the container and second the string you want to add before str1
-    int len1 = strlen(str1);
-    int len2 = strlen(str2);
-
-    // Shift the characters of str1 to the right to make space for str2
-    for (int i = len1; i >= 0; i--) {
-        str1[i + len2] = str1[i];
+static int nde__tree_max_char(Node* ths_node)
+{
+    if(ths_node != iCluige.public_root_2D)
+    {
+        return strlen(ths_node->name) + nde__tree_max_char(ths_node->parent) + 1;
     }
-
-    // Copy str2 into the beginning of str1
-    for (int i = 0; i < len2; i++) {
-        str1[i] = str2[i];
+    else
+    {
+        return strlen(ths_node->name);
     }
 }
 
+static void nde__rec_get_path_mallocing(Node* ths_node, char* res, int remaining_path_size)
+{
+    if(ths_node == iCluige.public_root_2D)
+    {
+        strncpy(res,"/public_root_2D",strlen(ths_node->name));
+    }
+    else //cas general
+    {
+        int this_name_length = strlen(ths_node->name);
+        char* write_here = res + remaining_path_size - this_name_length - 1;
+
+        write_here[0] = '/';
+        write_here++;
+
+        strncpy(write_here,ths_node->name,this_name_length);
+
+        nde__rec_get_path_mallocing(ths_node->parent,res,remaining_path_size - this_name_length - 1);
+    }
+}
 static char* nde_get_path_mallocing(Node* ths_node)
 {
-    StringBuilder sb;
-    int max_depth = nde_get_depth(ths_node);
-    char* pth = iCluige.iStringBuilder.string_alloc(&sb,max_depth + 100);
-
     assert(ths_node != NULL);
+    int max = nde__tree_max_char(ths_node);
+    char* res = iCluige.checked_malloc((max + 1) * sizeof(char));
 
-    int index = 1;
-    char bar[5] = "/";
-    Node* nxt_parent = ths_node;
-
-
-    while(nxt_parent != iCluige.public_root_2D)
-    {
-        insert_string(pth,nxt_parent->name);
-        index += strlen(nxt_parent->name); // Update index
-
-        insert_string(pth,&bar);
-        index += strlen(bar);
-
-        nxt_parent = nxt_parent->parent;
-    }
-    // Null-terminate the final string
-    pth[index] = '\0';
-    return pth;
+    nde__rec_get_path_mallocing(ths_node,res,max);
+    res[strlen(res)] = '\0';
+    return res;
 }
 
+//auxiliary function to know if a node is the parent (or grandparent etc..) of current node
+static bool nde__is_parent(Node* ths_node, Node* potential_ancestor)
+{
+    if(ths_node == potential_ancestor)
+    {
+        return true;
+    }
+    else if (ths_node->parent == NULL)
+    {
+        return false;
+    }
+    else
+    {
+        return nde__is_parent(ths_node->parent,potential_ancestor);
+    }
+
+}
 
 static void nde_queue_free(Node* node)
 {
-    iCluige.iDeque.append(&dq_free,node);
+    assert(node != NULL);
+    int size = iCluige.iDeque.size(&_queue_freed_nodes);
+    bool will_be_deleted = false;
+    for(int i = 0; i < size; i++)
+    {
+        Node* node_in_deque = iCluige.iDeque.at(&_queue_freed_nodes,i).ptr;
+
+        will_be_deleted = nde__is_parent(node_in_deque,node);
+        if (will_be_deleted) break;
+    }
+    if(!will_be_deleted)
+    {
+        iCluige.iDeque.append(&_queue_freed_nodes,node);
+    }
 }
 
 void debug_dq()
 {
-    int size = iCluige.iDeque.size(&dq_free);
+    int size = iCluige.iDeque.size(&_queue_freed_nodes);
     printf("dq_free: ");
     for(int i = 0; i < size; i++)
     {
-        Node* node = iCluige.iDeque.at(&dq_free,i).ptr;
+        Node* node = iCluige.iDeque.at(&_queue_freed_nodes,i).ptr;
 
         printf(" %s |",node->name);
     }
     printf("\n");
 }
 
-static void nde_empty_dq_free()
+static void nde__do_all_queue_free()
 {
-    int size = iCluige.iDeque.size(&dq_free);
+    int size = iCluige.iDeque.size(&_queue_freed_nodes);
     debug_dq();
     for(int i = 0; i < size; size--)
     {
 
-        Node* node = iCluige.iDeque.at(&dq_free,i).ptr;
+        Node* node = iCluige.iDeque.at(&_queue_freed_nodes,i).ptr;
 
-        if(node->next_sibling !=NULL)//removes the link between sibilings else delete_node will delete all siblings
-        {
-            node->parent->children = node->next_sibling;
-            node->next_sibling = NULL;
-        }
-        else
-        {
-            node->parent->children = NULL;
-        }
+        nde_remove_child(node->parent,node);
 
         nde_delete_Node(node);
-        iCluige.iDeque.remove(&dq_free,i);
+        iCluige.iDeque.remove(&_queue_freed_nodes,i);
         debug_dq();
     }
 }
@@ -456,7 +511,7 @@ static void nde_print_tree_pretty(const Node* node)
 
 void iiNode_init()
 {
-    iCluige.iDeque.deque_alloc(&dq_free, VT_POINTER, 100);
+    iCluige.iDeque.deque_alloc(&_queue_freed_nodes, VT_POINTER, 100);
 
 
     //iCluige.iNode.initZero = nde_initZero;
@@ -472,6 +527,6 @@ void iiNode_init()
     iCluige.iNode.remove_child = nde_remove_child;
     iCluige.iNode.get_path_mallocing = nde_get_path_mallocing;
     iCluige.iNode.queue_free = nde_queue_free;
-    iCluige.iNode.empty_dq_free = nde_empty_dq_free;
+    iCluige.iNode._do_all_queue_free = nde__do_all_queue_free;
 
 }

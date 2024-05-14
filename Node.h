@@ -68,11 +68,11 @@ struct iiNode
     //get the child at idx
     Node* (*get_child)(const Node* ths_node, int idx);
 
-    //get the number of childs of the current node
+    //get the number of children of the current node
     int (*get_child_count)(const Node* ths_node);
 
     //get a node based on the relative or absolute path
-    //examples: /test1/child_test1/
+    //examples: /root/child_test1/
     //          test1/child_test1/
     //          test1/child_test1
 
@@ -81,13 +81,15 @@ struct iiNode
 
     //The user have to save the Node manually in order to keep the node
     void (*remove_child)(Node* ths_node, Node* child);
-
+	
+	//the returned string is malloced, up to the user to free it later
     char* (*get_path_mallocing)(Node* node);
 
-    //add the node in the list of node to be delete next frame
+    //add the node in the deque of node to be deleted next frame
     void (*queue_free)(Node* node);
 
-    void (*empty_dq_free)();
+    //Only for cluige internal logic
+    void (*_do_all_queue_free)();
 };
 //iNode : in iiCluige
 

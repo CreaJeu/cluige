@@ -149,7 +149,7 @@ void cluige_run()
         process_tree(iCluige.private_root_2D, POST_PROCESS_PASS);
 
         refresh();
-        iCluige.iNode.empty_dq_free();
+        iCluige.iNode._do_all_queue_free();
         //curses
         int sleep_frame_milliseconds = 1;
 

@@ -16,7 +16,7 @@
 **Futures tâches**
 
 - fatal error => end loop + printf
-- queue_free(delete_node ???), remove child
+- queue_free, remove child
 - get node by name/path
 - project files to test every methods
 - get_path

@@ -76,12 +76,12 @@ struct iiNode
     //          test1/child_test1/
     //          test1/child_test1
 
-    Node* (*get_node)(const Node* ths_node, const char* node_path);
+    Node* (*get_node)(Node* ths_node, const char* node_path);
 
 
     //The user have to save the Node manually in order to keep the node
     void (*remove_child)(Node* ths_node, Node* child);
-	
+
 	//the returned string is malloced, up to the user to free it later
     char* (*get_path_mallocing)(Node* node);
 
@@ -90,6 +90,13 @@ struct iiNode
 
     //Only for cluige internal logic
     void (*_do_all_queue_free)();
+
+    //
+    bool (*is_ancestor_of)(Node* ths_node, Node* potential_ancestor);
+
+    bool (*is_greater_than)(Node* ths_node, Node* node);
+
+
 };
 //iNode : in iiCluige
 

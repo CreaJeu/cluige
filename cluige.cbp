@@ -54,6 +54,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Node.h" />
+		<Unit filename="Nodes/Camera2D.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Nodes/Camera2D.h" />
 		<Unit filename="Nodes/Clock.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -177,16 +177,20 @@ static void nde_auto_name(Node* node)
     }
 }
 
-//return child at idx in current child else NULL
+//returns child at idx in current node, if index is -1 returns last child else NULL
 static Node* nde_get_child(const Node* ths_node, int idx)
 {
     assert(ths_node != NULL);
+    assert(idx >= -1);
 
     Node* next_sib = ths_node->children;
     int count = 0;
-
     while(next_sib != NULL && count != idx  )
     {
+        if(idx == -1 && next_sib->next_sibling == NULL)// case -1 inx returns last child
+        {
+            return next_sib;
+        }
         next_sib = next_sib->next_sibling;
         count++;
     }
@@ -240,7 +244,6 @@ static Node* nde_get_node_rec(Node* ths_node,const char* node_path,bool absolute
             return ths_node;
         }
 
-
         //for ".."
         if(strcmp("..",element) == 0)
         {
@@ -291,18 +294,18 @@ static Node* nde_get_node(Node* ths_node,const char* node_path )//Not completed
     assert(node_path != NULL);
     bool absolute = node_path[0] == '/';
     Node* next_child;
-    char* tmp_path = node_path;
+    int ab = 0;
 
     if (absolute)
     {
         next_child = iCluige.public_root_2D;
-        tmp_path++;
+        ab++;
     }
     else
     {
         next_child = ths_node;
     }
-    return nde_get_node_rec(next_child,tmp_path,absolute);
+    return nde_get_node_rec(next_child,node_path + ab,absolute);
 
 }
 
@@ -375,9 +378,11 @@ static char* nde_get_path_mallocing(Node* ths_node)
     return res;
 }
 
-//auxiliary function to know if a node is the parent (or grandparent etc..) of current node
-static bool nde__is_parent(Node* ths_node, Node* potential_ancestor)
+//evaluates if a node is the parent (or grandparent etc..) of current node
+static bool nde_is_ancestor_of(Node* ths_node, Node* potential_ancestor)
 {
+    assert(ths_node != NULL);
+    assert(potential_ancestor != NULL);
     if(ths_node == potential_ancestor)
     {
         return true;
@@ -388,9 +393,41 @@ static bool nde__is_parent(Node* ths_node, Node* potential_ancestor)
     }
     else
     {
-        return nde__is_parent(ths_node->parent,potential_ancestor);
+        return nde_is_ancestor_of(ths_node->parent,potential_ancestor);
     }
 
+}
+
+//returns true if given node is higher in hierarchy than current node
+//also true if pther_node is just a higher son of the same parent node
+static bool nde_is_greater_than(Node* ths_node, Node* other_node)
+{
+    if(ths_node == other_node)// same nodes
+    {
+        return false;
+    }
+    int depth_ths_node = nde_get_depth(ths_node);
+    int depth_other_node = nde_get_depth(other_node);
+    if(depth_ths_node < depth_other_node)
+    {
+        return true;
+    }
+    else if (depth_ths_node == depth_other_node && ths_node->parent == other_node->parent)
+    {
+        while(other_node != NULL)
+        {
+            if(other_node->next_sibling == ths_node)
+            {
+                return true;
+            }
+            other_node = other_node->next_sibling;
+        }
+        return false;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 static void nde_queue_free(Node* node)
@@ -402,7 +439,7 @@ static void nde_queue_free(Node* node)
     {
         Node* node_in_deque = iCluige.iDeque.at(&_queue_freed_nodes,i).ptr;
 
-        will_be_deleted = nde__is_parent(node_in_deque,node);
+        will_be_deleted = nde_is_ancestor_of(node_in_deque,node);
         if (will_be_deleted) break;
     }
     if(!will_be_deleted)
@@ -411,7 +448,7 @@ static void nde_queue_free(Node* node)
     }
 }
 
-void debug_dq()
+void nde__debug_dq()
 {
     int size = iCluige.iDeque.size(&_queue_freed_nodes);
     printf("dq_free: ");
@@ -427,7 +464,7 @@ void debug_dq()
 static void nde__do_all_queue_free()
 {
     int size = iCluige.iDeque.size(&_queue_freed_nodes);
-    debug_dq();
+    //nde__debug_dq();
     for(int i = 0; i < size; size--)
     {
 
@@ -437,7 +474,7 @@ static void nde__do_all_queue_free()
 
         nde_delete_Node(node);
         iCluige.iDeque.remove(&_queue_freed_nodes,i);
-        debug_dq();
+        nde__debug_dq();
     }
 }
 
@@ -484,8 +521,49 @@ static void nde_add_child(Node* parent, Node* child)
         child->enter_tree(child);
     }
 }
+//TODO tester la fonction
+//not used in Cluige and not tested
+//Search in each children and grandchildren of the current node if there is a node with the type specified in parameters
+static Node*  check_children_type(Node* parent, char* class_name)
+{
+     // Check if the current node has children
+    if (parent->children!= NULL) {
+        // Recursively search through the children
+        Node* foundChild = check_children_type(parent->children, class_name);
+        if (foundChild!= NULL && strcmp(foundChild->_class_name,class_name) == 0) {
+            return foundChild; // Found a matching child, return it
+        }
+    }
+    else
+    {
+        if (parent != NULL && strcmp(parent->_class_name,class_name) == 0) {
+            return parent; // Found a matching child, return it
+        }
+    }
 
-static void nde_print_tree_pretty(const Node* node)
+    // Check if the current node has a next sibling
+    if (parent->next_sibling!= NULL) {
+        // Recursively search through the siblings
+        Node* foundSibling = check_children_type(parent->next_sibling, class_name);
+        if (foundSibling!= NULL && strcmp(foundSibling->_class_name,class_name) == 0) {
+            return foundSibling; // Found a matching sibling, return it
+        }
+    }
+    else
+    {
+        if (strcmp(parent->_class_name,class_name) == 0) {
+            return parent; // Found a matching child, return it
+        }
+    }
+
+    // No matching child or sibling found
+    return NULL;
+}
+
+
+
+
+ void nde_print_tree_pretty(const Node* node)
 {
     static int depth = 0;
 
@@ -523,10 +601,13 @@ void iiNode_init()
     iCluige.iNode.add_child = nde_add_child;
     iCluige.iNode.print_tree_pretty = nde_print_tree_pretty;
     iCluige.iNode.get_child = nde_get_child;
+    iCluige.iNode.get_child_count = nde_get_child_count;
     iCluige.iNode.get_node = nde_get_node;
     iCluige.iNode.remove_child = nde_remove_child;
     iCluige.iNode.get_path_mallocing = nde_get_path_mallocing;
     iCluige.iNode.queue_free = nde_queue_free;
     iCluige.iNode._do_all_queue_free = nde__do_all_queue_free;
+    iCluige.iNode.is_ancestor_of = nde_is_ancestor_of;
+    iCluige.iNode.is_greater_than = nde_is_greater_than;
 
 }

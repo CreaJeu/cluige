@@ -9,6 +9,9 @@
 #include <curses.h>
 //#include <math.h>
 
+
+
+
 ////////////////////////////////// _SpriteSVG /////////
 
 // ~private static
@@ -83,6 +86,21 @@ static void ssvg_pre_process_Node(Node* this_Node)
             &(this_Node2D->_tmp_global_position),
             &(this_SpriteSVG->offset),
             &orig);
+
+    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
+
+    assert(current_camera != NULL);
+
+    int x_camera = current_camera->_tmp_limited_offseted_global_position.x;
+    int y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+
+    int res_x_1 ;
+    int res_y_1 ;
+    int res_x_2 ;
+    int res_y_2 ;
+
+    Vector2 zoom = current_camera->zoom;
+
     float sX = this_SpriteSVG->scale.x;
     float sY = this_SpriteSVG->scale.y;
     Deque* paths = &(this_SpriteSVG->paths);
@@ -95,12 +113,31 @@ static void ssvg_pre_process_Node(Node* this_Node)
             int nb_points = iCluige.iPath2D.size(path_i);
             for(int j=0; j<(nb_points-1); j++)
             {
+
+
                 Vector2* p1 = iCluige.iPath2D.at(path_i, j);
                 Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
+                res_x_1 = (orig.x + ((p1->x) * sX));
+                res_y_1 = (orig.y + ((p1->y) * sY));
+                res_x_2 = (orig.x + ((p2->x) * sX));
+                res_y_2 = (orig.y + ((p2->y) * sY));
+
+
+                //TODO mode screensize inchallah
+
+                //Apply zoom + center on camera
+                res_x_1 = (res_x_1 - x_camera)*zoom.x;
+                res_y_1 = (res_y_1 - y_camera)*zoom.y;
+                res_x_2 = (res_x_2 - x_camera)*zoom.x;
+                res_y_2 = (res_y_2 - y_camera)*zoom.y;
+
                 ssvg_draw_line(
-                    orig.x + ((p1->x) * sX), orig.y + ((p1->y) * sY),
-                    orig.x + ((p2->x) * sX), orig.y + ((p2->y) * sY),
-                    false);
+                    res_x_1,
+                    res_y_1,
+                    res_x_2,
+                    res_y_2,
+                false);
+
             }
         }
     }
@@ -124,6 +161,21 @@ static void ssvg_post_process_Node(Node* this_Node)
             &(this_Node2D->_tmp_global_position),
             &(this_SpriteSVG->offset),
             &orig);
+
+    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
+    assert(current_camera != NULL);
+
+
+    int x_camera = current_camera->_tmp_limited_offseted_global_position.x;
+    int y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+
+    int res_x_1 ;
+    int res_y_1 ;
+    int res_x_2 ;
+    int res_y_2 ;
+
+    Vector2 zoom = current_camera->zoom;
+
     float sX = this_SpriteSVG->scale.x;
     float sY = this_SpriteSVG->scale.y;
     Deque* paths = &(this_SpriteSVG->paths);
@@ -136,12 +188,31 @@ static void ssvg_post_process_Node(Node* this_Node)
             int nb_points = iCluige.iPath2D.size(path_i);
             for(int j=0; j<(nb_points-1); j++)
             {
+
+
                 Vector2* p1 = iCluige.iPath2D.at(path_i, j);
                 Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
+                res_x_1 = (orig.x + ((p1->x) * sX));
+                res_y_1 = (orig.y + ((p1->y) * sY));
+                res_x_2 = (orig.x + ((p2->x) * sX));
+                res_y_2 = (orig.y + ((p2->y) * sY));
+
+
+                //TODO mode screensize inchallah
+
+                //Apply zoom + center on camera
+                res_x_1 = (res_x_1 - x_camera)*zoom.x;
+                res_y_1 = (res_y_1 - y_camera)*zoom.y;
+                res_x_2 = (res_x_2 - x_camera)*zoom.x;
+                res_y_2 = (res_y_2 - y_camera)*zoom.y;
+
                 ssvg_draw_line(
-                    orig.x + ((p1->x) * sX), orig.y + ((p1->y) * sY),
-                    orig.x + ((p2->x) * sX), orig.y + ((p2->y) * sY),
-                    true);
+                    res_x_1,
+                    res_y_1,
+                    res_x_2,
+                    res_y_2,
+                true);
+
             }
         }
     }

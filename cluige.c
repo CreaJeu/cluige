@@ -40,6 +40,7 @@ void cluige_init()
     iCluige.checked_malloc = clg_checked_malloc;
     iCluige.get_screen_size = clg_get_screen_size;
     iCluige.wanted_frame_seconds = .0666;//15 fps by default
+    iCluige.EPSILON = 0.00001;
     iCluige.quit_asked = false;
 
     iiVariant_init();
@@ -65,6 +66,14 @@ void cluige_init()
     iiInput_init();
     iCluige.input = iCluige.iInput.new_Input();
     iCluige.iNode.add_child(iCluige.private_root_2D, iCluige.input->_this_Node);
+
+    iiCamera2D_init();
+    Camera2D* default_camera = iCluige.iCamera2D.new_Camera2D();
+    iCluige.iCamera2D.current_camera = default_camera;
+    iCluige.iNode.set_name(iCluige.iCamera2D.current_camera->_this_Node2D->_this_Node,"default_camera");
+    iCluige.iNode.add_child(iCluige.private_root_2D, iCluige.iCamera2D.current_camera->_this_Node2D->_this_Node);
+    iCluige.iCamera2D.default_camera = default_camera;
+    //iCluige.iNode.print_tree_pretty(iCluige.private_root_2D);
 
     iCluige.public_root_2D = iCluige.iNode.new_Node();
     iCluige.iNode.set_name(iCluige.public_root_2D, "public_root_2D");
@@ -146,6 +155,7 @@ void cluige_run()
     {
         process_tree(iCluige.private_root_2D, PRE_PROCESS_PASS);
         process_tree(iCluige.private_root_2D, PROCESS_PASS);
+        iCluige.iCamera2D._predraw(iCluige.iCamera2D.current_camera->_this_Node2D->_this_Node);
         process_tree(iCluige.private_root_2D, POST_PROCESS_PASS);
 
         refresh();

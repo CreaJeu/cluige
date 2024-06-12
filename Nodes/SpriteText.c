@@ -48,18 +48,36 @@ static void sprtx_pre_process_Node(Node* this_Node)
             &(this_SpriteText->offset),
             &orig);
     int flat_i = 0;
+    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
+    assert(current_camera != NULL);
+
+    int x_camera = current_camera->_tmp_limited_offseted_global_position.x;
+    int y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+
+    int res_x;
+    int res_y;
+
+    Vector2 zoom = current_camera->zoom;
+
     for(int line = 0; line < this_SpriteText->nb_lines; line++)
     {
         int col = 0;
         //char* lineString = (char*)(this_SpriteText->text[line]);
         //char curr_char = lineString[col];
         char curr_char = this_SpriteText->text[flat_i];
+
+        res_y =lrintf(orig.y) + line;
         while(curr_char != 0)
         {
+
             if(curr_char != ' ')
             {
-                mvaddch(lrintf(orig.y) + line, lrintf(orig.x) + col, ' ');
+
+                res_x =lrintf(orig.x) + col;
+                mvaddch((res_y - y_camera) *zoom.y , (res_x - x_camera) * zoom.x, ' ');
             }
+
+
             col++;
             //curr_char = lineString[col];
             flat_i++;
@@ -87,12 +105,43 @@ static void sprtx_post_process_Node(Node* this_Node)
             &(this_Node2D->_tmp_global_position),
             &(this_SpriteText->offset),
             &orig);
-    char* line_string = this_SpriteText->text;
+    int flat_i = 0;
+    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
+    assert(current_camera != NULL);
+
+    int x_camera = current_camera->_tmp_limited_offseted_global_position.x;
+    int y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+
+    int res_x;
+    int res_y;
+
+    Vector2 zoom = current_camera->zoom;
+
     for(int line = 0; line < this_SpriteText->nb_lines; line++)
     {
-        //mvaddstr(orig.y + line, orig.x, (char*)(this_SpriteText->text[line]));
-        mvaddstr(lrintf(orig.y) + line, lrintf(orig.x), line_string);
-        line_string += strlen(line_string) + 1;
+        int col = 0;
+        //char* lineString = (char*)(this_SpriteText->text[line]);
+        //char curr_char = lineString[col];
+        char curr_char = this_SpriteText->text[flat_i];
+
+        res_y =lrintf(orig.y) + line;
+        while(curr_char != 0)
+        {
+
+            if(curr_char != ' ')
+            {
+
+                res_x =lrintf(orig.x) + col;
+                mvaddch((res_y - y_camera) *zoom.y , (res_x - x_camera) * zoom.x, curr_char);
+            }
+
+
+            col++;
+            //curr_char = lineString[col];
+            flat_i++;
+            curr_char = this_SpriteText->text[flat_i];
+        }
+        flat_i++;
     }
 }
 

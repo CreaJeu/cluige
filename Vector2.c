@@ -86,6 +86,11 @@ static float vct2_distance_squared_to(const Vector2* v1, const Vector2* v2)
 }
 
 
+static bool is_zero(Vector2 v)
+{
+    return abs(v.x) < iCluige.EPSILON && abs(v.y) < iCluige.EPSILON;
+}
+
 ////////////////////////////////// iVector2 /////////
 
 void iiVector2_init()

@@ -18,7 +18,7 @@ static Node* c2d__highest_node_excluding_one_nde(Node* parent, const char* class
 static void c2d_make_current(Camera2D* c2d)
 {
     assert(c2d != NULL);
-    assert(!c2d->enabled);
+    assert(c2d->enabled != false);
     assert(c2d != iCluige.iCamera2D.current_camera);
 
     iCluige.iCamera2D.current_camera = c2d;
@@ -115,7 +115,7 @@ static void c2d_set_enabled(Camera2D* c2d, bool enab)
     Node* node_c2d = c2d->_this_Node2D->_this_Node;
 
 
-    bool is_greater = iCluige.iNode.is_greater_than(node_c2d, node_current_camera);
+    bool is_greater = iCluige.iNode.is_higher_than(node_c2d, node_current_camera);
     //true if current_camera is higher than camera in parameter
 
     if(enab && !is_greater)
@@ -263,7 +263,7 @@ static struct _Camera2D* c2d_new_Camera2D()
     new_Node2D->_sub_class = new_camera2D;
 
     new_camera2D->delete_Node2D = new_Node2D->delete_Node2D;
-    new_camera2D->post_process_Node2D = NULL;//new_Node->post_process_Node;
+    new_camera2D->post_process_Node2D = new_Node->post_process_Node;
 
 
     free(new_Node->_class_name); //TODO static value to avoid free

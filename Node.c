@@ -400,7 +400,7 @@ static bool nde_is_ancestor_of(Node* ths_node, Node* potential_ancestor)
 
 //returns true if given node is higher in hierarchy than current node
 //also true if pther_node is just a higher son of the same parent node
-static bool nde_is_greater_than(Node* ths_node, Node* other_node)
+static bool nde_is_higher_than(Node* ths_node, Node* other_node)
 {
     if(ths_node == other_node)// same nodes
     {
@@ -608,6 +608,6 @@ void iiNode_init()
     iCluige.iNode.queue_free = nde_queue_free;
     iCluige.iNode._do_all_queue_free = nde__do_all_queue_free;
     iCluige.iNode.is_ancestor_of = nde_is_ancestor_of;
-    iCluige.iNode.is_greater_than = nde_is_greater_than;
+    iCluige.iNode.is_higher_than = nde_is_higher_than;
 
 }

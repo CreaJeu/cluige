@@ -94,7 +94,7 @@ struct iiNode
     //
     bool (*is_ancestor_of)(Node* ths_node, Node* potential_ancestor);
 
-    bool (*is_greater_than)(Node* ths_node, Node* node);
+    bool (*is_higher_than)(Node* ths_node, Node* node);
 
 
 };

@@ -5,7 +5,7 @@
 
 #include <string.h>
 #include <assert.h>
-
+#include <math.h>
 
 
 ////////////////////////////////// _Camera2D /////////
@@ -18,7 +18,7 @@ static Node* c2d__highest_node_excluding_one_nde(Node* parent, const char* class
 static void c2d_make_current(Camera2D* c2d)
 {
     assert(c2d != NULL);
-    assert(c2d->enabled != false);
+    assert(c2d->enabled);
     assert(c2d != iCluige.iCamera2D.current_camera);
 
     iCluige.iCamera2D.current_camera = c2d;
@@ -26,7 +26,7 @@ static void c2d_make_current(Camera2D* c2d)
 }
 
 
-static int clamp(int x, int min, int max)
+static float clamp(float x, float min, float max)
 {
     if (x < min)
     {
@@ -44,7 +44,7 @@ static int clamp(int x, int min, int max)
 
 static bool is_near_zero(Vector2 v)
 {
-    return abs(v.x) < iCluige.EPSILON || abs(v.y) < iCluige.EPSILON;
+    return fabs(v.x) < iCluige.EPSILON || fabs(v.y) < iCluige.EPSILON;
 }
 
 
@@ -66,7 +66,7 @@ static void c2d_delete_camera2d(Node* this_node)
     Camera2D* this_cam2d = (Camera2D*)(this_node2d->_sub_class);
     void (*delete_Node2D)(Node*) = this_cam2d->delete_Node2D;
 
-    if(iCluige.iCamera2D.current_camera == this_cam2d)
+    if(iCluige.iCamera2D.current_camera == this_cam2d && iCluige.iCamera2D.default_camera != iCluige.iCamera2D.current_camera)
     {
         Node* node_found = c2d__highest_node_excluding_one_nde(iCluige.public_root_2D,"NodeNode2DCamera2D",this_node);
         if(node_found != NULL)
@@ -102,8 +102,15 @@ static void c2d_set_zoom(Camera2D* c2d, Vector2 v)
 {
 
     assert(c2d != NULL);
-    assert(!is_near_zero(v));
-    c2d->zoom = (Vector2){v.x,v.y};
+    //assert(!is_near_zero(v));
+    if(!is_near_zero(v))
+    {
+        iCluige.iCamera2D._SCREEN_RIGHT_LIMITS = iCluige.iCamera2D._SCREEN_RIGHT_LIMITS * (1/v.x);
+        iCluige.iCamera2D._SCREEN_BOTTOM_LIMITS = iCluige.iCamera2D._SCREEN_BOTTOM_LIMITS * (1/v.y);
+        c2d->zoom = (Vector2){v.x,v.y};
+    }
+
+
 }
 
 
@@ -120,6 +127,8 @@ static void c2d_set_enabled(Camera2D* c2d, bool enab)
 
     if(enab && !is_greater)
     {
+        //make_current must have in parameter a enabled camera
+        c2d->enabled = enab;
         c2d_make_current(c2d);
     }
     else if (!enab && c2d == current_camera)// if user want to desactivate the current camera
@@ -156,13 +165,30 @@ static void c2d__pre_draw(Node* this_Node)
     cam->post_process_Node2D(this_Node);//super
 
 
-    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
     //updates values
-    current_camera->_tmp_limited_offseted_global_position.x =
-    clamp(node2d->_tmp_global_position.x , cam->limit_left,cam->limit_right)+ cam->offset.x;
 
-    current_camera->_tmp_limited_offseted_global_position.y =
-    clamp(node2d->_tmp_global_position.y , cam->limit_top,cam->limit_bottom) + cam->offset.y;
+    if(cam->anchor_mode == ANCHOR_MODE_FIXED_TOP_LEFT)
+    {
+        cam->_tmp_limited_offseted_global_position.x =
+        clamp(node2d->_tmp_global_position.x , cam->limit_left,cam->limit_right)+ cam->offset.x;
+
+        cam->_tmp_limited_offseted_global_position.y =
+        clamp(node2d->_tmp_global_position.y , cam->limit_top,cam->limit_bottom) + cam->offset.y;
+
+    }
+    else
+    {
+        float offset_adapted_x = -((iCluige.iCamera2D._SCREEN_RIGHT_LIMITS/2));
+        float offset_adapted_y = -((iCluige.iCamera2D._SCREEN_BOTTOM_LIMITS/2) );
+
+        cam->_tmp_limited_offseted_global_position.x =
+        clamp(node2d->_tmp_global_position.x , cam->limit_left,cam->limit_right)+ cam->offset.x + offset_adapted_x;
+
+        cam->_tmp_limited_offseted_global_position.y =
+        clamp(node2d->_tmp_global_position.y , cam->limit_top,cam->limit_bottom) + cam->offset.y + offset_adapted_y;
+    }
+
+
 }
 
 
@@ -177,6 +203,7 @@ static void c2d__pre_draw(Node* this_Node)
 @returns the highest node in tree hierarchy by class_name excluding one node of the tree
 */
 //not sure it works perfectly + not sure if it's relevant for Cluige
+//TODO cherhche la premiere par dfs
 static Node* c2d__highest_node_excluding_one_nde(Node* parent, const char* class_name, const Node* excluded_node) {
     assert(parent != NULL);
     Node* highest_camera = NULL;
@@ -239,15 +266,30 @@ static struct _Camera2D* c2d_new_Camera2D()
     //enabled must be set with the method set_enabled
     new_camera2D->enabled = true;
 
+    new_camera2D->ignore_rotation = true;
+
+    new_camera2D->rotation_angle = 0;
+
     //Zoom must be set with the method set_zoom
     new_camera2D->zoom = (Vector2){ 1., 1. };
 
     new_camera2D->offset = (Vector2){ 0., 0. };
 
-    new_camera2D->limit_bottom = 100000;
-    new_camera2D->limit_top = -100000;
-    new_camera2D->limit_right = 100000;
-    new_camera2D->limit_left = -100000;
+    new_camera2D->limit_bottom = 100000.0;
+    new_camera2D->limit_top = -100000.0;
+    new_camera2D->limit_right = 100000.0;
+    new_camera2D->limit_left = -100000.0;
+
+
+    new_camera2D->drag_horizontal_enabled = false;
+    new_camera2D->drag_vertical_enabled = false;
+    new_camera2D->drag_bottom_margin = 0.2;
+    new_camera2D->drag_top_margin = 0.2;
+    new_camera2D->drag_right_margin = 0.2;
+    new_camera2D->drag_left_margin = 0.2;
+
+    new_camera2D->anchor_mode = 0;
+
 
     //respectively Left Top Right Bottom
     new_camera2D->limits[0] = &new_camera2D->limit_left;
@@ -299,6 +341,10 @@ static struct _Camera2D* c2d_new_Camera2D()
 
 void iiCamera2D_init()
 {
+    iCluige.iCamera2D._SCREEN_BOTTOM_LIMITS = 100.0;
+    iCluige.iCamera2D._SCREEN_LEFT_LIMITS = 0.0;
+    iCluige.iCamera2D._SCREEN_TOP_LIMITS = 0.0;
+    iCluige.iCamera2D._SCREEN_RIGHT_LIMITS = 200.0;
     iCluige.iCamera2D.new_Camera2D = c2d_new_Camera2D;
     iCluige.iCamera2D.get_zoom = c2d_get_zoom;
     iCluige.iCamera2D.set_zoom = c2d_set_zoom;

@@ -51,11 +51,11 @@ static void sprtx_pre_process_Node(Node* this_Node)
     Camera2D* current_camera = iCluige.iCamera2D.current_camera;
     assert(current_camera != NULL);
 
-    int x_camera = current_camera->_tmp_limited_offseted_global_position.x;
-    int y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+    float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
+    float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
 
-    int res_x;
-    int res_y;
+    float res_x;
+    float res_y;
 
     Vector2 zoom = current_camera->zoom;
 
@@ -74,7 +74,25 @@ static void sprtx_pre_process_Node(Node* this_Node)
             {
 
                 res_x =lrintf(orig.x) + col;
-                mvaddch((res_y - y_camera) *zoom.y , (res_x - x_camera) * zoom.x, ' ');
+
+                res_y = (res_y - y_camera) *zoom.y ;
+                res_x = (res_x - x_camera) * zoom.x;
+                if(!current_camera->ignore_rotation)
+                {
+                    float rotation_angle = -current_camera->rotation_angle;
+                    float cf =  cosf(rotation_angle);
+                    float sf = sinf(rotation_angle);
+
+                    float orig_res_x = res_x;
+                    float orig_res_y = res_y;
+                    res_x = res_x * cf - res_y * sf;
+
+
+                    res_y = orig_res_x * sf + res_y * cf;
+
+                }
+                mvaddch(res_y,res_x , ' ');
+                //mvaddch((res_y - y_camera)  , (res_x - x_camera) , ' ');
             }
 
 
@@ -109,11 +127,11 @@ static void sprtx_post_process_Node(Node* this_Node)
     Camera2D* current_camera = iCluige.iCamera2D.current_camera;
     assert(current_camera != NULL);
 
-    int x_camera = current_camera->_tmp_limited_offseted_global_position.x;
-    int y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+    float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
+    float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
 
-    int res_x;
-    int res_y;
+    float res_x;
+    float res_y;
 
     Vector2 zoom = current_camera->zoom;
 
@@ -132,7 +150,25 @@ static void sprtx_post_process_Node(Node* this_Node)
             {
 
                 res_x =lrintf(orig.x) + col;
-                mvaddch((res_y - y_camera) *zoom.y , (res_x - x_camera) * zoom.x, curr_char);
+
+                res_y = (res_y - y_camera) *zoom.y ;
+                res_x = (res_x - x_camera) * zoom.x;
+                if(!current_camera->ignore_rotation)
+                {
+                    float rotation_angle = -current_camera->rotation_angle;
+                    float cf =  cosf(rotation_angle);
+                    float sf = sinf(rotation_angle);
+
+                    float orig_res_x = res_x;
+                    float orig_res_y = res_y;
+                    res_x = res_x * cf - res_y * sf;
+                    res_y = orig_res_x * sf + res_y * cf;
+
+
+
+                }
+                mvaddch(res_y,res_x , curr_char);
+                //mvaddch((res_y - y_camera)  , (res_x - x_camera), curr_char);
             }
 
 

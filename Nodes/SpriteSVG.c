@@ -7,8 +7,10 @@
 //#include <string.h>
 #include <assert.h>
 #include <curses.h>
-//#include <math.h>
-
+#include <math.h>
+#ifndef M_PI
+    const double M_PI = 3.14159265358979323846;
+#endif
 
 
 
@@ -91,13 +93,13 @@ static void ssvg_pre_process_Node(Node* this_Node)
 
     assert(current_camera != NULL);
 
-    int x_camera = current_camera->_tmp_limited_offseted_global_position.x;
-    int y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+    float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
+    float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
 
-    int res_x_1 ;
-    int res_y_1 ;
-    int res_x_2 ;
-    int res_y_2 ;
+    float res_x_1 ;
+    float res_y_1 ;
+    float res_x_2 ;
+    float res_y_2 ;
 
     Vector2 zoom = current_camera->zoom;
 
@@ -117,19 +119,36 @@ static void ssvg_pre_process_Node(Node* this_Node)
 
                 Vector2* p1 = iCluige.iPath2D.at(path_i, j);
                 Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
+
                 res_x_1 = (orig.x + ((p1->x) * sX));
                 res_y_1 = (orig.y + ((p1->y) * sY));
+
                 res_x_2 = (orig.x + ((p2->x) * sX));
                 res_y_2 = (orig.y + ((p2->y) * sY));
+
+
 
 
                 //TODO mode screensize inchallah
 
                 //Apply zoom + center on camera
-                res_x_1 = (res_x_1 - x_camera)*zoom.x;
-                res_y_1 = (res_y_1 - y_camera)*zoom.y;
-                res_x_2 = (res_x_2 - x_camera)*zoom.x;
-                res_y_2 = (res_y_2 - y_camera)*zoom.y;
+                res_x_1 = ((res_x_1 - x_camera)*zoom.x);
+                res_y_1 = ((res_y_1 - y_camera)*zoom.y);
+                res_x_2 = ((res_x_2 - x_camera)*zoom.x);
+                res_y_2 = ((res_y_2 - y_camera)*zoom.y);
+
+                /*
+                if(!current_camera->ignore_rotation)
+                {
+                    float rotation_angle = current_camera->rotation_angle;
+                    res_x_1 = res_x_1 * cosf(rotation_angle) - res_y_1 * sinf(rotation_angle);
+                    res_y_1 = res_x_1 * sinf(rotation_angle) + res_y_1 * cosf(rotation_angle);
+
+                    res_x_2 = res_x_2 * cosf(rotation_angle) - res_y_2 * sinf(rotation_angle);
+                    res_y_2 = res_x_2 * sinf(rotation_angle) + res_y_2 * cosf(rotation_angle);
+
+
+                }*/
 
                 ssvg_draw_line(
                     res_x_1,
@@ -146,16 +165,17 @@ static void ssvg_pre_process_Node(Node* this_Node)
 static void ssvg_post_process_Node(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
-    SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
-    //call super()
-    this_SpriteSVG->post_process_Node2D(this_Node);
-
     if(!(this_Node2D->visible))
     {
         return;
     }
+    SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
+    //call super()
+    this_SpriteSVG->post_process_Node2D(this_Node);
 
-    //draw new one
+    //clear old one (unless immobile? => no, because other masking things
+    //could have moved and made this sprite visible again;
+    //and curses already has characters cache)
     Vector2 orig;
     iCluige.iVector2.substract(
             &(this_Node2D->_tmp_global_position),
@@ -163,16 +183,16 @@ static void ssvg_post_process_Node(Node* this_Node)
             &orig);
 
     Camera2D* current_camera = iCluige.iCamera2D.current_camera;
+
     assert(current_camera != NULL);
 
+    float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
+    float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
 
-    int x_camera = current_camera->_tmp_limited_offseted_global_position.x;
-    int y_camera = current_camera->_tmp_limited_offseted_global_position.y;
-
-    int res_x_1 ;
-    int res_y_1 ;
-    int res_x_2 ;
-    int res_y_2 ;
+    float res_x_1 ;
+    float res_y_1 ;
+    float res_x_2 ;
+    float res_y_2 ;
 
     Vector2 zoom = current_camera->zoom;
 
@@ -196,15 +216,29 @@ static void ssvg_post_process_Node(Node* this_Node)
                 res_y_1 = (orig.y + ((p1->y) * sY));
                 res_x_2 = (orig.x + ((p2->x) * sX));
                 res_y_2 = (orig.y + ((p2->y) * sY));
+                /*
+                if(!iCluige.iCamera2D.current_camera->ignore_rotation)
+                {
+                    float rotation_angle = iCluige.iCamera2D.current_camera->rotation_angle;
+                    res_x_1 = res_x_1 * cosf(rotation_angle) - res_y_1 * sinf(rotation_angle);
+                    res_y_1 = res_x_1 * sinf(rotation_angle) + res_y_1 * cosf(rotation_angle);
 
+                    res_x_2 = res_x_2 * cosf(rotation_angle) - res_y_2 * sinf(rotation_angle);
+                    res_y_2 = res_x_2 * sinf(rotation_angle) + res_y_2 * cosf(rotation_angle);
+
+                }
+                */
 
                 //TODO mode screensize inchallah
 
                 //Apply zoom + center on camera
-                res_x_1 = (res_x_1 - x_camera)*zoom.x;
-                res_y_1 = (res_y_1 - y_camera)*zoom.y;
-                res_x_2 = (res_x_2 - x_camera)*zoom.x;
-                res_y_2 = (res_y_2 - y_camera)*zoom.y;
+                res_x_1 = ((res_x_1 - x_camera)*zoom.x);
+                res_y_1 = ((res_y_1 - y_camera)*zoom.y);
+                res_x_2 = ((res_x_2 - x_camera)*zoom.x);
+                res_y_2 = ((res_y_2 - y_camera)*zoom.y);
+
+
+
 
                 ssvg_draw_line(
                     res_x_1,

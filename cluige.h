@@ -20,7 +20,7 @@
 #include "Nodes/Input.h"
 #include "LineDrawerThin.h"
 #include "Path2D.h"
-#include "Nodes/SpriteSvg.h"
+#include "Nodes/SpriteSVG.h"
 #include "Nodes/Camera2D.h"
 
 //just a kind of namespace to prevent name collisions

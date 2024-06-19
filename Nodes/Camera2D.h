@@ -5,6 +5,13 @@
 
 typedef struct _Camera2D Camera2D;
 
+
+ enum AnchorMode
+    {
+        ANCHOR_MODE_FIXED_TOP_LEFT,
+        ANCHOR_MODE_DRAG_CENTER
+    };
+
 struct _Camera2D
 {
 
@@ -15,6 +22,10 @@ struct _Camera2D
 	//if false camera won't be current if true and if the camera is the highest camera in tree becomes current camera
 	//MUST use methods to modify
 	bool enabled;
+
+	bool ignore_rotation;
+
+	float rotation_angle;
 
 	//allow to zoom on the camera, can't be equal to zero
 	//(Vector2){0.5,0.5}; will zoom out
@@ -34,13 +45,26 @@ struct _Camera2D
     //Limits of the camera if the node off which the camera is attached goes off limits, the camera won't follow
     //the node can still move out of the camera bounds
     //
-    int limit_top;
-    int limit_right;
-    int limit_left;
-    int limit_bottom;
+    float limit_top;
+    float limit_right;
+    float limit_left;
+    float limit_bottom;
+
+    float drag_left_margin;
+    float drag_right_margin;
+    float drag_top_margin;
+    float drag_bottom_margin;
+
+    bool drag_horizontal_enabled;
+    bool drag_vertical_enabled;
+
+    //0 if anchor up left corner
+    //1 if anchor screen center
+    enum AnchorMode anchor_mode;
+
 
     //respectively Left Top Right Bottom
-    int* limits[4];
+    float* limits[4];
 
 
 	//virtual methods
@@ -61,13 +85,18 @@ struct iiCamera2D
 
 
 
-
 	Camera2D* default_camera;
 
 	Camera2D* (*new_Camera2D)();
 
 	//private method
 	void (*_predraw)(Node* this_node);
+
+	//temporary
+	float _SCREEN_BOTTOM_LIMITS;
+	float _SCREEN_TOP_LIMITS;
+	float _SCREEN_LEFT_LIMITS;
+	float _SCREEN_RIGHT_LIMITS;
 
 
 	Vector2 (*get_zoom)(const Camera2D* c2d);

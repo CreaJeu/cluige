@@ -25,7 +25,7 @@ struct _Camera2D
 
 	bool ignore_rotation;
 
-	float rotation_angle;
+	float rotation;
 
 	//allow to zoom on the camera, can't be equal to zero
 	//(Vector2){0.5,0.5}; will zoom out
@@ -50,13 +50,19 @@ struct _Camera2D
     float limit_left;
     float limit_bottom;
 
+    float global_tmp_sin_rotation;
+    float global_tmp_cos_rotation;
+
+    /* Future add to camera
     float drag_left_margin;
     float drag_right_margin;
     float drag_top_margin;
     float drag_bottom_margin;
 
+
     bool drag_horizontal_enabled;
     bool drag_vertical_enabled;
+    */
 
     //0 if anchor up left corner
     //1 if anchor screen center
@@ -93,10 +99,11 @@ struct iiCamera2D
 	void (*_predraw)(Node* this_node);
 
 	//temporary
-	float _SCREEN_BOTTOM_LIMITS;
-	float _SCREEN_TOP_LIMITS;
-	float _SCREEN_LEFT_LIMITS;
-	float _SCREEN_RIGHT_LIMITS;
+	float _SCREEN_HEIGHT;
+	float _SCREEN_ANCHOR_CENTER_Y;
+	float _SCREEN_ANCHOR_CENTER_X;
+	float _SCREEN_WIDTH;
+
 
 
 	Vector2 (*get_zoom)(const Camera2D* c2d);
@@ -111,6 +118,10 @@ struct iiCamera2D
     bool (*is_enabled)(const Camera2D* c2d);
     void (*make_current)(Camera2D* c2d);
 
+    //Must use this methods to set the rotation and get the rotation
+    //give degrees, not radians
+    void (*set_rotation)(Camera2D* c2d, float rotation_angle_degrees);
+    float (*get_rotation)(Camera2D* c2d);
 
 
 

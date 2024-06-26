@@ -12,21 +12,7 @@
 
 static Node* c2d__highest_node_excluding_one_nde(Node* parent, const char* class_name, const Node* camera_node);
 
-
-
-//TODO not finished
-static void c2d_make_current(Camera2D* c2d)
-{
-    assert(c2d != NULL);
-    assert(c2d->enabled);
-    assert(c2d != iCluige.iCamera2D.current_camera);
-
-    iCluige.iCamera2D.current_camera = c2d;
-    c2d->_this_Node2D->_local_position_changed = true;
-}
-
-
-static float clamp(float x, float min, float max)
+static int clamp(int x, int min, int max)
 {
     if (x < min)
     {
@@ -44,8 +30,42 @@ static float clamp(float x, float min, float max)
 
 static bool is_near_zero(Vector2 v)
 {
-    return fabs(v.x) < iCluige.EPSILON || fabs(v.y) < iCluige.EPSILON;
+    return abs(v.x) < iCluige.EPSILON || abs(v.y) < iCluige.EPSILON;
 }
+
+//given in degrees not radians
+static void c2d_set_rotation(Camera2D* c2d, float rotation_angle)
+{
+    assert(c2d != NULL);
+    float rota = clamp(rotation_angle,-360,360);
+
+    c2d->rotation = rota * 3.1415926 / 180;
+    c2d->global_tmp_cos_rotation = cosf(c2d->rotation);
+    c2d->global_tmp_sin_rotation = sinf(c2d->rotation);
+
+
+
+}
+
+static float c2d_get_rotation(Camera2D* c2d)
+{
+    assert(c2d != NULL);
+    return c2d->rotation * 180 / 3.1415926;
+}
+
+
+//TODO not finished
+static void c2d_make_current(Camera2D* c2d)
+{
+    assert(c2d != NULL);
+    assert(c2d->enabled);
+    assert(c2d != iCluige.iCamera2D.current_camera);
+
+    iCluige.iCamera2D.current_camera = c2d;
+    c2d->_this_Node2D->_local_position_changed = true;
+}
+
+
 
 
 static Camera2D* c2d__get_camera_from_node(Node* this_node)
@@ -105,8 +125,10 @@ static void c2d_set_zoom(Camera2D* c2d, Vector2 v)
     //assert(!is_near_zero(v));
     if(!is_near_zero(v))
     {
-        iCluige.iCamera2D._SCREEN_RIGHT_LIMITS = iCluige.iCamera2D._SCREEN_RIGHT_LIMITS * (1/v.x);
-        iCluige.iCamera2D._SCREEN_BOTTOM_LIMITS = iCluige.iCamera2D._SCREEN_BOTTOM_LIMITS * (1/v.y);
+        iCluige.iCamera2D._SCREEN_WIDTH = iCluige.iCamera2D._SCREEN_WIDTH * (1/v.x);
+        iCluige.iCamera2D._SCREEN_HEIGHT = iCluige.iCamera2D._SCREEN_HEIGHT * (1/v.y);
+        iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X = iCluige.iCamera2D._SCREEN_WIDTH/2;
+        iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y = iCluige.iCamera2D._SCREEN_HEIGHT/2;
         c2d->zoom = (Vector2){v.x,v.y};
     }
 
@@ -133,7 +155,8 @@ static void c2d_set_enabled(Camera2D* c2d, bool enab)
     }
     else if (!enab && c2d == current_camera)// if user want to desactivate the current camera
     {
-        Node* node_found = c2d__highest_node_excluding_one_nde(iCluige.public_root_2D,"NodeNode2DCamera2D",current_camera->_this_Node2D->_this_Node);
+        Node* node_found = c2d__highest_node_excluding_one_nde(iCluige.public_root_2D,"NodeNode2DCamera2D",
+                                                               current_camera->_this_Node2D->_this_Node);
         if(node_found == NULL)//no other camera in tree
         {
             c2d_make_current(iCluige.iCamera2D.default_camera);
@@ -155,7 +178,11 @@ static bool c2d_is_enabled(const Camera2D* c2d)
     return c2d->enabled;
 }
 
+/*
+function called before post_process to apply offsets and limits on camera
 
+
+*/
 static void c2d__pre_draw(Node* this_Node)
 {
 
@@ -178,14 +205,14 @@ static void c2d__pre_draw(Node* this_Node)
     }
     else
     {
-        float offset_adapted_x = -((iCluige.iCamera2D._SCREEN_RIGHT_LIMITS/2));
-        float offset_adapted_y = -((iCluige.iCamera2D._SCREEN_BOTTOM_LIMITS/2) );
+        float offset_adapted_x = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X;
+        float offset_adapted_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
 
         cam->_tmp_limited_offseted_global_position.x =
-        clamp(node2d->_tmp_global_position.x , cam->limit_left,cam->limit_right)+ cam->offset.x + offset_adapted_x;
+        clamp(node2d->_tmp_global_position.x , cam->limit_left,cam->limit_right)+ cam->offset.x - offset_adapted_x;
 
         cam->_tmp_limited_offseted_global_position.y =
-        clamp(node2d->_tmp_global_position.y , cam->limit_top,cam->limit_bottom) + cam->offset.y + offset_adapted_y;
+        clamp(node2d->_tmp_global_position.y , cam->limit_top,cam->limit_bottom) + cam->offset.y - offset_adapted_y;
     }
 
 
@@ -268,7 +295,7 @@ static struct _Camera2D* c2d_new_Camera2D()
 
     new_camera2D->ignore_rotation = true;
 
-    new_camera2D->rotation_angle = 0;
+    new_camera2D->rotation = 0;
 
     //Zoom must be set with the method set_zoom
     new_camera2D->zoom = (Vector2){ 1., 1. };
@@ -281,14 +308,8 @@ static struct _Camera2D* c2d_new_Camera2D()
     new_camera2D->limit_left = -100000.0;
 
 
-    new_camera2D->drag_horizontal_enabled = false;
-    new_camera2D->drag_vertical_enabled = false;
-    new_camera2D->drag_bottom_margin = 0.2;
-    new_camera2D->drag_top_margin = 0.2;
-    new_camera2D->drag_right_margin = 0.2;
-    new_camera2D->drag_left_margin = 0.2;
 
-    new_camera2D->anchor_mode = 0;
+    new_camera2D->anchor_mode = ANCHOR_MODE_DRAG_CENTER;
 
 
     //respectively Left Top Right Bottom
@@ -296,6 +317,9 @@ static struct _Camera2D* c2d_new_Camera2D()
     new_camera2D->limits[1] = &new_camera2D->limit_top;
     new_camera2D->limits[2] = &new_camera2D->limit_right;
     new_camera2D->limits[3] = &new_camera2D->limit_bottom;
+
+     new_camera2D->global_tmp_sin_rotation = sinf(new_camera2D->rotation);
+     new_camera2D->global_tmp_cos_rotation = cosf(new_camera2D->rotation);
 
     //private attributes of camera2D
 	new_camera2D->_this_Node2D = new_Node2D;
@@ -341,10 +365,11 @@ static struct _Camera2D* c2d_new_Camera2D()
 
 void iiCamera2D_init()
 {
-    iCluige.iCamera2D._SCREEN_BOTTOM_LIMITS = 100.0;
-    iCluige.iCamera2D._SCREEN_LEFT_LIMITS = 0.0;
-    iCluige.iCamera2D._SCREEN_TOP_LIMITS = 0.0;
-    iCluige.iCamera2D._SCREEN_RIGHT_LIMITS = 200.0;
+    iCluige.iCamera2D._SCREEN_HEIGHT = 100.0;
+    iCluige.iCamera2D._SCREEN_WIDTH = 200.0;
+    iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X = iCluige.iCamera2D._SCREEN_WIDTH / 2;
+    iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y = iCluige.iCamera2D._SCREEN_HEIGHT / 2;
+
     iCluige.iCamera2D.new_Camera2D = c2d_new_Camera2D;
     iCluige.iCamera2D.get_zoom = c2d_get_zoom;
     iCluige.iCamera2D.set_zoom = c2d_set_zoom;
@@ -352,6 +377,8 @@ void iiCamera2D_init()
     iCluige.iCamera2D.is_enabled = c2d_is_enabled;
     iCluige.iCamera2D._predraw = c2d__pre_draw;
     iCluige.iCamera2D.make_current = c2d_make_current;
+    iCluige.iCamera2D.set_rotation = c2d_set_rotation;
+    iCluige.iCamera2D.get_rotation = c2d_get_rotation;
 
 
 }

@@ -155,7 +155,8 @@ void cluige_run()
     {
         process_tree(iCluige.private_root_2D, PRE_PROCESS_PASS);
         process_tree(iCluige.private_root_2D, PROCESS_PASS);
-        iCluige.iCamera2D._predraw(iCluige.iCamera2D.current_camera->_this_Node2D->_this_Node);
+        Camera2D* curr_cam = iCluige.iCamera2D.current_camera;
+        iCluige.iCamera2D._predraw(curr_cam->_this_Node2D->_this_Node);
         process_tree(iCluige.private_root_2D, POST_PROCESS_PASS);
 
         refresh();

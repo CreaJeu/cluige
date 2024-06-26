@@ -8,9 +8,6 @@
 #include <assert.h>
 #include <curses.h>
 #include <math.h>
-#ifndef M_PI
-    const double M_PI = 3.14159265358979323846;
-#endif
 
 
 
@@ -84,7 +81,7 @@ static void ssvg_pre_process_Node(Node* this_Node)
     //could have moved and made this sprite visible again;
     //and curses already has characters cache)
     Vector2 orig;
-    iCluige.iVector2.substract(
+    iCluige.iVector2.add(
             &(this_Node2D->_tmp_global_position),
             &(this_SpriteSVG->offset),
             &orig);
@@ -100,6 +97,14 @@ static void ssvg_pre_process_Node(Node* this_Node)
     float res_y_1 ;
     float res_x_2 ;
     float res_y_2 ;
+
+    float res_zoom_x_1;
+    float res_zoom_y_1;
+    float res_zoom_x_2;
+    float res_zoom_y_2;
+
+
+
 
     Vector2 zoom = current_camera->zoom;
 
@@ -120,35 +125,57 @@ static void ssvg_pre_process_Node(Node* this_Node)
                 Vector2* p1 = iCluige.iPath2D.at(path_i, j);
                 Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
 
-                res_x_1 = (orig.x + ((p1->x) * sX));
-                res_y_1 = (orig.y + ((p1->y) * sY));
 
-                res_x_2 = (orig.x + ((p2->x) * sX));
-                res_y_2 = (orig.y + ((p2->y) * sY));
+                //Apply zoom + center on camera
+                res_zoom_x_1 = (((orig.x + ((p1->x) * sX)) - x_camera)*zoom.x);
+                res_zoom_y_1 = (((orig.y + ((p1->y) * sY)) - y_camera)*zoom.y);
+                res_zoom_x_2 = (((orig.x + ((p2->x) * sX)) - x_camera)*zoom.x);
+                res_zoom_y_2 = (((orig.y + ((p2->y) * sY)) - y_camera)*zoom.y);
+
+                if(!iCluige.iCamera2D.current_camera->ignore_rotation)
+                {
+                    float rotation_angle = -iCluige.iCamera2D.current_camera->rotation;
+                    float cf =  current_camera->global_tmp_cos_rotation;
+                    float sf = current_camera->global_tmp_sin_rotation;
+
+                    if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
+                    {
+                        float drag_center_offset_x = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X;
+                        float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
 
 
+
+                        res_x_1 = (res_zoom_x_1 - drag_center_offset_x)  * cf - (res_zoom_y_1 - drag_center_offset_y)  * sf;
+                        res_y_1 = (res_zoom_x_1 - drag_center_offset_x)  * sf + (res_zoom_y_1 - drag_center_offset_y)  * cf;
+
+                        res_x_2 = (res_zoom_x_2 - drag_center_offset_x)  * cf - (res_zoom_y_2 - drag_center_offset_y)  * sf;
+                        res_y_2 = (res_zoom_x_2 - drag_center_offset_x)  * sf + (res_zoom_y_2 - drag_center_offset_y)  * cf;
+
+                        res_x_1 += drag_center_offset_x;
+                        res_y_1 += drag_center_offset_y;
+                        res_x_2 += drag_center_offset_x;
+                        res_y_2 += drag_center_offset_y;
+
+
+                    }
+                    else
+                    {
+                        res_x_1 = res_zoom_x_1  * cf - res_zoom_y_1  * sf;
+                        res_y_1 = res_zoom_x_1  * sf + res_zoom_y_1  * cf;
+                        res_x_2 = res_zoom_x_2  * cf - res_zoom_y_2  * sf;
+                        res_y_2 = res_zoom_x_2  * sf + res_zoom_y_2  * cf;
+
+                    }
+
+
+                }
 
 
                 //TODO mode screensize inchallah
 
-                //Apply zoom + center on camera
-                res_x_1 = ((res_x_1 - x_camera)*zoom.x);
-                res_y_1 = ((res_y_1 - y_camera)*zoom.y);
-                res_x_2 = ((res_x_2 - x_camera)*zoom.x);
-                res_y_2 = ((res_y_2 - y_camera)*zoom.y);
-
-                /*
-                if(!current_camera->ignore_rotation)
-                {
-                    float rotation_angle = current_camera->rotation_angle;
-                    res_x_1 = res_x_1 * cosf(rotation_angle) - res_y_1 * sinf(rotation_angle);
-                    res_y_1 = res_x_1 * sinf(rotation_angle) + res_y_1 * cosf(rotation_angle);
-
-                    res_x_2 = res_x_2 * cosf(rotation_angle) - res_y_2 * sinf(rotation_angle);
-                    res_y_2 = res_x_2 * sinf(rotation_angle) + res_y_2 * cosf(rotation_angle);
 
 
-                }*/
+
 
                 ssvg_draw_line(
                     res_x_1,
@@ -177,7 +204,7 @@ static void ssvg_post_process_Node(Node* this_Node)
     //could have moved and made this sprite visible again;
     //and curses already has characters cache)
     Vector2 orig;
-    iCluige.iVector2.substract(
+    iCluige.iVector2.add(
             &(this_Node2D->_tmp_global_position),
             &(this_SpriteSVG->offset),
             &orig);
@@ -193,6 +220,14 @@ static void ssvg_post_process_Node(Node* this_Node)
     float res_y_1 ;
     float res_x_2 ;
     float res_y_2 ;
+
+    float res_zoom_x_1;
+    float res_zoom_y_1;
+    float res_zoom_x_2;
+    float res_zoom_y_2;
+
+
+
 
     Vector2 zoom = current_camera->zoom;
 
@@ -212,30 +247,55 @@ static void ssvg_post_process_Node(Node* this_Node)
 
                 Vector2* p1 = iCluige.iPath2D.at(path_i, j);
                 Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
-                res_x_1 = (orig.x + ((p1->x) * sX));
-                res_y_1 = (orig.y + ((p1->y) * sY));
-                res_x_2 = (orig.x + ((p2->x) * sX));
-                res_y_2 = (orig.y + ((p2->y) * sY));
-                /*
+
+
+                //Apply zoom + center on camera
+                res_zoom_x_1 = (((orig.x + ((p1->x) * sX)) - x_camera)*zoom.x);
+                res_zoom_y_1 = (((orig.y + ((p1->y) * sY)) - y_camera)*zoom.y);
+                res_zoom_x_2 = (((orig.x + ((p2->x) * sX)) - x_camera)*zoom.x);
+                res_zoom_y_2 = (((orig.y + ((p2->y) * sY)) - y_camera)*zoom.y);
+
                 if(!iCluige.iCamera2D.current_camera->ignore_rotation)
                 {
-                    float rotation_angle = iCluige.iCamera2D.current_camera->rotation_angle;
-                    res_x_1 = res_x_1 * cosf(rotation_angle) - res_y_1 * sinf(rotation_angle);
-                    res_y_1 = res_x_1 * sinf(rotation_angle) + res_y_1 * cosf(rotation_angle);
+                    float rotation_angle = -iCluige.iCamera2D.current_camera->rotation;
+                    float cf =  current_camera->global_tmp_cos_rotation;
+                    float sf = current_camera->global_tmp_sin_rotation;
 
-                    res_x_2 = res_x_2 * cosf(rotation_angle) - res_y_2 * sinf(rotation_angle);
-                    res_y_2 = res_x_2 * sinf(rotation_angle) + res_y_2 * cosf(rotation_angle);
+                    if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
+                    {
+                        float drag_center_offset_x = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X;
+                        float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
+
+
+
+                        res_x_1 = (res_zoom_x_1 - drag_center_offset_x)  * cf - (res_zoom_y_1 - drag_center_offset_y)  * sf;
+                        res_y_1 = (res_zoom_x_1 - drag_center_offset_x)  * sf + (res_zoom_y_1 - drag_center_offset_y)  * cf;
+
+                        res_x_2 = (res_zoom_x_2 - drag_center_offset_x)  * cf - (res_zoom_y_2 - drag_center_offset_y)  * sf;
+                        res_y_2 = (res_zoom_x_2 - drag_center_offset_x)  * sf + (res_zoom_y_2 - drag_center_offset_y)  * cf;
+
+                        res_x_1 += drag_center_offset_x;
+                        res_y_1 += drag_center_offset_y;
+                        res_x_2 += drag_center_offset_x;
+                        res_y_2 += drag_center_offset_y;
+
+
+                    }
+                    else
+                    {
+                        res_x_1 = res_zoom_x_1  * cf - res_zoom_y_1  * sf;
+                        res_y_1 = res_zoom_x_1  * sf + res_zoom_y_1  * cf;
+                        res_x_2 = res_zoom_x_2  * cf - res_zoom_y_2  * sf;
+                        res_y_2 = res_zoom_x_2  * sf + res_zoom_y_2  * cf;
+
+                    }
+
 
                 }
-                */
+
 
                 //TODO mode screensize inchallah
 
-                //Apply zoom + center on camera
-                res_x_1 = ((res_x_1 - x_camera)*zoom.x);
-                res_y_1 = ((res_y_1 - y_camera)*zoom.y);
-                res_x_2 = ((res_x_2 - x_camera)*zoom.x);
-                res_y_2 = ((res_y_2 - y_camera)*zoom.y);
 
 
 

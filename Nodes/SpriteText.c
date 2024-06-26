@@ -43,7 +43,7 @@ static void sprtx_pre_process_Node(Node* this_Node)
     //could have moved and made this sprite visible again;
     //and curses already has characters cache)
     Vector2 orig;
-    iCluige.iVector2.substract(
+    iCluige.iVector2.add(
             &(this_Node2D->_tmp_global_position),
             &(this_SpriteText->offset),
             &orig);
@@ -56,6 +56,10 @@ static void sprtx_pre_process_Node(Node* this_Node)
 
     float res_x;
     float res_y;
+    float res_zoom_x;
+    float res_zoom_y;
+
+
 
     Vector2 zoom = current_camera->zoom;
 
@@ -66,33 +70,47 @@ static void sprtx_pre_process_Node(Node* this_Node)
         //char curr_char = lineString[col];
         char curr_char = this_SpriteText->text[flat_i];
 
-        res_y =lrintf(orig.y) + line;
+
         while(curr_char != 0)
         {
 
             if(curr_char != ' ')
             {
 
-                res_x =lrintf(orig.x) + col;
 
-                res_y = (res_y - y_camera) *zoom.y ;
-                res_x = (res_x - x_camera) * zoom.x;
+                res_zoom_x = ((lrintf(orig.x) + col) - x_camera) * zoom.x;
+                res_zoom_y = ((lrintf(orig.y) + line) - y_camera) *zoom.y ;
                 if(!current_camera->ignore_rotation)
                 {
-                    float rotation_angle = -current_camera->rotation_angle;
-                    float cf =  cosf(rotation_angle);
-                    float sf = sinf(rotation_angle);
 
-                    float orig_res_x = res_x;
-                    float orig_res_y = res_y;
-                    res_x = res_x * cf - res_y * sf;
+                    float rotation_angle = -current_camera->rotation;
+                    float cf =  current_camera->global_tmp_cos_rotation;
+                    float sf = current_camera->global_tmp_sin_rotation;
 
 
-                    res_y = orig_res_x * sf + res_y * cf;
+                    if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
+                    {
+                        float drag_center_offset_x = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X;
+                        float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
+
+                        //substract the point you want to turn around (here the camera offset )
+
+
+                        res_x = (res_zoom_x - drag_center_offset_x)  * cf - (res_zoom_y - drag_center_offset_y)  * sf;
+                        res_y = (res_zoom_y - drag_center_offset_x)  * sf + (res_zoom_y - drag_center_offset_y)  * cf;
+
+                        res_x = res_x + drag_center_offset_x;
+                        res_y = res_y + drag_center_offset_y;
+                    }
+                    else//rotation around corner left
+                    {
+                        res_x = res_zoom_x  * cf - res_zoom_y  * sf;
+                        res_y = res_zoom_x  * sf + res_zoom_y  * cf;
+                    }
+
 
                 }
                 mvaddch(res_y,res_x , ' ');
-                //mvaddch((res_y - y_camera)  , (res_x - x_camera) , ' ');
             }
 
 
@@ -104,6 +122,7 @@ static void sprtx_pre_process_Node(Node* this_Node)
         flat_i++;
     }
 }
+
 
 static void sprtx_post_process_Node(Node* this_Node)
 {
@@ -117,9 +136,11 @@ static void sprtx_post_process_Node(Node* this_Node)
         return;
     }
 
-    //draw new one
+    //clear old one (unless immobile? => no, because other masking things
+    //could have moved and made this sprite visible again;
+    //and curses already has characters cache)
     Vector2 orig;
-    iCluige.iVector2.substract(
+    iCluige.iVector2.add(
             &(this_Node2D->_tmp_global_position),
             &(this_SpriteText->offset),
             &orig);
@@ -132,6 +153,10 @@ static void sprtx_post_process_Node(Node* this_Node)
 
     float res_x;
     float res_y;
+    float res_zoom_x;
+    float res_zoom_y;
+
+
 
     Vector2 zoom = current_camera->zoom;
 
@@ -142,33 +167,47 @@ static void sprtx_post_process_Node(Node* this_Node)
         //char curr_char = lineString[col];
         char curr_char = this_SpriteText->text[flat_i];
 
-        res_y =lrintf(orig.y) + line;
+
         while(curr_char != 0)
         {
 
             if(curr_char != ' ')
             {
 
-                res_x =lrintf(orig.x) + col;
 
-                res_y = (res_y - y_camera) *zoom.y ;
-                res_x = (res_x - x_camera) * zoom.x;
+                res_zoom_x = ((lrintf(orig.x) + col) - x_camera) * zoom.x;
+                res_zoom_y = ((lrintf(orig.y) + line) - y_camera) *zoom.y ;
                 if(!current_camera->ignore_rotation)
                 {
-                    float rotation_angle = -current_camera->rotation_angle;
-                    float cf =  cosf(rotation_angle);
-                    float sf = sinf(rotation_angle);
 
-                    float orig_res_x = res_x;
-                    float orig_res_y = res_y;
-                    res_x = res_x * cf - res_y * sf;
-                    res_y = orig_res_x * sf + res_y * cf;
+                    float rotation_angle = -current_camera->rotation;
+                    float cf =  current_camera->global_tmp_cos_rotation;
+                    float sf = current_camera->global_tmp_sin_rotation;
 
+
+                    if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
+                    {
+                        float drag_center_offset_x = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X;
+                        float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
+
+                        //substract the point you want to turn around (here the camera offset )
+
+
+                        res_x = (res_zoom_x - drag_center_offset_x)  * cf - (res_zoom_y - drag_center_offset_y)  * sf;
+                        res_y = (res_zoom_y - drag_center_offset_x)  * sf + (res_zoom_y - drag_center_offset_y)  * cf;
+
+                        res_x = res_x + drag_center_offset_x;
+                        res_y = res_y + drag_center_offset_y;
+                    }
+                    else//rotation around corner left
+                    {
+                        res_x = res_zoom_x  * cf - res_zoom_y  * sf;
+                        res_y = res_zoom_x  * sf + res_zoom_y  * cf;
+                    }
 
 
                 }
                 mvaddch(res_y,res_x , curr_char);
-                //mvaddch((res_y - y_camera)  , (res_x - x_camera), curr_char);
             }
 
 

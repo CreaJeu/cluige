@@ -107,8 +107,11 @@ static void sprtx_pre_process_Node(Node* this_Node)
                         res_x = res_zoom_x  * cf - res_zoom_y  * sf;
                         res_y = res_zoom_x  * sf + res_zoom_y  * cf;
                     }
-
-
+                }
+                else
+                {
+                    res_x = res_zoom_x;
+                    res_y = res_zoom_y;
                 }
                 mvaddch(res_y,res_x , ' ');
             }
@@ -204,8 +207,11 @@ static void sprtx_post_process_Node(Node* this_Node)
                         res_x = res_zoom_x  * cf - res_zoom_y  * sf;
                         res_y = res_zoom_x  * sf + res_zoom_y  * cf;
                     }
-
-
+                }
+                else
+                {
+                    res_x = res_zoom_x;
+                    res_y = res_zoom_y;
                 }
                 mvaddch(res_y,res_x , curr_char);
             }

@@ -25,6 +25,7 @@ struct _Camera2D
 
 	bool ignore_rotation;
 
+	//rotation angle value if ignore_rotation is true, in degrees
 	float rotation;
 
 	//allow to zoom on the camera, can't be equal to zero
@@ -50,10 +51,13 @@ struct _Camera2D
     float limit_left;
     float limit_bottom;
 
+
+    //cosf(rotation) and sinf(rotation)
     float global_tmp_sin_rotation;
     float global_tmp_cos_rotation;
 
-    /* Future add to camera
+    /*
+    way of upgrading the camera
     float drag_left_margin;
     float drag_right_margin;
     float drag_top_margin;
@@ -90,7 +94,7 @@ struct iiCamera2D
 	Camera2D* current_camera;
 
 
-
+    //default camera which is created at every lunch of cluige
 	Camera2D* default_camera;
 
 	Camera2D* (*new_Camera2D)();

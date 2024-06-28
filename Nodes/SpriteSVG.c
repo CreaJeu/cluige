@@ -166,8 +166,13 @@ static void ssvg_pre_process_Node(Node* this_Node)
                         res_y_2 = res_zoom_x_2  * sf + res_zoom_y_2  * cf;
 
                     }
-
-
+                }
+                else
+                {
+                    res_x_1 = res_zoom_x_1;
+                    res_y_1 = res_zoom_y_1;
+                    res_x_2 = res_zoom_x_2;
+                    res_y_2 = res_zoom_y_2;
                 }
 
 
@@ -255,7 +260,7 @@ static void ssvg_post_process_Node(Node* this_Node)
                 res_zoom_x_2 = (((orig.x + ((p2->x) * sX)) - x_camera)*zoom.x);
                 res_zoom_y_2 = (((orig.y + ((p2->y) * sY)) - y_camera)*zoom.y);
 
-                if(!iCluige.iCamera2D.current_camera->ignore_rotation)
+                if(!current_camera->ignore_rotation)
                 {
                     float rotation_angle = -iCluige.iCamera2D.current_camera->rotation;
                     float cf =  current_camera->global_tmp_cos_rotation;
@@ -289,8 +294,13 @@ static void ssvg_post_process_Node(Node* this_Node)
                         res_y_2 = res_zoom_x_2  * sf + res_zoom_y_2  * cf;
 
                     }
-
-
+                }
+                else
+                {
+                    res_x_1 = res_zoom_x_1;
+                    res_y_1 = res_zoom_y_1;
+                    res_x_2 = res_zoom_x_2;
+                    res_y_2 = res_zoom_y_2;
                 }
 
 

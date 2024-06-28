@@ -34,10 +34,10 @@ static bool is_near_zero(Vector2 v)
 }
 
 //given in degrees not radians
-static void c2d_set_rotation(Camera2D* c2d, float rotation_angle)
+static void c2d_set_rotation(Camera2D* c2d, float rotation_angle_degrees)
 {
     assert(c2d != NULL);
-    float rota = clamp(rotation_angle,-360,360);
+    float rota = clamp(rotation_angle_degrees,-360,360);
 
     c2d->rotation = rota * 3.1415926 / 180;
     c2d->global_tmp_cos_rotation = cosf(c2d->rotation);
@@ -59,7 +59,6 @@ static void c2d_make_current(Camera2D* c2d)
 {
     assert(c2d != NULL);
     assert(c2d->enabled);
-    assert(c2d != iCluige.iCamera2D.current_camera);
 
     iCluige.iCamera2D.current_camera = c2d;
     c2d->_this_Node2D->_local_position_changed = true;
@@ -344,13 +343,14 @@ static struct _Camera2D* c2d_new_Camera2D()
     //checks if the new camera should be the current or not
     if(current_camera != NULL)
     {
-        Node*  default_camera_node = iCluige.private_root_2D->children->next_sibling->next_sibling;
-        if(current_camera->_this_Node2D == default_camera_node->_sub_class)//default camera is the current_camera
+        if(current_camera == iCluige.iCamera2D.default_camera)//default camera is the current_camera
         {
             c2d_make_current(new_camera2D);
         }
-
-
+    }
+    else //first camera created
+    {
+        iCluige.iCamera2D.current_camera = new_camera2D;
     }
     new_Node->delete_Node = c2d_delete_camera2d;
 

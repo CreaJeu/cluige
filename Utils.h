@@ -9,6 +9,9 @@ typedef struct _Vector2 Vector2;
 
 void utils_breakpoint_trick(const void* anything, bool breakpoint);
 
+int clamp_int(int x, int min, int max);
+float clamp_float(float x, float min, float max);
+
 void utils_bool_from_parsed(bool* out,const SortedDictionary* params, const char* param_name);
 void utils_char_from_parsed(char* out,const SortedDictionary* params, const char* param_name);
 void utils_int_from_parsed(int* out,const SortedDictionary* params, const char* param_name);

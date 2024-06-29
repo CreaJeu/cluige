@@ -86,9 +86,9 @@ static float vct2_distance_squared_to(const Vector2* v1, const Vector2* v2)
 }
 
 
-static bool vct2_is_zero(const Vector2 v)
+static bool vct2_is_zero(const Vector2* v)
 {
-    return fabs(v.x) < iCluige.EPSILON && fabs(v.y) < iCluige.EPSILON;
+    return fabs(v->x) < iCluige.EPSILON && fabs(v->y) < iCluige.EPSILON;
 }
 
 ////////////////////////////////// iVector2 /////////

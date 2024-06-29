@@ -16,6 +16,38 @@ void utils_breakpoint_trick(const void* anything, bool breakpoint)
     }
 }
 
+int clamp_int(int x, int min, int max)
+{
+    if(x < min)
+    {
+        return min;
+    }
+    else if(max < x)
+    {
+        return max;
+    }
+    else
+    {
+        return x;
+    }
+}
+
+float clamp_float(float x, float min, float max)
+{
+    if(x < min)
+    {
+        return min;
+    }
+    else if(max < x)
+    {
+        return max;
+    }
+    else
+    {
+        return x;
+    }
+}
+
 void utils_bool_from_parsed(bool* out,const SortedDictionary* params, const char* param_name)
 {
     //false / true

@@ -53,14 +53,10 @@ static void sprtx_pre_process_Node(Node* this_Node)
 
     float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
     float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
-
     float res_x;
     float res_y;
     float res_zoom_x;
     float res_zoom_y;
-
-
-
     Vector2 zoom = current_camera->zoom;
 
     for(int line = 0; line < this_SpriteText->nb_lines; line++)
@@ -70,23 +66,17 @@ static void sprtx_pre_process_Node(Node* this_Node)
         //char curr_char = lineString[col];
         char curr_char = this_SpriteText->text[flat_i];
 
-
         while(curr_char != 0)
         {
-
             if(curr_char != ' ')
             {
-
-
                 res_zoom_x = ((lrintf(orig.x) + col) - x_camera) * zoom.x;
                 res_zoom_y = ((lrintf(orig.y) + line) - y_camera) *zoom.y ;
                 if(!current_camera->ignore_rotation)
                 {
-
-                    float rotation_angle = -current_camera->rotation;
+                    //float rotation_angle = -current_camera->rotation;
                     float cf =  current_camera->global_tmp_cos_rotation;
                     float sf = current_camera->global_tmp_sin_rotation;
-
 
                     if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
                     {
@@ -94,7 +84,6 @@ static void sprtx_pre_process_Node(Node* this_Node)
                         float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
 
                         //substract the point you want to turn around (here the camera offset )
-
 
                         res_x = (res_zoom_x - drag_center_offset_x)  * cf - (res_zoom_y - drag_center_offset_y)  * sf;
                         res_y = (res_zoom_y - drag_center_offset_x)  * sf + (res_zoom_y - drag_center_offset_y)  * cf;
@@ -116,7 +105,6 @@ static void sprtx_pre_process_Node(Node* this_Node)
                 mvaddch(res_y,res_x , ' ');
             }
 
-
             col++;
             //curr_char = lineString[col];
             flat_i++;
@@ -125,7 +113,6 @@ static void sprtx_pre_process_Node(Node* this_Node)
         flat_i++;
     }
 }
-
 
 static void sprtx_post_process_Node(Node* this_Node)
 {
@@ -153,14 +140,10 @@ static void sprtx_post_process_Node(Node* this_Node)
 
     float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
     float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
-
     float res_x;
     float res_y;
     float res_zoom_x;
     float res_zoom_y;
-
-
-
     Vector2 zoom = current_camera->zoom;
 
     for(int line = 0; line < this_SpriteText->nb_lines; line++)
@@ -170,23 +153,17 @@ static void sprtx_post_process_Node(Node* this_Node)
         //char curr_char = lineString[col];
         char curr_char = this_SpriteText->text[flat_i];
 
-
         while(curr_char != 0)
         {
-
             if(curr_char != ' ')
             {
-
-
                 res_zoom_x = ((lrintf(orig.x) + col) - x_camera) * zoom.x;
                 res_zoom_y = ((lrintf(orig.y) + line) - y_camera) *zoom.y ;
                 if(!current_camera->ignore_rotation)
                 {
-
-                    float rotation_angle = -current_camera->rotation;
+                    //float rotation_angle = -current_camera->rotation;
                     float cf =  current_camera->global_tmp_cos_rotation;
                     float sf = current_camera->global_tmp_sin_rotation;
-
 
                     if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
                     {
@@ -194,7 +171,6 @@ static void sprtx_post_process_Node(Node* this_Node)
                         float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
 
                         //substract the point you want to turn around (here the camera offset )
-
 
                         res_x = (res_zoom_x - drag_center_offset_x)  * cf - (res_zoom_y - drag_center_offset_y)  * sf;
                         res_y = (res_zoom_y - drag_center_offset_x)  * sf + (res_zoom_y - drag_center_offset_y)  * cf;
@@ -215,7 +191,6 @@ static void sprtx_post_process_Node(Node* this_Node)
                 }
                 mvaddch(res_y,res_x , curr_char);
             }
-
 
             col++;
             //curr_char = lineString[col];
@@ -291,7 +266,7 @@ static void sprtx_set_text(SpriteText* this_SpriteText, const char* new_text)
     }
 }
 
-/////////////////////////////////// Node //////////
+/////////////////////////////////// global //////////
 
 void iiSpriteText_init()
 {

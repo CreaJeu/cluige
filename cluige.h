@@ -60,9 +60,6 @@ struct iiCluige
 	//for user nodes
 	Node* public_root_2D;
 
-	// if epsilon = 5
-	// 0.000001 will be considered zero
-	// 0.0001 will not be considered zero
 	float EPSILON;
 
 	//void* checked_malloc(size_t)

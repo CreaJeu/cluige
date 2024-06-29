@@ -9,6 +9,9 @@
 (tous les identifiants en snake_case, types restent PascalCase)
 (sprite svg (no anim) : minimal file parsing)
 (SortedDictionary)
+(queue_free, remove child, get node by name/path, get_path)
+(~auto test project)
+(camera)
 
 
 **tâches actuelles**
@@ -23,10 +26,6 @@
 - sprite svg : optim big segments out of screen
 - node2D (et autre?) : meilleur test ~instanceof / _className static par classe
 - fatal error => end loop + printf
-- queue_free, remove child
-- get node by name/path
-- project files to test every methods
-- get_path
 
 
 
@@ -34,7 +33,6 @@
 
 - signals
 - collision rectangle
-- camera
 - more godot scene import
 - input : just_released? => MVC pour inputs (input server, platform-specific)
 - memory pools (at least for pairs in dico)

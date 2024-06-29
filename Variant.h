@@ -8,6 +8,7 @@
 typedef union _Variant Variant;
 typedef enum _VariantType VariantType;
 typedef struct _Pair Pair;
+typedef struct _Checked_Variant Checked_Variant;
 
 struct _Structed_va_list
 {
@@ -47,6 +48,12 @@ struct _Pair
 {
     Variant first;
     Variant second;
+};
+
+struct _Checked_Variant
+{
+    bool valid;
+    Variant v;
 };
 
 struct iiVariant

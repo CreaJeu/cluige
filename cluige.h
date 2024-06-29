@@ -5,7 +5,9 @@
 #include <stdbool.h> //for bool, true, false (standard since C99)
 #include <stddef.h> //for NULL
 #include <stdlib.h> //for EXIT_SUCCESS, malloc, etc.
+#include <string.h>
 
+#include "Utils.h"
 #include "Node.h"
 #include "StringBuilder.h"
 
@@ -43,7 +45,7 @@ struct iiCluige
 	struct iiSpriteSVG iSpriteSVG;
 
 	//for target FPS, 15 fps by default
-	float wanted_frame_seconds;
+	float wanted_frame_seconds;//TODO rename wanted_seconds_per_frame
 
 	//to quit a game
 	bool quit_asked;

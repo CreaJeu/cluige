@@ -28,8 +28,8 @@ struct iiSortedDictionary
 
     //read
 
-    //(NULL_VARIANT if not found)
-    Variant (*get)(const SortedDictionary* this_SortedDictionary, ...);
+    //result.valid = false if not found
+    Checked_Variant (*get)(const SortedDictionary* this_SortedDictionary, ...);
 
     //for loops ; returned Variant .ptr is to the Pair at i
     Variant (*at)(const SortedDictionary* this_SortedDictionary, int i);
@@ -39,19 +39,28 @@ struct iiSortedDictionary
 
     //insertion
 
-    //automatically insert or replace if key already present
-    //returns a copy of replaced value, for example if you need to do some free/delete
-    //or NULL_VARIANT if no value was replaced
-    Variant (*insert)(SortedDictionary* this_SortedDictionary, ...);
+
+
+
+    //inserts or automatically replaces if key already present
+    //returns a copy of replaced value (what was its value before replacement),
+    //for example if you need to do some free/delete
+    //result.valid = false if no elem was replaced
+    Checked_Variant (*insert)(SortedDictionary* this_SortedDictionary, ...);
 
     //inserts without any existence check
     void (*insert_first)(SortedDictionary* this_SortedDictionary, ...);
     //inserts without any existence check
     void (*insert_last)(SortedDictionary* this_SortedDictionary, ...);
 
+
     //deletion
 
-    void (*erase)(SortedDictionary* this_SortedDictionary, ...);
+    //no auto free/delete, don't forget to do it yourself before, if needed
+    //returns erased value (inside a Variant), or NULL_VARIANT if not found
+    Variant (*erase)(SortedDictionary* this_SortedDictionary, ...);
+
+    //no auto free/delete, don't forget to do it yourself before, if needed
     void (*clear)(SortedDictionary* this_SortedDictionary);
 
     //search

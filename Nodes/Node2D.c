@@ -144,6 +144,17 @@ static void n2d_set_local_position(Node2D* this_Node2D, Vector2 new_pos)
     this_Node2D->_local_position_changed = true;
 }
 
+static void n2d_deserialize_dico(Node2D* this_Node2D, const SortedDictionary* params)
+{
+    //mother class
+    iCluige.iNode.deserialize_dico(this_Node2D->_this_Node, params);
+
+    utils_bool_from_parsed(&(this_Node2D->visible), params, "visible");
+    utils_vector2_from_parsed(&(this_Node2D->position), params, "position");
+    // TODO scale : utils_vector2_from_parsed(&(this_Node2D->scale), params, "scale");
+    //maybe one day : rotation = 1.11177
+}
+
 /////////////////////////////////// Node //////////
 
 void iiNode2D_init()
@@ -153,5 +164,6 @@ void iiNode2D_init()
     iCluige.iNode2D.hide = n2d_hide;
     iCluige.iNode2D.move_local = n2d_move_local;
     iCluige.iNode2D.set_local_position = n2d_set_local_position;
+    iCluige.iNode2D.deserialize_dico = n2d_deserialize_dico;
 }
 

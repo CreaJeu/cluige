@@ -24,6 +24,7 @@ static void nde_delete_Node(Node* node)
     }
     if(node->next_sibling != NULL)
     {
+        //TODO really delete siblings? (but see above : deleting chidren assumes sibling auto deleted
         node->next_sibling->delete_Node(node->next_sibling);
         node->next_sibling = NULL;
     }
@@ -212,6 +213,14 @@ static void nde_print_tree_pretty(const Node* node)
     }
 }
 
+static void nde_deserialize_dico(Node* this_Node, const SortedDictionary* params)
+{
+    //Node* res = nde_new_Node();
+    utils_str_from_parsed(&(this_Node->name), params, "name");
+    // TODO ? // utils_bool_from_parsed(&(res->active), params, "active");
+    //return res;
+}
+
 /////////////////////////////////// Node //////////
 
 void iiNode_init()
@@ -224,5 +233,6 @@ void iiNode_init()
     iCluige.iNode.set_name = nde_set_name;
     iCluige.iNode.add_child = nde_add_child;
     iCluige.iNode.print_tree_pretty = nde_print_tree_pretty;
+    iCluige.iNode.deserialize_dico = nde_deserialize_dico;
 }
 

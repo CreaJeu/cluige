@@ -6,9 +6,12 @@
 typedef struct _Node Node;
 typedef struct _Script Script;
 
+//for godot import deserialize_dico()
+typedef struct _SortedDictionary SortedDictionary;
+
 struct _Node
 {
-	// ... position/transform
+	// position/transform : in Node2D
 	Node* parent;
 	Node* next_sibling;
 	Node* children;
@@ -63,6 +66,8 @@ struct iiNode
 
 	//void print_tree_pretty(Node*)
 	void (*print_tree_pretty)(const Node*);
+
+	void (*deserialize_dico)(Node* this_Node, const SortedDictionary*);
 
 	//TODO removeChild()
 	//TODO queueFree()

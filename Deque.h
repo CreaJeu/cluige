@@ -59,9 +59,10 @@ struct iiDeque
     void (*append)(Deque* this_Deque, ...);//same as push_back()
     void (*insert)(Deque* this_Deque, int i, ...);
 
-    //returns a copy of replaced elem, for example if you need to do some free/delete
-    //or NULL_VARIANT if no elem was replaced
-    Variant (*insert_or_replace_sorted)(Deque* this_Deque, bool replace, ...);
+    //returns a copy of replaced elem (what was its value before replacement)
+    //for example if you need to do some free/delete
+    //result.valid = false if no elem was replaced
+    Checked_Variant (*insert_or_replace_sorted)(Deque* this_Deque, bool replace, ...);
     //one day? append_array()
 
     //deletion

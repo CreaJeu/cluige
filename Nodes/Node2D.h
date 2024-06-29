@@ -39,6 +39,8 @@ struct iiNode2D
 	void (*move_local)(Node2D*, Vector2);
 	void (*set_local_position)(Node2D*, Vector2);
 	//later : moveGlobal
+
+	void (*deserialize_dico)(Node2D* this_Node2D, const SortedDictionary*);
 };
 //iNode2D : in iiCluige
 

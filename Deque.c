@@ -192,10 +192,10 @@ static void dq_insert(Deque* this_Deque, int i, ...)
 
 //returns a copy of replaced elem, for example if you need to do some free/delete
 //returns NULL_VARIANT if no elem was replaced
-static Variant dq_insert_or_replace_sorted(Deque* this_Deque, bool replace, ...)
+static Checked_Variant dq_insert_or_replace_sorted(Deque* this_Deque, bool replace, ...)
 {
     assert(this_Deque->_sorted);
-    Variant res;
+    Checked_Variant res;
     struct _Structed_va_list s_args_elem_value;
     va_start(s_args_elem_value.args, replace);
     Variant new_elem = iCluige.iVariant.from_s_args(
@@ -215,7 +215,8 @@ static Variant dq_insert_or_replace_sorted(Deque* this_Deque, bool replace, ...)
             i_insert = bsd._found_deque_index + 1;
             if(replace)
             {
-                res = iCluige.iDeque.at(this_Deque, bsd._found_deque_index);//copy
+                res.v = iCluige.iDeque.at(this_Deque, bsd._found_deque_index);//copy
+                res.valid = true;
                 iCluige.iDeque.replace(this_Deque, bsd._found_deque_index, new_elem);
                 return res;
             }
@@ -228,7 +229,8 @@ static Variant dq_insert_or_replace_sorted(Deque* this_Deque, bool replace, ...)
     va_start(s_args_elem_value.args, replace);
     dq__insert_va_list(this_Deque, i_insert, &s_args_elem_value);
     va_end(s_args_elem_value.args);
-    return iCluige.iVariant.NULL_VARIANT;
+    res.valid = false;
+    return res;
 }
 
 

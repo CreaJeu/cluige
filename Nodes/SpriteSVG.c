@@ -7,7 +7,9 @@
 //#include <string.h>
 #include <assert.h>
 #include <curses.h>
-//#include <math.h>
+#include <math.h>
+
+
 
 ////////////////////////////////// _SpriteSVG /////////
 
@@ -79,10 +81,33 @@ static void ssvg_pre_process_Node(Node* this_Node)
     //could have moved and made this sprite visible again;
     //and curses already has characters cache)
     Vector2 orig;
-    iCluige.iVector2.substract(
+    iCluige.iVector2.add(
             &(this_Node2D->_tmp_global_position),
             &(this_SpriteSVG->offset),
             &orig);
+
+    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
+
+    assert(current_camera != NULL);
+
+    float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
+    float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+
+    float res_x_1 ;
+    float res_y_1 ;
+    float res_x_2 ;
+    float res_y_2 ;
+
+    float res_zoom_x_1;
+    float res_zoom_y_1;
+    float res_zoom_x_2;
+    float res_zoom_y_2;
+
+
+
+
+    Vector2 zoom = current_camera->zoom;
+
     float sX = this_SpriteSVG->scale.x;
     float sY = this_SpriteSVG->scale.y;
     Deque* paths = &(this_SpriteSVG->paths);
@@ -95,12 +120,75 @@ static void ssvg_pre_process_Node(Node* this_Node)
             int nb_points = iCluige.iPath2D.size(path_i);
             for(int j=0; j<(nb_points-1); j++)
             {
+
+
                 Vector2* p1 = iCluige.iPath2D.at(path_i, j);
                 Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
+
+
+                //Apply zoom + center on camera
+                res_zoom_x_1 = (((orig.x + ((p1->x) * sX)) - x_camera)*zoom.x);
+                res_zoom_y_1 = (((orig.y + ((p1->y) * sY)) - y_camera)*zoom.y);
+                res_zoom_x_2 = (((orig.x + ((p2->x) * sX)) - x_camera)*zoom.x);
+                res_zoom_y_2 = (((orig.y + ((p2->y) * sY)) - y_camera)*zoom.y);
+
+                if(!iCluige.iCamera2D.current_camera->ignore_rotation)
+                {
+                    float rotation_angle = -iCluige.iCamera2D.current_camera->rotation;
+                    float cf =  current_camera->global_tmp_cos_rotation;
+                    float sf = current_camera->global_tmp_sin_rotation;
+
+                    if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
+                    {
+                        float drag_center_offset_x = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X;
+                        float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
+
+
+
+                        res_x_1 = (res_zoom_x_1 - drag_center_offset_x)  * cf - (res_zoom_y_1 - drag_center_offset_y)  * sf;
+                        res_y_1 = (res_zoom_x_1 - drag_center_offset_x)  * sf + (res_zoom_y_1 - drag_center_offset_y)  * cf;
+
+                        res_x_2 = (res_zoom_x_2 - drag_center_offset_x)  * cf - (res_zoom_y_2 - drag_center_offset_y)  * sf;
+                        res_y_2 = (res_zoom_x_2 - drag_center_offset_x)  * sf + (res_zoom_y_2 - drag_center_offset_y)  * cf;
+
+                        res_x_1 += drag_center_offset_x;
+                        res_y_1 += drag_center_offset_y;
+                        res_x_2 += drag_center_offset_x;
+                        res_y_2 += drag_center_offset_y;
+
+
+                    }
+                    else
+                    {
+                        res_x_1 = res_zoom_x_1  * cf - res_zoom_y_1  * sf;
+                        res_y_1 = res_zoom_x_1  * sf + res_zoom_y_1  * cf;
+                        res_x_2 = res_zoom_x_2  * cf - res_zoom_y_2  * sf;
+                        res_y_2 = res_zoom_x_2  * sf + res_zoom_y_2  * cf;
+
+                    }
+                }
+                else
+                {
+                    res_x_1 = res_zoom_x_1;
+                    res_y_1 = res_zoom_y_1;
+                    res_x_2 = res_zoom_x_2;
+                    res_y_2 = res_zoom_y_2;
+                }
+
+
+                //TODO mode screensize inchallah
+
+
+
+
+
                 ssvg_draw_line(
-                    orig.x + ((p1->x) * sX), orig.y + ((p1->y) * sY),
-                    orig.x + ((p2->x) * sX), orig.y + ((p2->y) * sY),
-                    false);
+                    res_x_1,
+                    res_y_1,
+                    res_x_2,
+                    res_y_2,
+                false);
+
             }
         }
     }
@@ -109,21 +197,45 @@ static void ssvg_pre_process_Node(Node* this_Node)
 static void ssvg_post_process_Node(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
-    SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
-    //call super()
-    this_SpriteSVG->post_process_Node2D(this_Node);
-
     if(!(this_Node2D->visible))
     {
         return;
     }
+    SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
+    //call super()
+    this_SpriteSVG->post_process_Node2D(this_Node);
 
-    //draw new one
+    //clear old one (unless immobile? => no, because other masking things
+    //could have moved and made this sprite visible again;
+    //and curses already has characters cache)
     Vector2 orig;
-    iCluige.iVector2.substract(
+    iCluige.iVector2.add(
             &(this_Node2D->_tmp_global_position),
             &(this_SpriteSVG->offset),
             &orig);
+
+    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
+
+    assert(current_camera != NULL);
+
+    float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
+    float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+
+    float res_x_1 ;
+    float res_y_1 ;
+    float res_x_2 ;
+    float res_y_2 ;
+
+    float res_zoom_x_1;
+    float res_zoom_y_1;
+    float res_zoom_x_2;
+    float res_zoom_y_2;
+
+
+
+
+    Vector2 zoom = current_camera->zoom;
+
     float sX = this_SpriteSVG->scale.x;
     float sY = this_SpriteSVG->scale.y;
     Deque* paths = &(this_SpriteSVG->paths);
@@ -136,12 +248,75 @@ static void ssvg_post_process_Node(Node* this_Node)
             int nb_points = iCluige.iPath2D.size(path_i);
             for(int j=0; j<(nb_points-1); j++)
             {
+
+
                 Vector2* p1 = iCluige.iPath2D.at(path_i, j);
                 Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
+
+
+                //Apply zoom + center on camera
+                res_zoom_x_1 = (((orig.x + ((p1->x) * sX)) - x_camera)*zoom.x);
+                res_zoom_y_1 = (((orig.y + ((p1->y) * sY)) - y_camera)*zoom.y);
+                res_zoom_x_2 = (((orig.x + ((p2->x) * sX)) - x_camera)*zoom.x);
+                res_zoom_y_2 = (((orig.y + ((p2->y) * sY)) - y_camera)*zoom.y);
+
+                if(!current_camera->ignore_rotation)
+                {
+                    float rotation_angle = -iCluige.iCamera2D.current_camera->rotation;
+                    float cf =  current_camera->global_tmp_cos_rotation;
+                    float sf = current_camera->global_tmp_sin_rotation;
+
+                    if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
+                    {
+                        float drag_center_offset_x = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X;
+                        float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
+
+
+
+                        res_x_1 = (res_zoom_x_1 - drag_center_offset_x)  * cf - (res_zoom_y_1 - drag_center_offset_y)  * sf;
+                        res_y_1 = (res_zoom_x_1 - drag_center_offset_x)  * sf + (res_zoom_y_1 - drag_center_offset_y)  * cf;
+
+                        res_x_2 = (res_zoom_x_2 - drag_center_offset_x)  * cf - (res_zoom_y_2 - drag_center_offset_y)  * sf;
+                        res_y_2 = (res_zoom_x_2 - drag_center_offset_x)  * sf + (res_zoom_y_2 - drag_center_offset_y)  * cf;
+
+                        res_x_1 += drag_center_offset_x;
+                        res_y_1 += drag_center_offset_y;
+                        res_x_2 += drag_center_offset_x;
+                        res_y_2 += drag_center_offset_y;
+
+
+                    }
+                    else
+                    {
+                        res_x_1 = res_zoom_x_1  * cf - res_zoom_y_1  * sf;
+                        res_y_1 = res_zoom_x_1  * sf + res_zoom_y_1  * cf;
+                        res_x_2 = res_zoom_x_2  * cf - res_zoom_y_2  * sf;
+                        res_y_2 = res_zoom_x_2  * sf + res_zoom_y_2  * cf;
+
+                    }
+                }
+                else
+                {
+                    res_x_1 = res_zoom_x_1;
+                    res_y_1 = res_zoom_y_1;
+                    res_x_2 = res_zoom_x_2;
+                    res_y_2 = res_zoom_y_2;
+                }
+
+
+                //TODO mode screensize inchallah
+
+
+
+
+
                 ssvg_draw_line(
-                    orig.x + ((p1->x) * sX), orig.y + ((p1->y) * sY),
-                    orig.x + ((p2->x) * sX), orig.y + ((p2->y) * sY),
-                    true);
+                    res_x_1,
+                    res_y_1,
+                    res_x_2,
+                    res_y_2,
+                true);
+
             }
         }
     }

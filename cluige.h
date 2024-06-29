@@ -22,7 +22,8 @@
 #include "Nodes/Input.h"
 #include "LineDrawerThin.h"
 #include "Path2D.h"
-#include "Nodes/SpriteSvg.h"
+#include "Nodes/SpriteSVG.h"
+#include "Nodes/Camera2D.h"
 
 //just a kind of namespace to prevent name collisions
 struct iiCluige
@@ -43,6 +44,9 @@ struct iiCluige
     struct iiLineDrawerThin iLineDrawerThin;
 	struct iiPath2D iPath2D;
 	struct iiSpriteSVG iSpriteSVG;
+	struct iiCamera2D iCamera2D;
+
+
 
 	//for target FPS, 15 fps by default
 	float wanted_frame_seconds;//TODO rename wanted_seconds_per_frame
@@ -55,6 +59,11 @@ struct iiCluige
 
 	//for user nodes
 	Node* public_root_2D;
+
+	// if epsilon = 5
+	// 0.000001 will be considered zero
+	// 0.0001 will not be considered zero
+	float EPSILON;
 
 	//void* checked_malloc(size_t)
 	void* (*checked_malloc)(size_t);

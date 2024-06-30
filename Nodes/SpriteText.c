@@ -235,6 +235,25 @@ static SpriteText* sprtx_new_SpriteText()
     return new_SpriteText;
 }
 
+//private util
+static void sprtx__bake_text(SpriteText* this_SpriteText)
+{
+    int total_length = strlen(this_SpriteText->text);
+    this_SpriteText->nb_lines = 0;
+    for(int i=0; i<total_length; i++)
+    {
+        if(this_SpriteText->text[i] == '\n')
+        {
+            this_SpriteText->text[i] = '\0';
+            this_SpriteText->nb_lines++;
+        }
+    }
+    if(total_length > 0)
+    {
+        this_SpriteText->nb_lines++;
+    }
+}
+
 static void sprtx_set_text(SpriteText* this_SpriteText, const char* new_text)
 {
     if(this_SpriteText->text != NULL)
@@ -248,22 +267,26 @@ static void sprtx_set_text(SpriteText* this_SpriteText, const char* new_text)
 //    this_SpriteText->text =
 //        iCluige.iStringBuilder.split(new_text, "\n", &(this_SpriteText->nb_lines));
     int total_length = strlen(new_text);
-    this_SpriteText->nb_lines = 0;
     StringBuilder sb;
     this_SpriteText->text = iCluige.iStringBuilder.string_alloc(&sb, total_length);
     iCluige.iStringBuilder.append(&sb, new_text);
-    for(int i=0; i<total_length; i++)
-    {
-        if(new_text[i] == '\n')
-        {
-            this_SpriteText->text[i] = '\0';
-            this_SpriteText->nb_lines++;
-        }
-    }
-    if(total_length > 0)
-    {
-        this_SpriteText->nb_lines++;
-    }
+    sprtx__bake_text(this_SpriteText);
+}
+
+static void sprtx_deserialize_dico(SpriteText* this_SpriteText, const SortedDictionary* params)
+{
+    //mother class
+    iCluige.iNode2D.deserialize_dico(this_SpriteText->_this_Node2D, params);
+
+    //offset = Vector2(2.265, -3.2)
+    //text = "un autre label
+    //sans param modifié
+    //à part texte et pos"
+    utils_vector2_from_parsed(&(this_SpriteText->offset), params, "offset");
+    assert(this_SpriteText->text == NULL);
+    utils_str_from_parsed(&(this_SpriteText->text), params, "text");
+    assert(this_SpriteText->text != NULL);
+    sprtx__bake_text(this_SpriteText);
 }
 
 /////////////////////////////////// global //////////
@@ -272,5 +295,6 @@ void iiSpriteText_init()
 {
     iCluige.iSpriteText.new_SpriteText = sprtx_new_SpriteText;
     iCluige.iSpriteText.set_text = sprtx_set_text;
+    iCluige.iSpriteText.deserialize_dico = sprtx_deserialize_dico;
 }
 

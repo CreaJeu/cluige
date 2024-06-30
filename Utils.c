@@ -12,7 +12,8 @@ void utils_breakpoint_trick(const void* anything, bool breakpoint)
 {
     if(breakpoint)
     {
-
+        //put your breakpoint here
+        breakpoint = true;
     }
 }
 

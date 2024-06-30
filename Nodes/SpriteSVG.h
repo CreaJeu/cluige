@@ -46,6 +46,7 @@ struct iiSpriteSVG
 	void (*add_path_from_parsed_deque)(SpriteSVG*, Deque*);
 
 	void (*parse_file)(SpriteSVG*, char* file_path);
+	void (*deserialize_dico)(SpriteSVG* this_SpriteText, const SortedDictionary*);
 };
 //iSpriteSVG : in iiCluige
 

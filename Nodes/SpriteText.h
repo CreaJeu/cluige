@@ -35,6 +35,8 @@ struct iiSpriteText
 
 	//void set_text(const char*)
 	void (*set_text)(SpriteText*, const char*);
+
+	void (*deserialize_dico)(SpriteText* this_SpriteText, const SortedDictionary*);
 };
 //iSpriteText : in iiCluige
 

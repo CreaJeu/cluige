@@ -85,9 +85,8 @@ static void n2d_on_loop_starting_Node2D(Node* this_Node)
 
 ////////////////////////////////// iiNode2D /////////
 
-static struct _Node2D* n2d_new_Node2D()
+static Node2D* n2d_new_Node2D_from_Node(Node* new_node)
 {
-    Node* new_node = iCluige.iNode.new_Node();
     struct _Node2D* new_node2D = iCluige.checked_malloc(sizeof(Node2D));
 
     new_node2D->visible = true;
@@ -118,6 +117,12 @@ static struct _Node2D* n2d_new_Node2D()
     return new_node2D;
 }
 
+static struct _Node2D* n2d_new_Node2D()
+{
+    Node* new_node = iCluige.iNode.new_Node();
+    return n2d_new_Node2D_from_Node(new_node);
+}
+
 static void n2d_show(Node2D* this_Node2D)
 {
     this_Node2D->visible = true;
@@ -144,15 +149,17 @@ static void n2d_set_local_position(Node2D* this_Node2D, Vector2 new_pos)
     this_Node2D->_local_position_changed = true;
 }
 
-static void n2d_deserialize_dico(Node2D* this_Node2D, const SortedDictionary* params)
+static Node* n2d_instanciate(const SortedDictionary* params)
 {
     //mother class
-    iCluige.iNode.deserialize_dico(this_Node2D->_this_Node, params);
+    Node* res_node = iCluige.iNode._Node_factory.instanciate(params);
+    Node2D* res_node2D = n2d_new_Node2D_from_Node(res_node);
 
-    utils_bool_from_parsed(&(this_Node2D->visible), params, "visible");
-    utils_vector2_from_parsed(&(this_Node2D->position), params, "position");
+    utils_bool_from_parsed(&(res_node2D->visible), params, "visible");
+    utils_vector2_from_parsed(&(res_node2D->position), params, "position");
     // TODO scale : utils_vector2_from_parsed(&(this_Node2D->scale), params, "scale");
     //maybe one day : rotation = 1.11177
+    return res_node;
 }
 
 /////////////////////////////////// Node //////////
@@ -160,10 +167,15 @@ static void n2d_deserialize_dico(Node2D* this_Node2D, const SortedDictionary* pa
 void iiNode2D_init()
 {
     iCluige.iNode2D.new_Node2D = n2d_new_Node2D;
+    iCluige.iNode2D.new_Node2D_from_Node = n2d_new_Node2D_from_Node;
     iCluige.iNode2D.show = n2d_show;
     iCluige.iNode2D.hide = n2d_hide;
     iCluige.iNode2D.move_local = n2d_move_local;
     iCluige.iNode2D.set_local_position = n2d_set_local_position;
-    iCluige.iNode2D.deserialize_dico = n2d_deserialize_dico;
+
+    SortedDictionary* fcties = &(iCluige.iNode.node_factories);
+    NodeFactory* fcty = &(iCluige.iNode2D._Node2D_factory);
+    fcty->instanciate = n2d_instanciate;
+    iCluige.iSortedDictionary.insert(fcties, "Node2D", fcty);
 }
 

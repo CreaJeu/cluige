@@ -204,9 +204,8 @@ static void sprtx_post_process_Node(Node* this_Node)
 
 ////////////////////////////////// iiSpriteText /////////
 
-static SpriteText* sprtx_new_SpriteText()
+static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
 {
-	Node2D* new_Node2D = iCluige.iNode2D.new_Node2D();
 	Node* new_Node = new_Node2D->_this_Node;
     SpriteText* new_SpriteText = iCluige.checked_malloc(sizeof(SpriteText));
 
@@ -233,6 +232,12 @@ static SpriteText* sprtx_new_SpriteText()
     new_Node->post_process_Node = sprtx_post_process_Node;
 
     return new_SpriteText;
+}
+
+static SpriteText* sprtx_new_SpriteText()
+{
+	Node2D* new_Node2D = iCluige.iNode2D.new_Node2D();
+	return sprtx_new_SpriteText_from_Node2D(new_Node2D);
 }
 
 //private util
@@ -273,20 +278,23 @@ static void sprtx_set_text(SpriteText* this_SpriteText, const char* new_text)
     sprtx__bake_text(this_SpriteText);
 }
 
-static void sprtx_deserialize_dico(SpriteText* this_SpriteText, const SortedDictionary* params)
+static Node* sprtx_instanciate(const SortedDictionary* params)
 {
     //mother class
-    iCluige.iNode2D.deserialize_dico(this_SpriteText->_this_Node2D, params);
+    Node* res_node = iCluige.iNode2D._Node2D_factory.instanciate(params);
+    Node2D* res_node2D = (Node2D*)(res_node->_sub_class);
+    SpriteText* res_SpriteText = sprtx_new_SpriteText_from_Node2D(res_node2D);
 
     //offset = Vector2(2.265, -3.2)
     //text = "un autre label
     //sans param modifié
     //à part texte et pos"
-    utils_vector2_from_parsed(&(this_SpriteText->offset), params, "offset");
-    assert(this_SpriteText->text == NULL);
-    utils_str_from_parsed(&(this_SpriteText->text), params, "text");
-    assert(this_SpriteText->text != NULL);
-    sprtx__bake_text(this_SpriteText);
+    utils_vector2_from_parsed(&(res_SpriteText->offset), params, "offset");
+    assert(res_SpriteText->text == NULL);
+    utils_str_from_parsed(&(res_SpriteText->text), params, "text");
+    assert(res_SpriteText->text != NULL);
+    sprtx__bake_text(res_SpriteText);
+    return res_node;
 }
 
 /////////////////////////////////// global //////////
@@ -294,7 +302,12 @@ static void sprtx_deserialize_dico(SpriteText* this_SpriteText, const SortedDict
 void iiSpriteText_init()
 {
     iCluige.iSpriteText.new_SpriteText = sprtx_new_SpriteText;
+    iCluige.iSpriteText.new_SpriteText_from_Node2D = sprtx_new_SpriteText_from_Node2D;
     iCluige.iSpriteText.set_text = sprtx_set_text;
-    iCluige.iSpriteText.deserialize_dico = sprtx_deserialize_dico;
+
+    SortedDictionary* fcties = &(iCluige.iNode.node_factories);
+    NodeFactory* fcty = &(iCluige.iSpriteText._SpriteText_factory);
+    fcty->instanciate = sprtx_instanciate;
+    iCluige.iSortedDictionary.insert(fcties, "SpriteText", fcty);
 }
 

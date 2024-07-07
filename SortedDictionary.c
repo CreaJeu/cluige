@@ -32,6 +32,30 @@ static void sd_pre_delete_SortedDictionary(SortedDictionary* this_SortedDictiona
     iCluige.iDeque.pre_delete_Deque(&(this_SortedDictionary->_pairs));
 }
 
+static void sd_free_all_keys_pointers(SortedDictionary* this_SortedDictionary)
+{
+    Deque* pairs = &(this_SortedDictionary->_pairs);
+    int nb_points = iCluige.iDeque.size(pairs);
+    for(int j=0; j<nb_points; j++)
+    {
+        Pair* pair_j = (Pair*)(iCluige.iDeque.at(pairs, j).ptr);
+        void* key_j = pair_j->first.ptr;
+        free(key_j);
+    }
+}
+
+static void sd_free_all_values_pointers(SortedDictionary* this_SortedDictionary)
+{
+    Deque* pairs = &(this_SortedDictionary->_pairs);
+    int nb_points = iCluige.iDeque.size(pairs);
+    for(int j=0; j<nb_points; j++)
+    {
+        Pair* pair_j = (Pair*)(iCluige.iDeque.at(pairs, j).ptr);
+        void* value_j = pair_j->second.ptr;
+        free(value_j);
+    }
+}
+
 static void sd_set_compare_keys_func(SortedDictionary* this_SortedDictionary, int (*compare_key_func)(const Deque*, Variant, Variant))
 {
     this_SortedDictionary->_pairs._compare_sub_func = compare_key_func;
@@ -230,6 +254,8 @@ void iiSortedDictionary_init()
 {
     iCluige.iSortedDictionary.sorted_dictionary_alloc = sd_sorted_dictionary_alloc;
     iCluige.iSortedDictionary.pre_delete_SortedDictionary = sd_pre_delete_SortedDictionary;
+    iCluige.iSortedDictionary.free_all_keys_pointers = sd_free_all_keys_pointers;
+    iCluige.iSortedDictionary.free_all_values_pointers = sd_free_all_values_pointers;
     iCluige.iSortedDictionary.set_compare_keys_func = sd_set_compare_keys_func;
     iCluige.iSortedDictionary.get = sd_get;
     iCluige.iSortedDictionary.at = sd_at;

@@ -14,6 +14,7 @@
 #include "Variant.h"
 #include "Deque.h"
 #include "SortedDictionary.h"
+#include "PackedScene.h"
 #include "Nodes/Clock.h"
 #include "Script.h"
 #include "Vector2.h"
@@ -32,6 +33,7 @@ struct iiCluige
     struct iiDeque iDeque;
     struct iiSortedDictionary iSortedDictionary;
 	struct iiStringBuilder iStringBuilder;
+    struct iiPackedScene iPackedScene;
 	struct iiNode iNode;
 	struct iiClock iClock;
 	struct _Clock* clock;
@@ -45,7 +47,6 @@ struct iiCluige
 	struct iiPath2D iPath2D;
 	struct iiSpriteSVG iSpriteSVG;
 	struct iiCamera2D iCamera2D;
-
 
 
 	//for target FPS, 15 fps by default

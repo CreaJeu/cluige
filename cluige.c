@@ -47,6 +47,7 @@ void cluige_init()
     iiDeque_init();
     iiSortedDictionary_init();
     iiStringBuilder_init();
+    iiPackedScene_init();
     iiNode_init();
     iCluige.private_root_2D = iCluige.iNode.new_Node();
     iCluige.iNode.set_name(iCluige.private_root_2D, "private_root_2D");

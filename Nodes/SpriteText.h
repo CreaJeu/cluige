@@ -30,13 +30,15 @@ struct _SpriteText
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiSpriteText
 {
+	// ~private static
+	NodeFactory _SpriteText_factory;
+
 	//SpriteText* new_SpriteText()
 	SpriteText* (*new_SpriteText)();
+	SpriteText* (*new_SpriteText_from_Node2D)(Node2D* new_Node2D);
 
 	//void set_text(const char*)
 	void (*set_text)(SpriteText*, const char*);
-
-	void (*deserialize_dico)(SpriteText* this_SpriteText, const SortedDictionary*);
 };
 //iSpriteText : in iiCluige
 

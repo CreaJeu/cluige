@@ -1,0 +1,41 @@
+#ifndef PACKED_SCENE_H_INCLUDED
+#define PACKED_SCENE_H_INCLUDED
+
+#include "SortedDictionary.h"
+#include "Deque.h"
+
+typedef struct _PackedScene PackedScene;
+
+struct _PackedScene
+{
+	//SortedDictionary<String, string>
+	//   param_name -> param_value
+	SortedDictionary dico_node;
+
+	//later : dico_script;
+
+	//later : connected signals
+
+	//Deque<PackedScene*>
+	Deque children;
+};
+
+//~namespace to call like : iCluige.iNode.f(myNode, param)
+struct iiPackedScene
+{
+	//later : Dico<uid, packed_scenes> ~static public
+
+	void (*packed_scene_alloc)(PackedScene* this_PackedScene);
+	PackedScene* (*new_PackedScene)();
+
+	void (*pre_delete_PackedScene)(PackedScene* this_PackedScene);
+
+	Node* (*instanciate)(const PackedScene* this_PackedScene);
+};
+//iPackedScene : in iiCluige
+
+//to be called only by cluige_init() to set iNode functions pointers
+void iiPackedScene_init();
+
+
+#endif // PACKED_SCENE_H_INCLUDED

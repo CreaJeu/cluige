@@ -43,6 +43,9 @@ struct iiDeque
     void (*deque_alloc)(Deque* this_Deque, VariantType elems_type, int capacity);
     void (*pre_delete_Deque)(Deque* this_Deque);
 
+    //helper function if needed before calling clear() or pre_delete_Deque()
+    void (*free_all_elems_pointers)(Deque* this_Deque);
+
     //read
 
     //(assert if out of bound)

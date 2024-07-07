@@ -2,7 +2,7 @@
 #define SORTED_DICTIONARY_H_INCLUDED
 
 #include "Variant.h"
-#include "SortedDictionary.h"
+#include "Deque.h"
 #include <stdbool.h>
 
 
@@ -23,6 +23,10 @@ struct iiSortedDictionary
     //constructor/destructor (don't forget to use them)
     void (*sorted_dictionary_alloc)(SortedDictionary* this_SortedDictionary, VariantType keys_type, VariantType values_type, int capacity);
     void (*pre_delete_SortedDictionary)(SortedDictionary* this_SortedDictionary);
+
+    //helper functions if needed before calling clear() or pre_delete_SortedDictionary()
+    void (*free_all_keys_pointers)(SortedDictionary* this_SortedDictionary);
+    void (*free_all_values_pointers)(SortedDictionary* this_SortedDictionary);
 
     void (*set_compare_keys_func)(SortedDictionary* this_SortedDictionary, int (*)(const Deque*, Variant, Variant));
 

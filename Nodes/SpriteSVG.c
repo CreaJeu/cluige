@@ -278,9 +278,8 @@ static void ssvg_post_process_Node(Node* this_Node)
 
 ////////////////////////////////// iiSpriteSVG /////////
 
-static SpriteSVG* ssvg_new_SpriteSVG()
+static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
 {
-	Node2D* new_Node2D = iCluige.iNode2D.new_Node2D();
 	Node* new_Node = new_Node2D->_this_Node;
     SpriteSVG* new_SpriteSVG = iCluige.checked_malloc(sizeof(SpriteSVG));
 
@@ -308,6 +307,12 @@ static SpriteSVG* ssvg_new_SpriteSVG()
     new_Node->post_process_Node = ssvg_post_process_Node;
 
     return new_SpriteSVG;
+}
+
+static SpriteSVG* ssvg_new_SpriteSVG()
+{
+	Node2D* new_Node2D = iCluige.iNode2D.new_Node2D();
+	return ssvg_new_SpriteSVG_from_Node2D(new_Node2D);
 }
 
 static void ssvg_add_path_from_array(SpriteSVG* this_SpriteSVG, Vector2* points, int nb_points)
@@ -347,21 +352,24 @@ static void ssvg_parse_file(SpriteSVG* this_SpriteSVG, char* file_path)
     iCluige.iSpriteSVG.iSVGParser.end_parsing(&_svg_parser);
 }
 
-static void ssvg_deserialize_dico(SpriteSVG* this_SpriteSVG, const SortedDictionary* params)
+static Node* ssvg_instanciate(const SortedDictionary* params)
 {
     //mother class
-    iCluige.iNode2D.deserialize_dico(this_SpriteSVG->_this_Node2D, params);
+    Node* res_node = iCluige.iNode2D._Node2D_factory.instanciate(params);
+    Node2D* res_node2D = (Node2D*)(res_node->_sub_class);
+    SpriteSVG* res_SpriteSVG = ssvg_new_SpriteSVG_from_Node2D(res_node2D);
 
     //offset = Vector2(2.265, -3.2)
     //scale = Vector2(2.265, -3.2)
     //svg_file_path = "../some/where"
-    utils_vector2_from_parsed(&(this_SpriteSVG->offset), params, "offset");
-    utils_vector2_from_parsed(&(this_SpriteSVG->scale), params, "scale");
-    assert(iCluige.iDeque.empty(&(this_SpriteSVG->paths)));
+    utils_vector2_from_parsed(&(res_SpriteSVG->offset), params, "offset");
+    utils_vector2_from_parsed(&(res_SpriteSVG->scale), params, "scale");
+    assert(iCluige.iDeque.empty(&(res_SpriteSVG->paths)));
     char* svg_file_path;
     utils_str_from_parsed(&(svg_file_path), params, "svg_file_path");
-    ssvg_parse_file(this_SpriteSVG, svg_file_path);
+    ssvg_parse_file(res_SpriteSVG, svg_file_path);
     free(svg_file_path);
+    return res_node;
 }
 
 /////////////////////////////////// Node //////////
@@ -369,11 +377,15 @@ static void ssvg_deserialize_dico(SpriteSVG* this_SpriteSVG, const SortedDiction
 void iiSpriteSVG_init()
 {
     iCluige.iSpriteSVG.new_SpriteSVG = ssvg_new_SpriteSVG;
+    iCluige.iSpriteSVG.new_SpriteSVG_from_Node2D = ssvg_new_SpriteSVG_from_Node2D;
     iCluige.iSpriteSVG.add_path_from_array = ssvg_add_path_from_array;
     iCluige.iSpriteSVG.add_path_from_array_relative = ssvg_add_path_from_array_relative;
     iCluige.iSpriteSVG.add_path_from_parsed_deque = ssvg_add_path_from_parsed_deque;
     iCluige.iSpriteSVG.parse_file = ssvg_parse_file;
-    iCluige.iSpriteSVG.deserialize_dico = ssvg_deserialize_dico;
+    SortedDictionary* fcties = &(iCluige.iNode.node_factories);
+    NodeFactory* fcty = &(iCluige.iSpriteSVG._SpriteSVG_factory);
+    fcty->instanciate = ssvg_instanciate;
+    iCluige.iSortedDictionary.insert(fcties, "SpriteSVG", fcty);
 
     iiSVGParser_init(&(iCluige.iSpriteSVG.iSVGParser));
     iCluige.iSpriteSVG.iSVGParser.SVGParser_alloc(&_svg_parser);

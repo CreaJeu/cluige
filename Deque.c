@@ -12,6 +12,8 @@
 //just forward declarations, see implentation below
 static void dq_bsearch_rec(const Deque* this_Deque, Variant searched_elem, struct _BSearchData* bsd);
 static int dq_bsearch(const Deque* this_Deque, ...);
+static int dq_size(const Deque* this_Deque);
+static Variant dq_at(const Deque* this_Deque, int i);
 
 // ~static private
 
@@ -38,6 +40,16 @@ static void dq_pre_delete_Deque(Deque* this_Deque)
     //if elements are pointers, they must be deleted outside of this function,
     //according to the user needs
     free(this_Deque->_elems);
+}
+
+static void dq_free_all_elems_pointers(Deque* this_Deque)
+{
+    int nb_points = dq_size(this_Deque);
+    for(int j=0; j<nb_points; j++)
+    {
+        void* elem_j = dq_at(this_Deque, j).ptr;
+        free(elem_j);
+    }
 }
 
 //private utils
@@ -420,6 +432,7 @@ void iiDeque_init()
 {
     iCluige.iDeque.deque_alloc = dq_deque_alloc;
     iCluige.iDeque.pre_delete_Deque = dq_pre_delete_Deque;
+    iCluige.iDeque.free_all_elems_pointers = dq_free_all_elems_pointers;
     iCluige.iDeque.at = dq_at;
     iCluige.iDeque.back = dq_back;
     iCluige.iDeque.front = dq_front;

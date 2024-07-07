@@ -78,6 +78,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Nodes/SpriteText.h" />
+		<Unit filename="PackedScene.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="PackedScene.h" />
 		<Unit filename="Path2D.c">
 			<Option compilerVar="CC" />
 		</Unit>

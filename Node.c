@@ -548,12 +548,13 @@ static void nde__do_all_queue_free()
     //nde__debug_dq();
 }
 
-static void nde_deserialize_dico(Node* this_Node, const SortedDictionary* params)
+static Node* nde_instanciate(const SortedDictionary* parsed_params)
 {
-    //Node* res = nde_new_Node();
-    utils_str_from_parsed(&(this_Node->name), params, "name");
-    // TODO ? // utils_bool_from_parsed(&(res->active), params, "active");
-    //return res;
+    Node* res = nde_new_Node();
+    //assert(this_Node->name == NULL);
+    utils_str_from_parsed(&(res->name), parsed_params, "name");
+    // TODO ? from godot process mode? // utils_bool_from_parsed(&(res->active), params, "active");
+    return res;
 }
 
 /////////////////////////////////// Node //////////
@@ -580,7 +581,13 @@ void iiNode_init()
     iCluige.iNode.remove_child = nde_remove_child;
     iCluige.iNode.queue_free = nde_queue_free;
     iCluige.iNode._do_all_queue_free = nde__do_all_queue_free;
-    iCluige.iNode.deserialize_dico = nde_deserialize_dico;
+
+    SortedDictionary* fcties = &(iCluige.iNode.node_factories);
+    NodeFactory* fcty = &(iCluige.iNode._Node_factory);
+    fcty->instanciate = nde_instanciate;
+    iCluige.iSortedDictionary.sorted_dictionary_alloc(fcties, VT_POINTER, VT_POINTER, 20);
+    iCluige.iSortedDictionary.set_compare_keys_func(fcties, iCluige.iDeque.default_compare_string_func);
+    iCluige.iSortedDictionary.insert(fcties, "Node", fcty);
 }
 
 

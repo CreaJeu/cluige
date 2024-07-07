@@ -32,15 +32,17 @@ struct _Node2D
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiNode2D
 {
+	// ~private static
+	NodeFactory _Node2D_factory;
+
 	//Node2D* new_Node2D()
 	Node2D* (*new_Node2D)();
+	Node2D* (*new_Node2D_from_Node)(Node* new_Node);
 	void (*show)(Node2D*);
 	void (*hide)(Node2D*);
 	void (*move_local)(Node2D*, Vector2);
 	void (*set_local_position)(Node2D*, Vector2);
 	//later : moveGlobal
-
-	void (*deserialize_dico)(Node2D* this_Node2D, const SortedDictionary*);
 };
 //iNode2D : in iiCluige
 

@@ -32,11 +32,15 @@ struct _SpriteSVG
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiSpriteSVG
 {
+	// ~private static
+	NodeFactory _SpriteSVG_factory;
+
     //too specific to be in iCluige
     struct iiSVGParser iSVGParser;
 
 	//SpriteSVG* new_SpriteSVG()
 	SpriteSVG* (*new_SpriteSVG)();
+	SpriteSVG* (*new_SpriteSVG_from_Node2D)();
 
 	//copies the points from the array
 	void (*add_path_from_array)(SpriteSVG*, Vector2*, int nb_points);
@@ -46,7 +50,6 @@ struct iiSpriteSVG
 	void (*add_path_from_parsed_deque)(SpriteSVG*, Deque*);
 
 	void (*parse_file)(SpriteSVG*, char* file_path);
-	void (*deserialize_dico)(SpriteSVG* this_SpriteText, const SortedDictionary*);
 };
 //iSpriteSVG : in iiCluige
 

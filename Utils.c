@@ -113,10 +113,16 @@ void utils_str_from_parsed(char** out,const SortedDictionary* params, const char
     Checked_Variant found = iCluige.iSortedDictionary.get(params, param_name);
     if(found.valid)//param found
     {
+        //beware : strings values are quoted!
+        // =>here we remove those \"
+        char* param_str = (char*)(found.v.ptr);// ""text""
+        size_t length_param = strlen(param_str);
+        //crash //param_str[length_param - 1] = '\0';// ""text\0"
+        size_t length_res_null_termin = length_param - 1;//-2+1 // "text\0"
         //deep copy string
-        char* param_str = (char*)(found.v.ptr);
-        char* copied = iCluige.checked_malloc(1 + (sizeof(char) * strlen(param_str)));
-        strcpy(copied, param_str);
+        char* copied = iCluige.checked_malloc(sizeof(char) * length_res_null_termin);// "text\0"
+        strncpy(copied, param_str + 1, length_res_null_termin - 1);
+        copied[length_res_null_termin - 1] = '\0';// "text\0"
         (*out) = copied;
     }
 }

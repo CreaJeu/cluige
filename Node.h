@@ -3,11 +3,18 @@
 
 #include <stdbool.h>
 
+//for node_factories for godot import
+#include "SortedDictionary.h"
+
 typedef struct _Node Node;
 typedef struct _Script Script;
+typedef struct _NodeFactory NodeFactory;
 
-//for godot import deserialize_dico()
-typedef struct _SortedDictionary SortedDictionary;
+
+struct _NodeFactory
+{
+    Node* (*instanciate)(const SortedDictionary* parsed_params);
+};
 
 struct _Node
 {
@@ -38,6 +45,14 @@ struct _Node
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiNode
 {
+	// ~public static
+	//Dico<String, NodeFactory*>
+	// class_name -> factory*
+	SortedDictionary node_factories;
+
+	// ~private static
+	NodeFactory _Node_factory;
+
 	//void (*initZero)(Node*);// no : would encourage not freeable nodes on the stack
 
 	//Node* new_Node()
@@ -93,8 +108,6 @@ struct iiNode
 
 	//Only for cluige internal logic
 	void (*_do_all_queue_free)();
-
-	void (*deserialize_dico)(Node* this_Node, const SortedDictionary*);
 };
 //iNode : in iiCluige
 

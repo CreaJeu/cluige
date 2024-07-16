@@ -17,4 +17,5 @@ function pointers :
 
 
 General :
+	indentation : tab (no space indent, any remaining space-indents will be fixed in near future) (in Code::Blocks, check the checkbox to force tab-indent)
 	use but don't abuse of new lines

@@ -8,6 +8,9 @@ typedef struct _PackedScene PackedScene;
 
 struct _PackedScene
 {
+	const char* name;
+	const char* type;
+	const char* parent;
 	//SortedDictionary<String, string>
 	//   param_name -> param_value
 	SortedDictionary dico_node;
@@ -30,7 +33,13 @@ struct iiPackedScene
 
 	void (*pre_delete_PackedScene)(PackedScene* this_PackedScene);
 
+	PackedScene* (*get_packed_node)(PackedScene* root, const char* path);
+
 	Node* (*instanciate)(const PackedScene* this_PackedScene);
+
+	//returned char* is malloced, up to the user to delete it
+	char* (*debug)(const PackedScene* this_PackedScene);
+	char* (*debug_recrusive)(const PackedScene* root, Deque* strings);
 };
 //iPackedScene : in iiCluige
 

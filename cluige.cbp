@@ -102,6 +102,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="StringBuilder.h" />
+		<Unit filename="TscnParser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TscnParser.h" />
 		<Unit filename="Utils.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -30,6 +30,7 @@ struct iiSortedDictionary
 
     void (*set_compare_keys_func)(SortedDictionary* this_SortedDictionary, int (*)(const Deque*, Variant, Variant));
 
+
     //read
 
     //result.valid = false if not found
@@ -41,10 +42,8 @@ struct iiSortedDictionary
     int (*size)(const SortedDictionary* this_SortedDictionary);
     bool (*is_empty)(const SortedDictionary* this_SortedDictionary);
 
+
     //insertion
-
-
-
 
     //inserts or automatically replaces if key already present
     //returns a copy of replaced value (what was its value before replacement),
@@ -67,10 +66,18 @@ struct iiSortedDictionary
     //no auto free/delete, don't forget to do it yourself before, if needed
     void (*clear)(SortedDictionary* this_SortedDictionary);
 
+
     //search
 
     //use get() instead
     //bool (*has)(const SortedDictionary* this_SortedDictionary, ...);
+
+
+	//other
+
+	//only for Dico<char*, char*>
+	//returned char* is malloced, up to the user to delete it
+	char* (*debug_str_str)(SortedDictionary* this_SortedDictionary);
 };
 
 void iiSortedDictionary_init();

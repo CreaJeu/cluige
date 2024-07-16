@@ -4,6 +4,7 @@
 #include "SortedDictionary.h"
 
 #include <stdarg.h>
+#include <assert.h>
 
 
 
@@ -248,6 +249,37 @@ static void sd_clear(SortedDictionary* this_SortedDictionary)
     iCluige.iDeque.clear(_pairs);
 }
 
+//only for Dico<char*, char*>
+//returned char* is malloced, up to the user to delete it
+static char* sd_debug_str_str(SortedDictionary* this_SortedDictionary)
+{
+	const SortedDictionary* dic = this_SortedDictionary;
+	int len = 16 + iCluige.iStringBuilder.DECIMAL_DIGITS_FOR_INT;//" - nb elems : ####\n"
+	assert(dic->_keys_type == VT_POINTER);
+	assert(dic->_values_type == VT_POINTER);
+	int n = iCluige.iSortedDictionary.size(dic);
+	for(int i=0; i<n; i++)
+	{
+		Variant v_pair_i = iCluige.iSortedDictionary.at(dic, i);
+		Pair* pair_i = (Pair*)(v_pair_i.ptr);
+		const char* key = (const char*)(pair_i->first.ptr);
+		const char* val = (const char*)(pair_i->second.ptr);
+		len += 4 + strlen(key) + strlen(val);//"key = val\n"
+	}
+	StringBuilder sb;
+	iCluige.iStringBuilder.string_alloc(&sb, len);
+	for(int i=0; i<n; i++)
+	{
+		Variant v_pair_i = iCluige.iSortedDictionary.at(dic, i);
+		Pair* pair_i = (Pair*)(v_pair_i.ptr);
+		const char* key = (const char*)(pair_i->first.ptr);
+		const char* val = (const char*)(pair_i->second.ptr);
+		iCluige.iStringBuilder.append(&sb, "%s = %s\n", key, val);
+	}
+	iCluige.iStringBuilder.append(&sb, " - nb elems : %d", n);
+	return sb.built_string;
+}
+
 ////////////////////////////////// iSortedDictionary /////////
 
 void iiSortedDictionary_init()
@@ -266,5 +298,6 @@ void iiSortedDictionary_init()
     iCluige.iSortedDictionary.insert_last = sd_insert_last;
     iCluige.iSortedDictionary.erase = sd_erase;
     iCluige.iSortedDictionary.clear = sd_clear;
+    iCluige.iSortedDictionary.debug_str_str = sd_debug_str_str;
 }
 

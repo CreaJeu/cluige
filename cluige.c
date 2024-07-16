@@ -80,6 +80,8 @@ void cluige_init()
     iCluige.iNode.set_name(iCluige.public_root_2D, "public_root_2D");
     iCluige.iNode.add_child(iCluige.private_root_2D, iCluige.public_root_2D);
 
+    iiTscnParser_init();
+
     //...
     //...
 

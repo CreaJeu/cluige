@@ -8,6 +8,8 @@
 #include "cluige.h"
 #include "SVGParser.h"
 
+//for a better parser example, see TscnParser
+
 
 ////////////////////////////////// _SVGParser /////////
 

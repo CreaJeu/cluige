@@ -25,6 +25,7 @@
 #include "Path2D.h"
 #include "Nodes/SpriteSVG.h"
 #include "Nodes/Camera2D.h"
+#include "TscnParser.h"
 
 //just a kind of namespace to prevent name collisions
 struct iiCluige
@@ -47,6 +48,7 @@ struct iiCluige
 	struct iiPath2D iPath2D;
 	struct iiSpriteSVG iSpriteSVG;
 	struct iiCamera2D iCamera2D;
+	struct iiTscnParser iTscnParser;
 
 
 	//for target FPS, 15 fps by default

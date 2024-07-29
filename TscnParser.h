@@ -2,7 +2,9 @@
 #define TSCN_PARSER_H_INCLUDED
 
 //for FILE*
-#include <stdio.h>
+//#include <stdio.h>
+
+#include "FileLineReader.h"
 
 //by default this "mother class" is for Godot 4
 //(for future versions, "sub-classes" will have to be provided)
@@ -13,40 +15,34 @@ typedef struct _PackedScene PackedScene;
 struct _TscnParser //"mother class", Godot 4 by default
 {
 	//public
-	char* file_path;
+
 	PackedScene* scene_root;
 
 	//private
-	FILE* _file;
 
+	FileLineReader _file_reader;
 	PackedScene* _current_packed_scene;
-	char* _current_line;
-	int _current_line_capacity;
-	char* _current_value;
-	int _current_value_capacity;
-	char* _current_param;
+	int _current_line;//first line of file is # 0
+	const char* _current_param;
+	int _current_param_len;
+	const char* _current_value;
+	int _current_value_len;
 
 	bool (*parse_scene)(TscnParser* this_TscnParser);
-	bool (*ignore)(TscnParser* this_TscnParser);
 	bool (*node)(TscnParser* this_TscnParser);
 	bool (*param)(TscnParser* this_TscnParser);
 	bool (*value)(TscnParser* this_TscnParser);
 
-	bool (*read_line)(TscnParser* this_TscnParser);
+	bool (*is_starting_node)(TscnParser* this_TscnParser);
 	bool (*is_ending_quote)(TscnParser* this_TscnParser);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiTscnParser
 {
-	//deep-copies file_path
 	void (*tscn_parser_alloc)(TscnParser* this_TscnParser, const char* file_path);
 
 	void (*pre_delete_TscnParser)(TscnParser* this_TscnParser);
-
-	//not here, outside in calling code
-	//bool (*prepare_parsing)(struct _TscnParser* this_TscnParser, char* file_path);
-	//void (*end_parsing)(struct _TscnParser* this_TscnParser);
 };
 //iTscnParser : in iiSpriteGodotScene
 

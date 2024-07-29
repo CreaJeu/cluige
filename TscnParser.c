@@ -8,97 +8,24 @@
 
 ////////////////////////////////// _TscnParser /////////
 
-static bool tsnp_read_line(TscnParser* this_TscnParser)
-{
-//A successful call to fgetpos stores a representation of the
-//value of this mbstate_t object as part of the value of the fpos_t object. A later
-//successful call to fsetpos using the same stored fpos_t value restores the value of
-//the associated mbstate_t object as well as the position within the controlled stream.
-
-	fpos_t backup_pos;
-	int ok = fgetpos(this_TscnParser->_file, &backup_pos);
-	if(ok != 0)
-	{
-		assert(00 == "failed to get stream position");
-		return false;
-	}
-
-	int max_len = this_TscnParser->_current_line_capacity;//just shorter alias
-	char* res = fgets(this_TscnParser->_current_line, max_len, this_TscnParser->_file);
-	//final "\n" included (but no "\n" if last line of file is EOF without \n)
-	if(res == NULL)
-	{
-		//assert(00 == "failed to read line");
-		ok = fsetpos(this_TscnParser->_file, &backup_pos);
-		assert(ok == 0 || 00 == "failed to set stream position");
-		return false;
-	}
-	int nb_read = strlen(this_TscnParser->_current_line);
-	int i = 0;
-	while(nb_read >= max_len - 1) // _current_line not long enough
-	{
-		res = fgets(this_TscnParser->_current_line, max_len, this_TscnParser->_file);
-		if(res == NULL)
-		{
-			//assert(00 == "failed to read line");
-			ok = fsetpos(this_TscnParser->_file, &backup_pos);
-			assert(ok == 0 || 00 == "failed to set stream position");
-			return false;
-		}
-		nb_read = strlen(this_TscnParser->_current_line);
-		i++;
-	}
-	if(i > 0)
-	{
-		// _current_line was not long enough, must allocate more
-		max_len = (i + 1) * max_len;
-		this_TscnParser->_current_line_capacity = max_len;
-		free(this_TscnParser->_current_line);
-		this_TscnParser->_current_line = iCluige.checked_malloc(max_len * sizeof(char));
-
-		ok = fsetpos(this_TscnParser->_file, &backup_pos);
-		if(ok != 0)
-		{
-			assert(00 == "failed to set stream position");
-			return false;
-		}
-		res = fgets(this_TscnParser->_current_line, max_len, this_TscnParser->_file);
-		if(res == NULL)
-		{
-			//assert(00 == "failed to read line");
-			ok = fsetpos(this_TscnParser->_file, &backup_pos);
-			assert(ok == 0 || 00 == "failed to set stream position");
-			return false;
-		}
-	}
-	return true;
-
-//char *fgets(char * restrict s, int n, FILE * restrict stream);
-//The fgets function reads at most one less than the number of characters specified by n
-//from the stream pointed to by stream into the array pointed to by s. No additional
-//characters are read after a new-line character (which is retained) or after end-of-file. A
-//null character is written immediately after the last character read into the array.
-//The fgets function returns s if successful.
-//If end-of-file is encountered and no
-//characters have been read into the array, the contents of the array remain unchanged and a
-//null pointer is returned. If a read error occurs during the operation, the array contents are
-//indeterminate and a null pointer is returned.
-}
 
 static bool tsnp_is_ending_quote(TscnParser* this_TscnParser)
 {
+	FileLineReader* fr = &(this_TscnParser->_file_reader);
+	int curr_line_i = this_TscnParser->_current_line;
+	const char* curr_line = iCluige.iFileLineReader.get_line(fr, curr_line_i);
 	//reverse iterator
-	int r = strlen(this_TscnParser->_current_line) - 1;
+	int r = strlen(curr_line) - 1;
 	if(r < 0)
 	{
 		return false;
 	}
-	else if(this_TscnParser->_current_line[r] == '\n')
+	else if(curr_line[r] == '\n')
 	{
 		r--;
 	}
 
-	if(r < 0 || this_TscnParser->_current_line[r] != '\"')
+	if(r < 0 || curr_line[r] != '\"')
 	{
 		return false;
 	}
@@ -107,7 +34,7 @@ static bool tsnp_is_ending_quote(TscnParser* this_TscnParser)
 	//handle cases like \", \\", \\\"...
 	r--;
 	int nb_antislashes = 0;
-	while(r >= 0 && this_TscnParser->_current_line[r] == '\\')
+	while(r >= 0 && curr_line[r] == '\\')
 	{
 		nb_antislashes++;
 		r--;
@@ -117,91 +44,57 @@ static bool tsnp_is_ending_quote(TscnParser* this_TscnParser)
 
 static bool tsnp_value(TscnParser* this_TscnParser)
 {
-	int len = 0;
-	fpos_t backup_pos;
-	int ok = fgetpos(this_TscnParser->_file, &backup_pos);
-	if(ok != 0)
-	{
-		assert(00 == "failed to get stream position");
-		return false;
-	}
-	if(!(this_TscnParser->read_line(this_TscnParser)))
-	{
-		return false;
-	}
-	int nb_read = strlen(this_TscnParser->_current_line);
-	if(nb_read == 0)
-	{
-		return false;
-	}
+	FileLineReader* fr = &(this_TscnParser->_file_reader);
+	int curr_line_i = this_TscnParser->_current_line;
+	const char* curr_line = iCluige.iFileLineReader.get_line(fr, curr_line_i);
 
-	//later : add case with brackets { ... }
+	int len = strlen(curr_line);
+	int before_value_len = this_TscnParser->_current_param_len + 3; // "param" + " = "
+	int token_len = len - before_value_len;
+	if(token_len <= 0)
+	{
+		return false;
+	}
+	const char* current_token = curr_line + before_value_len;
+
+	//case with (potentially multiline) brackets { ... }
+	if(current_token[0] == '{')
+	{
+		return false;//TODO
+	}
 
 	//case with (potentially multiline) quoted string
-	if(this_TscnParser->_current_line[0] == '\"')
+	else if(current_token[0] == '\"')
 	{
+		int line_len = strlen(curr_line);
 		while(!(this_TscnParser->is_ending_quote(this_TscnParser)))
 		{
-			if(!(this_TscnParser->read_line(this_TscnParser)))
-			{
-				return false;
-			}
-			nb_read += strlen(this_TscnParser->_current_line);
+			this_TscnParser->_current_line++;
+			curr_line_i = this_TscnParser->_current_line;
+			curr_line = iCluige.iFileLineReader.get_line(fr, curr_line_i);
+			line_len = strlen(curr_line);
+			token_len += line_len;
 		}
-		ok = fsetpos(this_TscnParser->_file, &backup_pos);
-		if(ok != 0)
+
+		this_TscnParser->_current_value = current_token;
+		if(curr_line[line_len - 1] == '\n')
 		{
-			assert(00 == "failed to set stream position");
-			return false;
+			token_len--;
 		}
-		if(this_TscnParser->_current_value_capacity < nb_read)
-		{
-			free(this_TscnParser->_current_value);
-			int new_cap = (nb_read * 11) / 10;
-			this_TscnParser->_current_value_capacity = new_cap;
-			this_TscnParser->_current_value = iCluige.checked_malloc(new_cap * sizeof(char));
-		}
-		char* append_here = this_TscnParser->_current_value;
-		if(!(this_TscnParser->read_line(this_TscnParser)))
-		{
-			return false;
-		}
-		strcpy(append_here, this_TscnParser->_current_line);
-		nb_read = strlen(append_here);
-		append_here += nb_read;
-		while(!(this_TscnParser->is_ending_quote(this_TscnParser)))
-		{
-			if(!(this_TscnParser->read_line(this_TscnParser)))
-			{
-				return false;
-			}
-			strcpy(append_here, this_TscnParser->_current_line);
-			nb_read = strlen(append_here);
-			append_here += nb_read;
-		}
-		//trim final \n
-		len = strlen(this_TscnParser->_current_value);
-		if(len > 0 && this_TscnParser->_current_value[len - 1] == '\n')
-		{
-			this_TscnParser->_current_value[len - 1] = '\0';
-		}
+		this_TscnParser->_current_value_len = token_len;
+		this_TscnParser->_current_line++;
 		return true;
 	}
+
 	else //easy case : no delimiter, just read until end of line
 	{
-		if(this_TscnParser->_current_value_capacity < nb_read)
+		this_TscnParser->_current_value = current_token;
+		if(this_TscnParser->_current_value[token_len - 1] == '\n')
 		{
-			free(this_TscnParser->_current_value);
-			int new_cap = (nb_read * 11) / 10;
-			this_TscnParser->_current_value_capacity = new_cap;
-			this_TscnParser->_current_value = iCluige.checked_malloc(new_cap * sizeof(char));
+			token_len--;
 		}
-		strcpy(this_TscnParser->_current_value, this_TscnParser->_current_line);
-		len = strlen(this_TscnParser->_current_value);
-		if(len > 0 && this_TscnParser->_current_value[len - 1] == '\n')
-		{
-			this_TscnParser->_current_value[len - 1] = '\0';
-		}
+		this_TscnParser->_current_value_len = token_len;
+		this_TscnParser->_current_line++;
 		return true;
 	}
 	utils_breakpoint_trick(NULL, true);//why gone here?
@@ -210,26 +103,26 @@ static bool tsnp_value(TscnParser* this_TscnParser)
 
 static bool tsnp_param(TscnParser* this_TscnParser)
 {
-	fpos_t backup_pos;
-	int ok = fgetpos(this_TscnParser->_file, &backup_pos);
-	if(ok != 0)
-	{
-		assert(00 == "failed to get stream position");
-		return false;
-	}
-
-	ok = fscanf(this_TscnParser->_file, "%s = ", this_TscnParser->_current_param);
-	if(ok == 0 || ok == EOF)
+	FileLineReader* fr = &(this_TscnParser->_file_reader);
+	int curr_line_i = this_TscnParser->_current_line;
+	const char* curr_line = iCluige.iFileLineReader.get_line(fr, curr_line_i);
+	if(curr_line == NULL)
 	{
 		return false;
 	}
-	ok = strncmp(this_TscnParser->_current_param, "[node", 5);
+	int param_len = 0;
+	int ok = sscanf(curr_line, "%*s%n = ", &param_len);
+	if(param_len <= 0)
+	{
+		return false;
+	}
+	ok = strncmp(curr_line, "[node", 5);
 	if(ok == 0)//not a param
 	{
-		ok = fsetpos(this_TscnParser->_file, &backup_pos);
-		assert(ok == 0 || 00 == "failed to set stream position");
 		return false;
 	}
+	this_TscnParser->_current_param = curr_line;
+	this_TscnParser->_current_param_len = param_len;
 
 //int fscanf(FILE * restrict stream, const char * restrict format, ...)
 //returns the number of input items assigned (or EOF if zero items ok)
@@ -243,61 +136,37 @@ static bool tsnp_param(TscnParser* this_TscnParser)
 	bool parse_ok = this_TscnParser->value(this_TscnParser);
 	if(!parse_ok)
 	{
-		ok = fsetpos(this_TscnParser->_file, &backup_pos);
-		assert(ok == 0 || 00 == "failed to set stream position");
 		return false;
 	}
 	return true;
 }
 
-/*
-header examples :
-[node name="UneRacine" type="Node2D"]
-[node name="UnLabel" type="Label" parent="." node_paths=PackedStringArray("_une_racine")]
-[node name="UnAnimationPlayer" type="AnimationPlayer" parent="UnLabel"]
-[node name="UnSprite2D" type="Sprite2D" parent="."]
-[node name="UnSousSprite2D" type="Sprite2D" parent="UnSprite2D"]
-[node name="UnNode" type="Node" parent="UnSprite2D/UnSousSprite2D"]
-[node name="UnNode2D" type="Node2D" parent="UnSprite2D/UnSousSprite2D"]
-[node name="UnAutreLabel" type="Label" parent="."]
-[node name="unLabelFourbe" type="Label" parent="."]
 
-[node name="XXX" type="YYY" parent="ZZZ" WWW]
-*/
+//header examples :
+//[node name="UneRacine" type="Node2D"]
+//[node name="UnLabel" type="Label" parent="." node_paths=PackedStringArray("_une_racine")]
+//[node name="UnAnimationPlayer" type="AnimationPlayer" parent="UnLabel"]
+//[node name="UnSprite2D" type="Sprite2D" parent="."]
+//[node name="UnSousSprite2D" type="Sprite2D" parent="UnSprite2D"]
+//[node name="UnNode" type="Node" parent="UnSprite2D/UnSousSprite2D"]
+//[node name="UnNode2D" type="Node2D" parent="UnSprite2D/UnSousSprite2D"]
+//[node name="UnAutreLabel" type="Label" parent="."]
+//[node name="unLabelFourbe" type="Label" parent="."]
+//
+//[node name="XXX" type="YYY" parent="ZZZ" WWW]
 static bool tsnp_node(TscnParser* this_TscnParser)
 {
-	fpos_t backup_pos;
-	int ok = fgetpos(this_TscnParser->_file, &backup_pos);
-	if(ok != 0)
-	{
-		assert(00 == "failed to get stream position");
-		return false;
-	}
-	bool parse_ok = false;
-	int line_len = 0;
-	while(line_len == 0)
-	{
-		parse_ok = this_TscnParser->read_line(this_TscnParser);
-		if(!parse_ok)
-		{
-			return false;
-		}
-		line_len = strlen(this_TscnParser->_current_line);
-		if(line_len > 0 && this_TscnParser->_current_line[0] == '\n')
-		{
-			line_len--;
-		}
-	}
-	//sscanf not enough, %s expands till next blank
-//	ok = sscanf(this_TscnParser->_current_line, "[node name=\"%s\" type=\"%s\"", tmp_name, tmp_str);
-//	if(ok ...)
-	char* from = this_TscnParser->_current_line;//[node name="XXX" type="YYY" parent="ZZZ" WWW]
+	FileLineReader* fr = &(this_TscnParser->_file_reader);
+	int curr_line_i = this_TscnParser->_current_line;
+//	int backup_curr_line_i = curr_line_i;
+	const char* curr_line = iCluige.iFileLineReader.get_line(fr, curr_line_i);
+	//[node name="XXX" type="YYY" parent="ZZZ" WWW]
+	const char* from = curr_line;//beware : pointer can become invalid if FileLineReader realloc buffer
+
 	int tmp_len = strlen("[node name=\"");
-	ok = strncmp(from, "[node name=\"", tmp_len);
+	int ok = strncmp(from, "[node name=\"", tmp_len);
 	if(ok != 0)
 	{
-		ok = fsetpos(this_TscnParser->_file, &backup_pos);
-		assert(ok == 0 || 00 == "failed to set stream position");
 		return false;
 	}
 	from += tmp_len;//XXX" type="YYY" parent="ZZZ" WWW]
@@ -311,8 +180,8 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 	ok = strncmp(from, "\" type=\"", tmp_len);
 	if(ok != 0)
 	{
-		ok = fsetpos(this_TscnParser->_file, &backup_pos);
-		assert(ok == 0 || 00 == "failed to set stream position");
+		free(tmp_name);
+		assert(00 == "Error in scene file reading : node without a type");
 		return false;
 	}
 	from += tmp_len;//YYY" parent="ZZZ" WWW]
@@ -323,14 +192,15 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 
 	this_TscnParser->_current_packed_scene = iCluige.iPackedScene.new_PackedScene();
 	PackedScene* ps = this_TscnParser->_current_packed_scene;
-	ps->name = tmp_name;//iCluige.checked_malloc(strlen(tmp_name) * sizeof(char));
-	ps->type = tmp_type;//iCluige.checked_malloc(strlen(tmp_str) * sizeof(char));
+	ps->name = tmp_name;
+	ps->type = tmp_type;
 
 	from += tmp_len;//" parent="ZZZ" WWW]
 	tmp_len = strlen("\" parent=\"");
 	ok = strncmp(from, "\" parent=\"", tmp_len);
 	if(ok != 0)
 	{
+		assert(this_TscnParser->scene_root == NULL);
 		ps->parent = NULL;
 		this_TscnParser->scene_root = ps;
 	}
@@ -358,33 +228,92 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 
 	SortedDictionary* dic = &(ps->dico_node);
 	Checked_Variant cv;
-	parse_ok = this_TscnParser->param(this_TscnParser);
+	this_TscnParser->_current_line++;
+
+	bool parse_ok = this_TscnParser->param(this_TscnParser);
 	char* keeped_key, *keeped_val;//, *dbg_dic;
 	while(parse_ok)
 	{
-		keeped_key = iCluige.checked_malloc((sizeof(char)) * (1 + strlen(this_TscnParser->_current_param)));
-		strcpy(keeped_key, this_TscnParser->_current_param);
-		keeped_val = iCluige.checked_malloc((sizeof(char)) * (1 + strlen(this_TscnParser->_current_value)));
-		strcpy(keeped_val, this_TscnParser->_current_value);
+		tmp_len = this_TscnParser->_current_param_len;
+		keeped_key = iCluige.checked_malloc((tmp_len +  1) * sizeof(char));
+		strncpy(keeped_key, this_TscnParser->_current_param, tmp_len);
+		keeped_key[tmp_len] = '\0';
+
+		//strcpy() value, but can be multiline and file_reader buffer contains '\0' between lines
+		tmp_len = this_TscnParser->_current_value_len;
+		keeped_val = iCluige.checked_malloc((tmp_len +  1) * sizeof(char));
+		int nb_copied = 0;
+		const char* tmp_value_line = this_TscnParser->_current_value;
+		char* tmp_append_here = keeped_val;
+		while(nb_copied < tmp_len)
+		{
+			int sub_len = strlen(tmp_value_line);
+			strncpy(tmp_append_here, tmp_value_line, sub_len);
+			//memcpy(tmp_append_here, tmp_value_line, sub_len);
+			tmp_append_here += sub_len;
+			tmp_value_line += sub_len + 1;
+			nb_copied += sub_len;
+		}
+		keeped_val[tmp_len] = '\0';
+
 		cv = iCluige.iSortedDictionary.insert(dic,
 				keeped_key,
 				keeped_val);
 		//dbg_dic = iCluige.iSortedDictionary.debug_str_str(dic);
 		bool inserted_ok = !(cv.valid);
 		assert(inserted_ok || 00 == "could not insert parsed param-value");
+
 		parse_ok = this_TscnParser->param(this_TscnParser);
 	}
 	return true;
 }
 
-static bool tsnp_ignore(TscnParser* this_TscnParser)
+//examples:
+//[gd_scene load_steps=7 format=3 uid="uid://b75aarxsf6n0o"]
+//[ext_resource type="Script" path="res://Label.gd" id="1_4fevc"]
+//[sub_resource type="Animation" id="Animation_1oibt"]
+//length = 0.001
+//(or empty line)
+//no advance in file stream from this function
+static bool tsnp_is_starting_node(TscnParser* this_TscnParser)
 {
-	return false;
+	FileLineReader* fr = &(this_TscnParser->_file_reader);
+	int curr_line_i = this_TscnParser->_current_line;
+	const char* curr_line = iCluige.iFileLineReader.get_line(fr, curr_line_i);
+	int tmp_len = strlen("[node name=\"");
+	int cmp = strncmp(curr_line, "[node name=\"", tmp_len);
+	return cmp == 0;
 }
 
 static bool tsnp_parse_scene(TscnParser* this_TscnParser)
 {
-	return false;
+	int nb_nodes = 0;
+	bool more_ignore = true;
+	bool more_node = true;
+	FileLineReader* fr = &(this_TscnParser->_file_reader);
+	while(!iCluige.iFileLineReader.feof(fr, this_TscnParser->_current_line))
+	{
+		more_ignore = true;
+		while(more_ignore && !iCluige.iFileLineReader.feof(fr, this_TscnParser->_current_line))
+		{
+			//consume empty lines or non-node lines
+			this_TscnParser->_current_line++;
+			more_ignore = !(this_TscnParser->is_starting_node(this_TscnParser));
+			if(fr->_nb_chars > 400)//arbitrary number to lighten buffer but not too often
+			{
+				iCluige.iFileLineReader.forget_lines_before(fr, this_TscnParser->_current_line);
+			}
+		}
+		more_node = this_TscnParser->node(this_TscnParser);
+//		PackedScene* ps = this_TscnParser->_current_packed_scene;//dbg
+//		utils_breakpoint_trick(ps, false);
+		if(more_node)
+		{
+			iCluige.iFileLineReader.forget_lines_before(fr, this_TscnParser->_current_line);
+			nb_nodes++;
+		}
+	}
+	return nb_nodes > 0;
 }
 
 //later : script
@@ -394,43 +323,43 @@ static bool tsnp_parse_scene(TscnParser* this_TscnParser)
 
 static void tsnp_tscn_parser_alloc(struct _TscnParser* this_TscnParser, const char* file_path)
 {
-	//deep copy to prevent pointing to the stack
 	assert(file_path != NULL);
-	int len = strlen(file_path);
-	this_TscnParser->file_path = iCluige.checked_malloc((len + 1) * sizeof(char));
-	strcpy(this_TscnParser->file_path, file_path);
-
+	//public
 	this_TscnParser->scene_root = NULL;
-	this_TscnParser->_current_packed_scene = NULL;
-	this_TscnParser->_current_line_capacity = 200;//grows if needed, see tsnp_read_line()
-	this_TscnParser->_current_line = iCluige.checked_malloc(this_TscnParser->_current_line_capacity * sizeof(char));
-	this_TscnParser->_current_param = iCluige.checked_malloc(200 * sizeof(char));//never grows, enough?
-	this_TscnParser->_current_value = iCluige.checked_malloc(200 * sizeof(char));//grows if needed, see tsnp_value()
-	this_TscnParser->_current_value_capacity = 200;
 
-	this_TscnParser->_file = fopen(file_path, "r");
-	if(this_TscnParser->_file == 00)
+	//private
+	this_TscnParser->_current_packed_scene = NULL;
+	FileLineReader* fr = &(this_TscnParser->_file_reader);
+	iCluige.iFileLineReader.fileLineReader_alloc(fr, 1000);
+	bool ok = iCluige.iFileLineReader.open_file_start_reader(fr, file_path);
+	if(!ok)
 	{
-		printf("\n\n  ERROR : cannot read file %s\n\n", file_path);
-		assert((this_TscnParser->_file != 00) && "cannot read file");// && file_path);
+		printf("\n  ERROR : cannot read scene file %s\n\n", file_path);
+		assert(00 == "cannot read file");// && file_path);
 	}
+	this_TscnParser->_current_line = -1;//first line of file is # 0
 
 	this_TscnParser->parse_scene = tsnp_parse_scene;
-	this_TscnParser->ignore = tsnp_ignore;
+	this_TscnParser->is_starting_node = tsnp_is_starting_node;
 	this_TscnParser->node = tsnp_node;
 	this_TscnParser->param = tsnp_param;
 	this_TscnParser->value = tsnp_value;
-	this_TscnParser->read_line = tsnp_read_line;
+//	this_TscnParser->read_line = tsnp_read_line;
 	this_TscnParser->is_ending_quote = tsnp_is_ending_quote;
 }
 
 static void tsnp_pre_delete_TscnParser(TscnParser* this_TscnParser)
 {
-	fclose(this_TscnParser->_file);
-	free(this_TscnParser->_current_line);
-	free(this_TscnParser->_current_param);
-	free(this_TscnParser->_current_value);
-	// free file_path ? used in result packed scene ?
+	//fclose(this_TscnParser->_file);
+	FileLineReader* fr = &(this_TscnParser->_file_reader);
+	iCluige.iFileLineReader.close_file(fr);
+	iCluige.iFileLineReader.pre_delete_FileLineReader(fr);
+	// ? scene_root - including _current_packed_scene
+
+//	free(this_TscnParser->_current_line);
+//	free(this_TscnParser->_current_param);
+//	free(this_TscnParser->_current_value);
+	// free file_path ? used in result packed scene ? => freed in iFileLineReader.pre_delete_FileLineReader()
 }
 
 

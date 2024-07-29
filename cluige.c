@@ -46,6 +46,7 @@ void cluige_init()
     iiVariant_init();
     iiDeque_init();
     iiSortedDictionary_init();
+    iiFileLineReader_init();
     iiStringBuilder_init();
     iiPackedScene_init();
     iiNode_init();

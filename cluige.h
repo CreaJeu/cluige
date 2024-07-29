@@ -6,6 +6,7 @@
 #include <stddef.h> //for NULL
 #include <stdlib.h> //for EXIT_SUCCESS, malloc, etc.
 #include <string.h>
+#include <limits.h> //for INT_MAX, etc.
 
 #include "Utils.h"
 #include "Node.h"
@@ -14,6 +15,7 @@
 #include "Variant.h"
 #include "Deque.h"
 #include "SortedDictionary.h"
+#include "FileLineReader.h"
 #include "PackedScene.h"
 #include "Nodes/Clock.h"
 #include "Script.h"
@@ -33,6 +35,7 @@ struct iiCluige
     struct iiVariant iVariant;
     struct iiDeque iDeque;
     struct iiSortedDictionary iSortedDictionary;
+    struct iiFileLineReader iFileLineReader;
 	struct iiStringBuilder iStringBuilder;
     struct iiPackedScene iPackedScene;
 	struct iiNode iNode;

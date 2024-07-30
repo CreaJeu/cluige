@@ -58,9 +58,44 @@ static bool tsnp_value(TscnParser* this_TscnParser)
 	const char* current_token = curr_line + before_value_len;
 
 	//case with (potentially multiline) brackets { ... }
+	//for example AnimationPlayer libraries
 	if(current_token[0] == '{')
 	{
-		return false;//TODO
+		this_TscnParser->_current_value = current_token;
+		this_TscnParser->_current_value_len = 1;
+		current_token++;
+		int nb_opened = 1;
+		while(nb_opened > 0)
+		{
+			this_TscnParser->_current_value_len += strlen(current_token);
+			//strpbrk
+			while(current_token != NULL)
+			{
+				current_token = strpbrk(current_token, "{}");//1st occurrence of either
+				if(current_token != NULL)
+				{
+					if(current_token[0] == '{')
+					{
+						nb_opened++;
+						current_token++;
+					}
+					else if(current_token[0] == '}')
+					{
+						nb_opened--;
+						current_token++;
+					}
+				}
+			}
+			curr_line_i++;
+			this_TscnParser->_current_line = curr_line_i;
+			if(iCluige.iFileLineReader.feof(fr, curr_line_i))
+			{
+				assert(00 == "tscn file error : unclosed '{'");
+				return false;
+			}
+			current_token = iCluige.iFileLineReader.get_line(fr, curr_line_i);
+		}
+		return true;
 	}
 
 	//case with (potentially multiline) quoted string
@@ -175,30 +210,48 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 	strncpy(tmp_name, from, tmp_len);
 	tmp_name[tmp_len] = '\0';
 
-	from += tmp_len;//" type="YYY" parent="ZZZ" WWW]
-	tmp_len = strlen("\" type=\"");
-	ok = strncmp(from, "\" type=\"", tmp_len);
-	if(ok != 0)
-	{
-		free(tmp_name);
-		assert(00 == "Error in scene file reading : node without a type");
-		return false;
-	}
-	from += tmp_len;//YYY" parent="ZZZ" WWW]
-	tmp_len = strcspn(from, "\"");
-	char* tmp_type = iCluige.checked_malloc((tmp_len +  1) * sizeof(char));
-	strncpy(tmp_type, from, tmp_len);
-	tmp_type[tmp_len] = '\0';
-
 	this_TscnParser->_current_packed_scene = iCluige.iPackedScene.new_PackedScene();
 	PackedScene* ps = this_TscnParser->_current_packed_scene;
 	ps->name = tmp_name;
-	ps->type = tmp_type;
 
-	from += tmp_len;//" parent="ZZZ" WWW]
+	int type_xor_inst = 0;
+
+	tmp_len = strlen("\" type=\"");
+	from = strstr(curr_line, "\" type=\"");//" type="YYY" parent="ZZZ" WWW]
+	if(from != NULL)
+	{
+		from += tmp_len;//YYY" parent="ZZZ" WWW]
+		tmp_len = strcspn(from, "\"");
+		char* tmp_type = iCluige.checked_malloc((tmp_len +  1) * sizeof(char));
+		strncpy(tmp_type, from, tmp_len);
+		tmp_type[tmp_len] = '\0';
+		ps->type = tmp_type;
+		type_xor_inst++;
+	}
+
+	tmp_len = strlen("instance=ExtResource(\"");
+	from = strstr(curr_line, "instance=ExtResource(\"");//instance=ExtResource("1_hl8su")
+	if(from != NULL)
+	{
+		from += tmp_len;//1_hl8su")
+		tmp_len = strcspn(from, "\"");
+		char* tmp_inst = iCluige.checked_malloc((tmp_len +  1) * sizeof(char));
+		strncpy(tmp_inst, from, tmp_len);
+		tmp_inst[tmp_len] = '\0';
+		ps->instance_res = tmp_inst;
+		type_xor_inst++;
+	}
+
+	if(type_xor_inst != 1)
+	{
+		free(tmp_name);
+		assert(00 == "Error in scene file reading : node with incorrect type or instance resource");
+		return false;
+	}
+
+	from = strstr(curr_line, "\" parent=\"");//" parent="ZZZ" WWW]
 	tmp_len = strlen("\" parent=\"");
-	ok = strncmp(from, "\" parent=\"", tmp_len);
-	if(ok != 0)
+	if(from == NULL)//ok != 0)
 	{
 		assert(this_TscnParser->scene_root == NULL);
 		ps->parent = NULL;

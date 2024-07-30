@@ -12,11 +12,12 @@
 (queue_free, remove child, get node by name/path, get_path)
 (~auto test project)
 (camera)
+(minimal godot scene import : tscn format parsing, packed scene generation)
 
 
 **tâches actuelles**
 
-- minimal godot scene import
+- more godot scene import : PackedScene::instanciate() per-scene-dico id>uid, global-dico uid>PackedScene, project.godot parsing, script attachment, global dico script-name>script-constructor + system to auto register scripts into it, inputs, other deserialize()
 
 **Futures tâches**
 
@@ -33,7 +34,6 @@
 
 - signals
 - collision rectangle
-- more godot scene import
 - input : just_released? => MVC pour inputs (input server, platform-specific)
 - memory pools (at least for pairs in dico)
 - full transform2D?

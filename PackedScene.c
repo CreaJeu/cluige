@@ -22,6 +22,8 @@ static void pksc_packed_scene_alloc(PackedScene* this_PackedScene)
 
     Deque* children = &(this_PackedScene->children);
     iCluige.iDeque.deque_alloc(children, VT_POINTER, 2);
+    this_PackedScene->type = NULL;
+    this_PackedScene->instance_res = NULL;
 }
 
 static PackedScene* pksc_new_PackedScene()
@@ -87,7 +89,14 @@ static char* pksc_debug(const PackedScene* this_PackedScene)
 {
 	int len = 15 + iCluige.iStringBuilder.DECIMAL_DIGITS_FOR_INT;//" - children : ####"
 	len += 8 + strlen(this_PackedScene->name);//"name = AAA\n"
-	len += 8 + strlen(this_PackedScene->name);//"type = BBB\n"
+	if(this_PackedScene->type != NULL)
+	{
+		len += 8 + strlen(this_PackedScene->type);//"type = BBB\n"
+	}
+	if(this_PackedScene->instance_res != NULL)
+	{
+		len += 20 + strlen(this_PackedScene->instance_res);//"instance resource = BBB\n"
+	}
 	int parent_len = 0;
 	if(this_PackedScene->parent != NULL)
 	{
@@ -108,7 +117,14 @@ static char* pksc_debug(const PackedScene* this_PackedScene)
 	iCluige.iStringBuilder.string_alloc(&sb, len);
 
 	iCluige.iStringBuilder.append(&sb, "name = %s\n", this_PackedScene->name);
-	iCluige.iStringBuilder.append(&sb, "type = %s\n", this_PackedScene->type);
+	if(this_PackedScene->type != NULL)
+	{
+		iCluige.iStringBuilder.append(&sb, "type = %s\n", this_PackedScene->type);
+	}
+	if(this_PackedScene->instance_res != NULL)
+	{
+		iCluige.iStringBuilder.append(&sb, "instance resource = %s\n", this_PackedScene->instance_res);
+	}
 	if(this_PackedScene->parent == NULL)
 	{
 		iCluige.iStringBuilder.append(&sb, "parent =\n");

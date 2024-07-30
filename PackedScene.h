@@ -10,6 +10,7 @@ struct _PackedScene
 {
 	const char* name;
 	const char* type;
+	const char* instance_res;
 	const char* parent;
 	//SortedDictionary<String, string>
 	//   param_name -> param_value

@@ -8,17 +8,18 @@ typedef struct _SortedDictionary SortedDictionary;
 typedef struct _Vector2 Vector2;
 
 void utils_breakpoint_trick(const void* anything, bool breakpoint);
+//void utils_cluige_printf(int x, int y, const char* msg);
 
 int clamp_int(int x, int min, int max);
 float clamp_float(float x, float min, float max);
 
-void utils_bool_from_parsed(bool* out,const SortedDictionary* params, const char* param_name);
-void utils_char_from_parsed(char* out,const SortedDictionary* params, const char* param_name);
-void utils_int_from_parsed(int* out,const SortedDictionary* params, const char* param_name);
-void utils_float_from_parsed(float* out,const SortedDictionary* params, const char* param_name);
-void utils_vector2_from_parsed(Vector2* out,const SortedDictionary* params, const char* param_name);
-//with str deep copy
-void utils_str_from_parsed(char** out,const SortedDictionary* params, const char* param_name);
+bool utils_bool_from_parsed(bool* out,const SortedDictionary* params, const char* param_name);
+bool utils_char_from_parsed(char* out,const SortedDictionary* params, const char* param_name);
+bool utils_int_from_parsed(int* out,const SortedDictionary* params, const char* param_name);
+bool utils_float_from_parsed(float* out,const SortedDictionary* params, const char* param_name);
+bool utils_vector2_from_parsed(Vector2* out,const SortedDictionary* params, const char* param_name);
+//with str deep copy (malloc)
+bool utils_str_from_parsed(char** out,const SortedDictionary* params, const char* param_name);
 
 
 

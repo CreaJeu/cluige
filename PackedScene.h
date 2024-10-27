@@ -14,6 +14,8 @@ struct _PackedScene
 	const char* parent;
 	//SortedDictionary<String, string>
 	//   param_name -> param_value
+	//warning : in this dico, 'class' names are from godot :
+	//	Label instead of SpriteText, Sprite2D instead of SpriteSVG
 	SortedDictionary dico_node;
 
 	//later : dico_script;

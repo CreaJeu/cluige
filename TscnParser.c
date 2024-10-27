@@ -213,6 +213,15 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 	this_TscnParser->_current_packed_scene = iCluige.iPackedScene.new_PackedScene();
 	PackedScene* ps = this_TscnParser->_current_packed_scene;
 	ps->name = tmp_name;
+	SortedDictionary* ps_dico = &(ps->dico_node);
+	char* name_name = iCluige.checked_malloc(6 * sizeof(char));//because will be deleted via dico.pre_delete()
+	strncpy(name_name, "name", 6);
+	int tmp_name_len = strlen(tmp_name);
+	char* quoted_name = iCluige.checked_malloc((3 + tmp_name_len) * sizeof(char));
+	strcpy(quoted_name, "\"");
+	strncpy(quoted_name + 1, tmp_name, tmp_name_len);
+	strncpy(quoted_name + 1 + tmp_name_len, "\"", 2);
+	iCluige.iSortedDictionary.insert(ps_dico, name_name, quoted_name);
 
 	int type_xor_inst = 0;
 

@@ -366,7 +366,9 @@ static Node* ssvg_instanciate(const SortedDictionary* params)
     utils_vector2_from_parsed(&(res_SpriteSVG->scale), params, "scale");
     assert(iCluige.iDeque.empty(&(res_SpriteSVG->paths)));
     char* svg_file_path;
-    utils_str_from_parsed(&(svg_file_path), params, "svg_file_path");
+    bool ok = utils_str_from_parsed(&svg_file_path, params, "svg_file_path");
+    utils_breakpoint_trick(&ok, !ok);
+    assert(ok || 00=="missing 'svg_file_path' field");
     ssvg_parse_file(res_SpriteSVG, svg_file_path);
     free(svg_file_path);
     return res_node;
@@ -385,7 +387,9 @@ void iiSpriteSVG_init()
     SortedDictionary* fcties = &(iCluige.iNode.node_factories);
     NodeFactory* fcty = &(iCluige.iSpriteSVG._SpriteSVG_factory);
     fcty->instanciate = ssvg_instanciate;
-    iCluige.iSortedDictionary.insert(fcties, "SpriteSVG", fcty);
+    char* fcty_key = iCluige.checked_malloc(9 * sizeof(char));
+    strncpy(fcty_key, "Sprite2D", 9);
+    iCluige.iSortedDictionary.insert(fcties, fcty_key, fcty);
 
     iiSVGParser_init(&(iCluige.iSpriteSVG.iSVGParser));
     iCluige.iSpriteSVG.iSVGParser.SVGParser_alloc(&_svg_parser);

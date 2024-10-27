@@ -63,7 +63,10 @@ static PackedScene* pksc_get_packed_node(PackedScene* root, const char* path)
 	for(int i=0; i<n; i++)
 	{
 		ps = (PackedScene*)(iCluige.iDeque.at(children, i).ptr);
-		cmp = strncmp(ps->name, path, child_name_len);
+		char sub_path[iCluige.iNode._MAX_NAME_LENGTH];
+		strncpy(sub_path, path, child_name_len);
+		sub_path[child_name_len] = '\0';
+		cmp = strcmp(sub_path, ps->name);
 		if(cmp == 0)
 		{
 			if(first_slash == NULL)
@@ -81,8 +84,24 @@ static PackedScene* pksc_get_packed_node(PackedScene* root, const char* path)
 
 static Node* pksc_instanciate(const PackedScene* this_PackedScene)
 {
-	assert(00=="TODO");
-	return NULL;
+	//TODO type XOR instance_res : instance_res => instance from other scene
+	const char* t = this_PackedScene->type;
+	const SortedDictionary* fcties = &(iCluige.iNode.node_factories);
+	Checked_Variant got = iCluige.iSortedDictionary.get(fcties, t);
+	assert(got.valid || 00 == "type found in PackedScene in unknown by cluige");
+	const NodeFactory* fcty = (const NodeFactory*)(got.v.ptr);
+	Node* new_node = fcty->instanciate(&(this_PackedScene->dico_node));
+
+	//children
+	int nb_children = iCluige.iDeque.size(&(this_PackedScene->children));
+	for(int c = 0; c < nb_children; c++)
+	{
+		const PackedScene* child_ps =
+			(const PackedScene*)(iCluige.iDeque.at(&(this_PackedScene->children), c).ptr);
+		Node* child_nde = pksc_instanciate(child_ps);
+		iCluige.iNode.add_child(new_node, child_nde);
+	}
+	return new_node;
 }
 
 static char* pksc_debug(const PackedScene* this_PackedScene)
@@ -111,7 +130,10 @@ static char* pksc_debug(const PackedScene* this_PackedScene)
 		Pair* pair_i = (Pair*)(v_pair_i.ptr);
 		const char* key = (const char*)(pair_i->first.ptr);
 		const char* val = (const char*)(pair_i->second.ptr);
-		len += 4 + strlen(key) + strlen(val);//"key = val\n"
+		if(strcmp(key, "name") != 0)
+		{
+			len += 4 + strlen(key) + strlen(val);//"key = val\n"
+		}
 	}
 	StringBuilder sb;
 	iCluige.iStringBuilder.string_alloc(&sb, len);
@@ -139,7 +161,10 @@ static char* pksc_debug(const PackedScene* this_PackedScene)
 		Pair* pair_i = (Pair*)(v_pair_i.ptr);
 		const char* key = (const char*)(pair_i->first.ptr);
 		const char* val = (const char*)(pair_i->second.ptr);
-		iCluige.iStringBuilder.append(&sb, "%s = %s\n", key, val);
+		if(strcmp(key, "name") != 0)
+		{
+			iCluige.iStringBuilder.append(&sb, "%s = %s\n", key, val);
+		}
 	}
 
 	int nb_children = iCluige.iDeque.size(&(this_PackedScene->children));

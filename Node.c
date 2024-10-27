@@ -10,7 +10,7 @@
 
 //Deque to keep track of which malloc to free
 Deque _queue_freed_nodes;
-const int _MAX_NAME_LENGTH = 150;
+//const int _MAX_NAME_LENGTH = 150;//cf. iiNode / init()
 
 
 ////////////////////////////////// _Node /////////
@@ -183,7 +183,7 @@ static Node* nde__get_node_rec(Node* ths_node,const char* node_path,bool absolut
 {
     assert(node_path != NULL);
     int i =0;
-    char element[_MAX_NAME_LENGTH];
+    char element[iCluige.iNode._MAX_NAME_LENGTH];
     int size = strlen(node_path);
     Node* tmp;
     if(sscanf(node_path, "%[^/]/", element) == 1)// "test/main" or "main" format
@@ -312,7 +312,7 @@ static bool nde_is_higher_than(Node* ths_node, Node* other_node)
 }
 
 //private util
-static int nde__path_char_length(Node* ths_node)
+static int nde__path_char_length(const Node* ths_node)
 {
     if(ths_node != iCluige.public_root_2D)
     {
@@ -325,7 +325,7 @@ static int nde__path_char_length(Node* ths_node)
 }
 
 //private util
-static void nde__rec_get_path(Node* ths_node, char* res, int remaining_path_size)
+static void nde__rec_get_path(const Node* ths_node, char* res, int remaining_path_size)
 {
     if(ths_node == iCluige.public_root_2D)
     {
@@ -345,14 +345,14 @@ static void nde__rec_get_path(Node* ths_node, char* res, int remaining_path_size
     }
 }
 
-static char* nde_get_path_mallocing(Node* ths_node)
+static char* nde_get_path_mallocing(const Node* ths_node)
 {
     assert(ths_node != NULL);
     int max = nde__path_char_length(ths_node);
     char* res = iCluige.checked_malloc((max + 1) * sizeof(char));
 
     nde__rec_get_path(ths_node,res,max);
-    res[strlen(res)] = '\0';
+    res[max] = '\0';
     return res;
 }
 
@@ -552,7 +552,9 @@ static Node* nde_instanciate(const SortedDictionary* parsed_params)
 {
     Node* res = nde_new_Node();
     //assert(this_Node->name == NULL);
-    utils_str_from_parsed(&(res->name), parsed_params, "name");
+    bool ok = utils_str_from_parsed(&(res->name), parsed_params, "name");
+    utils_breakpoint_trick(&ok, !ok);
+    assert(ok || 00=="missing 'name' field");
     // TODO ? from godot process mode? // utils_bool_from_parsed(&(res->active), params, "active");
     return res;
 }
@@ -561,6 +563,8 @@ static Node* nde_instanciate(const SortedDictionary* parsed_params)
 
 void iiNode_init()
 {
+	iCluige.iNode._MAX_NAME_LENGTH = 150;
+
     iCluige.iDeque.deque_alloc(&_queue_freed_nodes, VT_POINTER, 20);
 
     iCluige.iNode.new_Node = nde_new_Node;
@@ -587,7 +591,10 @@ void iiNode_init()
     fcty->instanciate = nde_instanciate;
     iCluige.iSortedDictionary.sorted_dictionary_alloc(fcties, VT_POINTER, VT_POINTER, 20);
     iCluige.iSortedDictionary.set_compare_keys_func(fcties, iCluige.iDeque.default_compare_string_func);
-    iCluige.iSortedDictionary.insert(fcties, "Node", fcty);
+
+    char* fcty_key = iCluige.checked_malloc(5 * sizeof(char));
+    strncpy(fcty_key, "Node", 5);
+    iCluige.iSortedDictionary.insert(fcties, fcty_key, fcty);
 }
 
 

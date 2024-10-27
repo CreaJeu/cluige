@@ -13,11 +13,13 @@
 (~auto test project)
 (camera)
 (minimal godot scene import : tscn format parsing, packed scene generation)
+(more godot scene import : instanciate() ok for some node classes in their current state)
 
 
 **tâches actuelles**
 
-- more godot scene import : PackedScene::instanciate() per-scene-dico id>uid, global-dico uid>PackedScene, project.godot parsing, script attachment, global dico script-name>script-constructor + system to auto register scripts into it, inputs, other deserialize()
+- more godot scene import : instanciate() for clock and camera, per-scene-dico id>uid, global-dico uid>PackedScene, project.godot parsing, script attachment, global dico script-name>script-constructor + system to auto register scripts into it, inputs, other deserialize()
+- tscn import : move test functions from gamejam to test project
 
 **Futures tâches**
 
@@ -27,6 +29,8 @@
 - sprite svg : optim big segments out of screen
 - node2D (et autre?) : meilleur test ~instanceof / _className static par classe
 - fatal error => end loop + printf
+- Deque::sort()
+- reallocate in Deque::grow()
 
 
 

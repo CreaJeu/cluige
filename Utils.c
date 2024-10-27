@@ -7,6 +7,9 @@
 //for sscanf
 #include <stdio.h>
 
+////for utils_cluige_printf() TODO replace curses depndcy with ~'godot server'
+//#include <curses.h>
+
 
 void utils_breakpoint_trick(const void* anything, bool breakpoint)
 {
@@ -16,6 +19,11 @@ void utils_breakpoint_trick(const void* anything, bool breakpoint)
         breakpoint = true;
     }
 }
+
+//void utils_cluige_printf(int x, int y, const char* msg)
+//{
+//	mvaddstr(y, x, msg);
+//}
 
 int clamp_int(int x, int min, int max)
 {
@@ -49,7 +57,7 @@ float clamp_float(float x, float min, float max)
     }
 }
 
-void utils_bool_from_parsed(bool* out,const SortedDictionary* params, const char* param_name)
+bool utils_bool_from_parsed(bool* out,const SortedDictionary* params, const char* param_name)
 {
     //false / true
     Checked_Variant found = iCluige.iSortedDictionary.get(params, param_name);
@@ -58,40 +66,48 @@ void utils_bool_from_parsed(bool* out,const SortedDictionary* params, const char
         char* param_str = (char*)(found.v.ptr);
         int cmp = strcmp(param_str, "true");
         (*out) = (cmp == 0);
+        return true;
     }
+    return false;
 }
 
-void utils_char_from_parsed(char* out,const SortedDictionary* params, const char* param_name)
+bool utils_char_from_parsed(char* out,const SortedDictionary* params, const char* param_name)
 {
     Checked_Variant found = iCluige.iSortedDictionary.get(params, param_name);
     if(found.valid)//param found
     {
         char* param_str = (char*)(found.v.ptr);
         (*out) = param_str[0];
+        return true;
     }
+    return false;
 }
 
-void utils_int_from_parsed(int* out,const SortedDictionary* params, const char* param_name)
+bool utils_int_from_parsed(int* out,const SortedDictionary* params, const char* param_name)
 {
     Checked_Variant found = iCluige.iSortedDictionary.get(params, param_name);
     if(found.valid)//param found
     {
         char* param_str = (char*)(found.v.ptr);
         (*out) = atoi(param_str);
+        return true;
     }
+    return false;
 }
 
-void utils_float_from_parsed(float* out,const SortedDictionary* params, const char* param_name)
+bool utils_float_from_parsed(float* out,const SortedDictionary* params, const char* param_name)
 {
     Checked_Variant found = iCluige.iSortedDictionary.get(params, param_name);
     if(found.valid)//param found
     {
         char* param_str = (char*)(found.v.ptr);
         (*out) = strtof(param_str, NULL);
+        return true;
     }
+    return false;
 }
 
-void utils_vector2_from_parsed(Vector2* out,const SortedDictionary* params, const char* param_name)
+bool utils_vector2_from_parsed(Vector2* out,const SortedDictionary* params, const char* param_name)
 {
     Checked_Variant found = iCluige.iSortedDictionary.get(params, param_name);
     if(found.valid)//param found
@@ -105,10 +121,12 @@ void utils_vector2_from_parsed(Vector2* out,const SortedDictionary* params, cons
             out->x = x;
             out->y = y;
         }
+        return true;
     }
+    return false;
 }
 
-void utils_str_from_parsed(char** out,const SortedDictionary* params, const char* param_name)
+bool utils_str_from_parsed(char** out, const SortedDictionary* params, const char* param_name)
 {
     Checked_Variant found = iCluige.iSortedDictionary.get(params, param_name);
     if(found.valid)//param found
@@ -124,5 +142,7 @@ void utils_str_from_parsed(char** out,const SortedDictionary* params, const char
         strncpy(copied, param_str + 1, length_res_null_termin - 1);
         copied[length_res_null_termin - 1] = '\0';// "text\0"
         (*out) = copied;
+        return true;
     }
+    return false;
 }

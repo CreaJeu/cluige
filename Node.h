@@ -45,6 +45,7 @@ struct _Node
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiNode
 {
+	int _MAX_NAME_LENGTH;
 	// ~public static
 	//Dico<String, NodeFactory*>
 	// class_name -> factory*
@@ -85,7 +86,7 @@ struct iiNode
 	bool (*is_higher_than)(Node* ths_node, Node* node);
 
 	//the returned string is malloced, up to the user to free it later
-	char* (*get_path_mallocing)(Node* node);
+	char* (*get_path_mallocing)(const Node* node);
 
 	//void print_tree_pretty(Node*)
 	void (*print_tree_pretty)(const Node*);

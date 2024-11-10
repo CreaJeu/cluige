@@ -65,19 +65,19 @@ static void c2d_delete_camera2d(Node* this_node)
     Camera2D* this_cam2d = (Camera2D*)(this_node2d->_sub_class);
     void (*delete_Node2D)(Node*) = this_cam2d->delete_Node2D;
 
-    if(iCluige.iCamera2D.current_camera == this_cam2d && iCluige.iCamera2D.default_camera != iCluige.iCamera2D.current_camera)
-    {
-        Node* node_found = c2d__highest_node_excluding_one_nde(iCluige.public_root_2D,"NodeNode2DCamera2D",this_node);
-        if(node_found != NULL)
-        {
-            c2d_make_current(c2d__get_camera_from_node(node_found));
-        }
-        else
-        {
-            //default camera
-            c2d_make_current(iCluige.iCamera2D.default_camera);
-        }
-    }
+//    if(iCluige.iCamera2D.current_camera == this_cam2d && iCluige.iCamera2D.default_camera != iCluige.iCamera2D.current_camera)
+//    {
+//        Node* node_found = c2d__highest_node_excluding_one_nde(iCluige.public_root_2D,"NodeNode2DCamera2D",this_node);
+//        if(node_found != NULL)
+//        {
+//            c2d_make_current(c2d__get_camera_from_node(node_found));
+//        }
+//        else
+//        {
+//            //default camera
+//            c2d_make_current(iCluige.iCamera2D.default_camera);
+//        }
+//    }
     assert(this_cam2d->_sub_class == NULL);
     free(this_cam2d);
     this_node2d->_sub_class = NULL;

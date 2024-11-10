@@ -18,6 +18,7 @@ struct _PackedScene
 	//	Label instead of SpriteText, Sprite2D instead of SpriteSVG
 	SortedDictionary dico_node;
 
+	SortedDictionary dico_svg_paths;
 	//later : dico_script;
 
 	//later : connected signals

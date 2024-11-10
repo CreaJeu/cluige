@@ -57,6 +57,11 @@ float clamp_float(float x, float min, float max)
     }
 }
 
+bool str_equals(const char* s1, const char* s2)
+{
+	return (strcmp(s1, s2) == 0);
+}
+
 bool utils_bool_from_parsed(bool* out,const SortedDictionary* params, const char* param_name)
 {
     //false / true
@@ -145,4 +150,34 @@ bool utils_str_from_parsed(char** out, const SortedDictionary* params, const cha
         return true;
     }
     return false;
+}
+
+bool utils_nonquoted_str_from_parsed(char** out, const SortedDictionary* params, const char* param_name)
+{
+	Checked_Variant found = iCluige.iSortedDictionary.get(params, param_name);
+	if(found.valid)//param found
+	{
+		char* param_str = (char*)(found.v.ptr);// "text\0"
+//		size_t length_res_null_termin =  strlen(param_str);
+//		char* copied = iCluige.checked_malloc(sizeof(char) * length_res_null_termin);// "text\0"
+//		strcpy(copied, param_str);
+//		(*out) = copied;
+		(*out) = param_str;
+		return true;
+	}
+	return false;
+}
+
+bool utils_id_str_from_ExtResource_parsed(char** out, const char* parsed_value)
+{
+	// "ExtResource("2_efpur")\0"
+	const char* from = parsed_value;
+	int tmp_len = strlen("ExtResource(\"");
+	from += tmp_len;//2_efpur")\0"
+	tmp_len = strcspn(from, "\"");
+	char* copied = iCluige.checked_malloc((tmp_len +  1) * sizeof(char));
+	strncpy(copied, from, tmp_len);
+	copied[tmp_len] = '\0';
+	(*out) = copied;
+	return true;
 }

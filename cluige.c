@@ -6,7 +6,7 @@
 
 ////////////////////////////////// iiCluige /////////
 
-static void* clg_checked_malloc(size_t s)
+static void* clg_checked_malloc(size_t s)//TODO : move to Utils, add a checked_realloc()
 {
     void* res = malloc(s);
     if(res == NULL)

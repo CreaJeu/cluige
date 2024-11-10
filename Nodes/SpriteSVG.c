@@ -366,11 +366,14 @@ static Node* ssvg_instanciate(const SortedDictionary* params)
     utils_vector2_from_parsed(&(res_SpriteSVG->scale), params, "scale");
     assert(iCluige.iDeque.empty(&(res_SpriteSVG->paths)));
     char* svg_file_path;
-    bool ok = utils_str_from_parsed(&svg_file_path, params, "svg_file_path");
+    //'texture'=>'path/to/file.svg' see TscnParser::node()
+    bool ok = utils_nonquoted_str_from_parsed(&svg_file_path, params, "svg_file_path");
+//	char* dbg = iCluige.iSortedDictionary.debug_str_str(params);
+//	utils_breakpoint_trick(dbg, !ok);
     utils_breakpoint_trick(&ok, !ok);
-    assert(ok || 00=="missing 'svg_file_path' field");
+    assert(ok || 00=="missing 'texture' field");
     ssvg_parse_file(res_SpriteSVG, svg_file_path);
-    free(svg_file_path);
+    //free(svg_file_path);no need with utils_nonquoted_str_from_parsed()
     return res_node;
 }
 

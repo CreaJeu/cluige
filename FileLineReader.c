@@ -62,6 +62,7 @@ static void flr_pre_delete_FileLineReader(FileLineReader* this_FileLineReader)
 //beware : buffer can be reallocated, user should not store returned pointer, instead re-call get_line() each time
 static const char* flr_get_line(FileLineReader* this_FileLineReader, int i)
 {
+	utils_breakpoint_trick(this_FileLineReader, this_FileLineReader->_oldest_line > i);
 	assert(this_FileLineReader->_oldest_line <= i);// && i <= this_FileLineReader->_newest_line);
 	if(i > this_FileLineReader->_eof_line)
 	{

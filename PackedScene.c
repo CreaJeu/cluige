@@ -17,6 +17,10 @@ static void pksc_packed_scene_alloc(PackedScene* this_PackedScene)
     iCluige.iSortedDictionary.sorted_dictionary_alloc(dico_node, VT_POINTER, VT_POINTER, 7);
     iCluige.iSortedDictionary.set_compare_keys_func(dico_node, iCluige.iDeque.default_compare_string_func);
 
+    SortedDictionary* dico_svg_paths = &(this_PackedScene->dico_svg_paths);
+    iCluige.iSortedDictionary.sorted_dictionary_alloc(dico_svg_paths, VT_POINTER, VT_POINTER, 7);
+    iCluige.iSortedDictionary.set_compare_keys_func(dico_svg_paths, iCluige.iDeque.default_compare_string_func);
+
     //later : script
     //later : signals
 

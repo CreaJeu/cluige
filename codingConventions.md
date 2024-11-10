@@ -1,9 +1,9 @@
 //TODO
 
 Members :
-    snake_case
-    public : no _ prefix
-    private : one _ prefix
+	snake_case
+	public : no _ prefix
+	private : one _ prefix
 
 In .c
 	prefixed static functions to feed function pointers :
@@ -12,8 +12,8 @@ In .c
 
 
 function pointers :
-    virtual/inheritance : in _Struct
-    non virtual/inheritance : in _iiStruct
+	virtual/inheritance : in _Struct
+	non virtual/inheritance : in _iiStruct
 
 
 General :

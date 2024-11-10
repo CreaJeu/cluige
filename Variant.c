@@ -189,7 +189,7 @@ void iiVariant_init()
 {
     //iCluige.iVariant.NULL_VARIANT = (Variant)0;//not standard C
     iCluige.iVariant.NULL_VARIANT.d = 0;
-    iCluige.iVariant.NULL_VARIANT.ptr = 0;///TODO better way to be sure to fully fill with 0? memcpy from int[]{0,0,0..}?
+    iCluige.iVariant.NULL_VARIANT.ptr = 0;///TODO better way to be sure to fully fill with 0? memcpy from int[]{0,0,0..}? => see calloc() (fills with zeros)
     iCluige.iVariant.from_val = vrt_from_val;
     iCluige.iVariant.from_s_args = vrt_from_s_args;
     iCluige.iVariant.pair_from_args = vrt_pair_from_args;

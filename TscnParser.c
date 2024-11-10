@@ -318,12 +318,40 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 		}
 		keeped_val[tmp_len] = '\0';
 
+		if(str_equals(keeped_key, "texture") && str_equals(ps->type, "Sprite2D"))
+		{
+			//keeped_val is like 'ExtResource("2_efpur")\0'
+			//we must extract the id, then find filepath from it
+			char* svg_id;
+			bool ok = utils_id_str_from_ExtResource_parsed(&svg_id, keeped_val);
+			utils_breakpoint_trick(&ok, !ok);
+			assert(ok || 00=="texture id could not be read");
+
+			SortedDictionary* dico_ids = &(this_TscnParser->_dico_ids);
+			cv = iCluige.iSortedDictionary.get(dico_ids, svg_id);
+			//assert(cv.valid || 0=="id of texture not found in tscn_parser dico");
+			if(cv.valid)
+			{
+				keeped_key = realloc(keeped_key, strlen("svg_file_path!") * sizeof(char));
+				//TODO utils::checked_realloc()
+				strcpy(keeped_key, "svg_file_path");
+				char* file_path = (char*)(cv.v.ptr);
+				free(keeped_val);
+				keeped_val = file_path;
+				//char* dbg = iCluige.iSortedDictionary.debug_str_str(dic);
+				//utils_breakpoint_trick(dbg, true);
+			}
+			free(svg_id);
+		}
+		//else script TODO
+
 		cv = iCluige.iSortedDictionary.insert(dic,
 				keeped_key,
 				keeped_val);
 		//dbg_dic = iCluige.iSortedDictionary.debug_str_str(dic);
-		bool inserted_ok = !(cv.valid);
-		assert(inserted_ok || 00 == "could not insert parsed param-value");
+		bool overwritten = (cv.valid);
+		utils_breakpoint_trick(NULL, overwritten);
+		assert(!overwritten || 00 == "parsed param-value would overwrite another param-value");
 
 		parse_ok = this_TscnParser->param(this_TscnParser);
 	}
@@ -347,15 +375,96 @@ static bool tsnp_is_starting_node(TscnParser* this_TscnParser)
 	return cmp == 0;
 }
 
+//examples:
+//[ext_resource type="Texture2D" uid="uid://8j50qrs1q30l" path="res://loupe.svg" id="1_kwa0e"]
+//[ext_resource type="Script" path="res://player.gd" id="2_pseyi"]
+//(or empty line)
+//advances in file stream if returns true
+static bool tsnp_ext_res(TscnParser* this_TscnParser)
+{
+	FileLineReader* fr = &(this_TscnParser->_file_reader);
+	int curr_line_i = this_TscnParser->_current_line;
+	const char* curr_line = iCluige.iFileLineReader.get_line(fr, curr_line_i);
+	if(strncmp(curr_line, "\n", 1) == 0)
+	{
+		this_TscnParser->_current_line++;
+		return true;
+	}
+	int tmp_len = strlen("[ext_resource type=\"");
+	int cmp = strncmp(curr_line, "[ext_resource type=\"", tmp_len);
+	if(cmp != 0)
+	{
+		return false;
+	}
+	const char* from = curr_line + tmp_len;//Texture2D" uid="uid://8j50qrs1q30l" path="res://loupe.svg" id="1_kwa0e"]
+	tmp_len = strcspn(from, "\"");
+	//SVG
+	if(strncmp(from, "Texture2D\"", tmp_len+1) == 0)
+	{
+		from = strstr(curr_line, "\" id=\"");
+		utils_breakpoint_trick(from, from == NULL);
+		assert(from != NULL || 0=="error in cluige or in tscn : 'id' not found for texture");
+		tmp_len = strlen("\" id=\"");
+		from += tmp_len;//1_kwa0e"]
+		tmp_len = strcspn(from, "\"");
+		char* keeped_key = iCluige.checked_malloc((tmp_len +  1) * sizeof(char));
+		strncpy(keeped_key, from, tmp_len);
+		keeped_key[tmp_len] = '\0';
+
+		from = strstr(curr_line, "\" path=\"res://");
+		utils_breakpoint_trick(from, from == NULL);
+		assert(from != NULL || 0=="error in cluige or in tscn : 'path' not found for texture");
+		tmp_len = strlen("\" path=\"res://");
+		from += tmp_len;//loupe.svg" id="1_kwa0e"]
+		tmp_len = strcspn(from, "\"");
+		char* keeped_val = iCluige.checked_malloc((tmp_len +  1) * sizeof(char));
+		strncpy(keeped_val, from, tmp_len);//loupe.svg
+		keeped_val[tmp_len] = '\0';
+
+		bool is_svg = (keeped_val[tmp_len - 4] == '.');
+		is_svg = is_svg && ( (keeped_val[tmp_len - 3] == 's') || (keeped_val[tmp_len - 3] == 'S') );
+		is_svg = is_svg && ( (keeped_val[tmp_len - 2] == 'v') || (keeped_val[tmp_len - 2] == 'V') );
+		is_svg = is_svg && ( (keeped_val[tmp_len - 1] == 'g') || (keeped_val[tmp_len - 1] == 'G') );
+		if(is_svg)
+		{
+			SortedDictionary* dico = &(this_TscnParser->_dico_ids);
+			Checked_Variant cv = iCluige.iSortedDictionary.insert(dico, keeped_key, keeped_val);
+			utils_breakpoint_trick(dico, cv.valid);//key/val overwriten
+		}
+		else
+		{
+			free(keeped_key);
+			free(keeped_val);
+		}
+	}
+	//else Script
+		//TODO
+
+	this_TscnParser->_current_line++;
+	return true;
+}
+
 static bool tsnp_parse_scene(TscnParser* this_TscnParser)
 {
 	int nb_nodes = 0;
 	bool more_ignore = true;
+	bool more_ext_res = true;
 	bool more_node = true;
 	FileLineReader* fr = &(this_TscnParser->_file_reader);
+	this_TscnParser->_current_line = 1;
 	while(!iCluige.iFileLineReader.feof(fr, this_TscnParser->_current_line))
 	{
-		more_ignore = true;
+		more_ext_res = this_TscnParser->ext_res(this_TscnParser);//auto-consumes empty lines
+		while(more_ext_res && !iCluige.iFileLineReader.feof(fr, this_TscnParser->_current_line))
+		{
+			//this_TscnParser->_current_line++;//auto-consumed
+			more_ext_res = (this_TscnParser->ext_res(this_TscnParser));
+			if(fr->_nb_chars > 400)//arbitrary number to lighten buffer but not too often
+			{
+				iCluige.iFileLineReader.forget_lines_before(fr, this_TscnParser->_current_line);
+			}
+		}
+		more_ignore = !(this_TscnParser->is_starting_node(this_TscnParser));
 		while(more_ignore && !iCluige.iFileLineReader.feof(fr, this_TscnParser->_current_line))
 		{
 			//consume empty lines or non-node lines
@@ -403,11 +512,16 @@ static void tsnp_tscn_parser_alloc(struct _TscnParser* this_TscnParser, const ch
 
 	this_TscnParser->parse_scene = tsnp_parse_scene;
 	this_TscnParser->is_starting_node = tsnp_is_starting_node;
+	this_TscnParser->ext_res = tsnp_ext_res;
 	this_TscnParser->node = tsnp_node;
 	this_TscnParser->param = tsnp_param;
 	this_TscnParser->value = tsnp_value;
 //	this_TscnParser->read_line = tsnp_read_line;
 	this_TscnParser->is_ending_quote = tsnp_is_ending_quote;
+
+	SortedDictionary* dico = &(this_TscnParser->_dico_ids);
+	iCluige.iSortedDictionary.sorted_dictionary_alloc(dico, VT_POINTER, VT_POINTER, 7);
+	iCluige.iSortedDictionary.set_compare_keys_func(dico, iCluige.iDeque.default_compare_string_func);
 }
 
 static void tsnp_pre_delete_TscnParser(TscnParser* this_TscnParser)
@@ -416,6 +530,9 @@ static void tsnp_pre_delete_TscnParser(TscnParser* this_TscnParser)
 	FileLineReader* fr = &(this_TscnParser->_file_reader);
 	iCluige.iFileLineReader.close_file(fr);
 	iCluige.iFileLineReader.pre_delete_FileLineReader(fr);
+
+	SortedDictionary* dico = &(this_TscnParser->_dico_ids);
+	iCluige.iSortedDictionary.pre_delete_SortedDictionary(dico);
 	// ? scene_root - including _current_packed_scene
 
 //	free(this_TscnParser->_current_line);

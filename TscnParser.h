@@ -27,8 +27,10 @@ struct _TscnParser //"mother class", Godot 4 by default
 	int _current_param_len;
 	const char* _current_value;
 	int _current_value_len;
+	SortedDictionary _dico_ids;
 
 	bool (*parse_scene)(TscnParser* this_TscnParser);
+	bool (*ext_res)(TscnParser* this_TscnParser);
 	bool (*node)(TscnParser* this_TscnParser);
 	bool (*param)(TscnParser* this_TscnParser);
 	bool (*value)(TscnParser* this_TscnParser);
@@ -55,8 +57,9 @@ void iiTscnParser_init();
 
 //  ~grammar godot 4 ("format=3" in .tscn)
 /*
-scene : ignored_top format=3 ignored_more_top node* ignored_bottom
+scene : ignored_top format=3 ignored_more_top ext_res* ignore* node* ignored_bottom
 
+ext_res : \[ext_resource type=quoted_string ignore* path=quoted_string id=quoted_string\]
 node : node_header param* whole_script?
 node_header : \[node name=quoted_string type=quoted_string [parent=quoted_string] [ignored] \]
 whole_script : script = ExtResource("1_4fevc") \n param*

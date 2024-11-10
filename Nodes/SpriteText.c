@@ -20,6 +20,11 @@ static void sprtx_delete_SpriteText(Node* this_Node)
 //    {
 //        free(this_SpriteText->text[i]);
 //    }
+	//clear display
+	if(this_Node2D->visible && !(iCluige.quit_asked))
+	{
+		this_Node->pre_process_Node(this_Node);
+	}
     free(this_SpriteText->text);
     assert(this_SpriteText->_sub_class == NULL);
     free(this_SpriteText);

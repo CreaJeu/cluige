@@ -21,6 +21,12 @@ static void ssvg_delete_SpriteSVG(Node* this_Node)
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
     void (*delete_Node2D)(Node*) = this_SpriteSVG->delete_Node2D;
+
+    //clear display
+	if(this_Node2D->visible && !(iCluige.quit_asked))
+	{
+		this_Node->pre_process_Node(this_Node);
+	}
     //delete my attributes
     //Deque<Path2D* > paths
     Deque* paths = &(this_SpriteSVG->paths);

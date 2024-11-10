@@ -541,7 +541,8 @@ static void nde__do_all_queue_free()
     {
         Node* node = iCluige.iDeque.at(&_queue_freed_nodes,i).ptr;
         nde_remove_child(node->parent,node);
-        nde_delete_Node(node);
+        node->delete_Node(node);
+//        nde_delete_Node(node);
         //iCluige.iDeque.remove(&_queue_freed_nodes,i);
     }
     iCluige.iDeque.clear(&_queue_freed_nodes);

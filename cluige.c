@@ -73,6 +73,7 @@ void cluige_init()
     Camera2D* default_camera = iCluige.iCamera2D.new_Camera2D();
     iCluige.iCamera2D.current_camera = default_camera;
     iCluige.iNode.set_name(iCluige.iCamera2D.current_camera->_this_Node2D->_this_Node,"default_camera");
+    default_camera->anchor_mode = ANCHOR_MODE_FIXED_TOP_LEFT;
     iCluige.iNode.add_child(iCluige.private_root_2D, iCluige.iCamera2D.current_camera->_this_Node2D->_this_Node);
     iCluige.iCamera2D.default_camera = default_camera;
     //iCluige.iNode.print_tree_pretty(iCluige.private_root_2D);

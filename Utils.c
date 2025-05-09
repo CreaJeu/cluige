@@ -120,7 +120,7 @@ bool utils_vector2_from_parsed(Vector2* out,const SortedDictionary* params, cons
         const char* str_res = (char*)(found.v.ptr);// "Vector2(2.265, -3.2)"
         float x, y;
         int ok = sscanf(str_res, "Vector2(%f, %f)", &x, &y);
-        assert(ok == 2);
+        CLUIGE_ASSERT(ok == 2, "Utils::utils_vector2_from_parsed() : not a parsable Vector2");
         if(ok == 2)
         {
             out->x = x;
@@ -180,4 +180,19 @@ bool utils_id_str_from_ExtResource_parsed(char** out, const char* parsed_value)
 	copied[tmp_len] = '\0';
 	(*out) = copied;
 	return true;
+}
+
+void _cluige_assert(bool right, const char* msg)
+{
+	if(!right)
+	{
+		printf("ASSERT FAILED %s\n", msg);// TODO see utils_cluige_printf() in .h
+		utils_breakpoint_trick(msg, true);
+		assert(right);
+	}
+	//memo to 'replace all' with regex in code::blocks :
+	//Ctrl+R
+	//check 'regular expression' and 'match case'
+	//assert(\(.*\));
+	//CLUIGE_ASSERT(\1, "XXXX::() : ");
 }

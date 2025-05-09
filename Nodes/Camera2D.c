@@ -3,7 +3,6 @@
 #include "Camera2D.h"
 
 #include <string.h>
-#include <assert.h>
 #include <math.h>
 
 
@@ -14,7 +13,7 @@ static Node* c2d__highest_node_excluding_one_nde(Node* parent, const char* class
 //given in degrees not radians
 static void c2d_set_rotation_degrees(Camera2D* c2d, float angle_degrees)
 {
-    assert(c2d != NULL);
+    CLUIGE_ASSERT(c2d != NULL, "Camera2D::set_rotation_degrees() : calling object is null");
     //float rota = clamp_float(rotation_angle_degrees,-360,360);
     while(angle_degrees < -360)
     {
@@ -33,15 +32,15 @@ static void c2d_set_rotation_degrees(Camera2D* c2d, float angle_degrees)
 //in degrees
 static float c2d_get_rotation_degrees(Camera2D* c2d)
 {
-    assert(c2d != NULL);
+    CLUIGE_ASSERT(c2d != NULL, "Camera2D::get_rotation_degrees() : calling object is null");
     return c2d->rotation_radians * 180 / 3.1415926;
 }
 
 //TODO not finished
 static void c2d_make_current(Camera2D* c2d)
 {
-    assert(c2d != NULL);
-    assert(c2d->enabled);
+    CLUIGE_ASSERT(c2d != NULL, "Camera2D::make_current() : calling object is null");
+    CLUIGE_ASSERT(c2d->enabled, "Camera2D::make_current() : calling object is not enabled");
 
     iCluige.iCamera2D.current_camera = c2d;
     c2d->_this_Node2D->_local_position_changed = true;
@@ -50,17 +49,17 @@ static void c2d_make_current(Camera2D* c2d)
 //private uitl
 static Camera2D* c2d__get_camera_from_node(Node* this_node)
 {
-    assert(this_node != NULL);
+    CLUIGE_ASSERT(this_node != NULL, "Camera2D::_get_camera_from_node() : calling object is null");
     Node2D* nde_2d = (Node2D*)(this_node->_sub_class);
-    assert(nde_2d != NULL);
+    CLUIGE_ASSERT(nde_2d != NULL, "Camera2D::_get_camera_from_node() : calling object _sub_class is null");
     Camera2D* nde_cam_2d = (Camera2D*) (nde_2d->_sub_class);
-    assert(nde_cam_2d != NULL);
+    CLUIGE_ASSERT(nde_cam_2d != NULL, "Camera2D::_get_camera_from_node() : calling object _sub_class->_sub_class is null");
     return nde_cam_2d;
 }
 
 static void c2d_delete_camera2d(Node* this_node)
 {
-    assert(this_node != NULL);
+    CLUIGE_ASSERT(this_node != NULL, "Camera2D::delete_camera2d() : calling object is null");
     Node2D* this_node2d = (Node2D*)(this_node->_sub_class);
     Camera2D* this_cam2d = (Camera2D*)(this_node2d->_sub_class);
     void (*delete_Node2D)(Node*) = this_cam2d->delete_Node2D;
@@ -78,7 +77,7 @@ static void c2d_delete_camera2d(Node* this_node)
 //            c2d_make_current(iCluige.iCamera2D.default_camera);
 //        }
 //    }
-    assert(this_cam2d->_sub_class == NULL);
+    CLUIGE_ASSERT(this_cam2d->_sub_class == NULL, "Camera2D::delete_camera2d() : not null subclass found");
     free(this_cam2d);
     this_node2d->_sub_class = NULL;
     delete_Node2D(this_node);
@@ -86,14 +85,14 @@ static void c2d_delete_camera2d(Node* this_node)
 
 static Vector2 c2d_get_zoom(const Camera2D* c2d)
 {
-    assert(c2d != NULL);
+    CLUIGE_ASSERT(c2d != NULL, "Camera2D::get_zoom() : calling object is null");
     return c2d->zoom;
 }
 
 static void c2d_set_zoom(Camera2D* c2d, Vector2 v)
 {
-    assert(c2d != NULL);
-    //assert(!is_near_zero(v));
+    CLUIGE_ASSERT(c2d != NULL, "Camera2D::set_zoom() : calling object is null");
+    //CLUIGE_ASSERT(!is_near_zero(v), "Camera2D::() : ");
     if(fabs(v.x) > .01 && fabs(v.y) > .01)
     {
         //TODO gné?
@@ -107,7 +106,7 @@ static void c2d_set_zoom(Camera2D* c2d, Vector2 v)
 
 static void c2d_set_enabled(Camera2D* c2d, bool enab)
 {
-    assert(c2d != NULL);
+    CLUIGE_ASSERT(c2d != NULL, "Camera2D::set_enabled() : calling object is null");
     Camera2D* current_camera = iCluige.iCamera2D.current_camera;
     Node* node_current_camera = current_camera->_this_Node2D->_this_Node;
     Node* node_c2d = c2d->_this_Node2D->_this_Node;
@@ -139,7 +138,7 @@ static void c2d_set_enabled(Camera2D* c2d, bool enab)
 
 static bool c2d_is_enabled(const Camera2D* c2d)
 {
-    assert(c2d != NULL);
+    CLUIGE_ASSERT(c2d != NULL, "Camera2D::is_enabled() : calling object is null");
     return c2d->enabled;
 }
 
@@ -187,7 +186,7 @@ static void c2d__pre_draw(Node* this_Node)
 */
 //TODO not sure it works perfectly + not sure if it's relevant for Cluige
 static Node* c2d__highest_node_excluding_one_nde(Node* parent, const char* class_name, const Node* excluded_node) {
-    assert(parent != NULL);
+    CLUIGE_ASSERT(parent != NULL, "Camera2D::_highest_node_excluding_one_nde() : parent is null");
     Node* highest_camera = NULL;
     int highest_depth = -1;
 

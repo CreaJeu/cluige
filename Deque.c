@@ -2,7 +2,6 @@
 #include "cluige.h"
 #include "Deque.h"
 
-#include <assert.h>
 #include <stdarg.h>
 #include <stdlib.h>
 
@@ -97,21 +96,21 @@ static void dq__grow(Deque* this_Deque)
 
 static Variant dq_at(const Deque* this_Deque, int i)
 {
-    assert((0 <= i) && (i < this_Deque->_nb_elems));
+    CLUIGE_ASSERT((0 <= i) && (i < this_Deque->_nb_elems), "Deque::at(i) : i is out of bounds");
     int i_array = dq__i_array(this_Deque, i);
     return this_Deque->_elems[i_array];
 }
 
 static Variant dq_back(const Deque* this_Deque)
 {
-    assert(this_Deque->_nb_elems > 0);
+    CLUIGE_ASSERT(this_Deque->_nb_elems > 0, "Deque::back() : deque is empty");
     int i_array = dq__i_array(this_Deque, this_Deque->_nb_elems - 1);
     return this_Deque->_elems[i_array];
 }
 
 static Variant dq_front(const Deque* this_Deque)
 {
-    assert(this_Deque->_nb_elems > 0);
+    CLUIGE_ASSERT(this_Deque->_nb_elems > 0, "Deque::back() : deque is empty");
     return this_Deque->_elems[this_Deque->_front_i];
 }
 
@@ -195,7 +194,7 @@ static void dq_append(Deque* this_Deque, ...)
 
 static void dq_insert(Deque* this_Deque, int i, ...)
 {
-    assert((0 <= i) && (i <= this_Deque->_nb_elems));
+    CLUIGE_ASSERT((0 <= i) && (i <= this_Deque->_nb_elems), "Deque::insert(i, ...) : i is out of bound");
     struct _Structed_va_list s_args_elem_value;
     va_start(s_args_elem_value.args, i);
     dq__insert_va_list(this_Deque, i, &s_args_elem_value);
@@ -206,7 +205,7 @@ static void dq_insert(Deque* this_Deque, int i, ...)
 //returns NULL_VARIANT if no elem was replaced
 static Checked_Variant dq_insert_or_replace_sorted(Deque* this_Deque, bool replace, ...)
 {
-    assert(this_Deque->_sorted);
+    CLUIGE_ASSERT(this_Deque->_sorted, "Deque::insert_or_replace_sorted(...) : deque is not sorted");
     Checked_Variant res;
     struct _Structed_va_list s_args_elem_value;
     va_start(s_args_elem_value.args, replace);
@@ -250,7 +249,7 @@ static Checked_Variant dq_insert_or_replace_sorted(Deque* this_Deque, bool repla
 
 static Variant dq_pop_back(Deque* this_Deque)
 {
-    assert(this_Deque->_nb_elems > 0);
+    CLUIGE_ASSERT(this_Deque->_nb_elems > 0, "Deque::pop_back() : deque is empty");
     Variant* res = dq__at_ptr(this_Deque, this_Deque->_nb_elems - 1);
     this_Deque->_nb_elems--;
     return *res;
@@ -258,7 +257,7 @@ static Variant dq_pop_back(Deque* this_Deque)
 
 static Variant dq_pop_front(Deque* this_Deque)
 {
-    assert(this_Deque->_nb_elems > 0);
+    CLUIGE_ASSERT(this_Deque->_nb_elems > 0, "Deque::pop_front() : deque is empty");
     Variant* res = dq__at_ptr(this_Deque, 0);
     this_Deque->_nb_elems--;
     this_Deque->_front_i = dq__i_array(this_Deque, 1);
@@ -267,7 +266,7 @@ static Variant dq_pop_front(Deque* this_Deque)
 
 static void dq_remove(Deque* this_Deque, int i)
 {
-    assert((0 <= i) && (i < this_Deque->_nb_elems));
+    CLUIGE_ASSERT((0 <= i) && (i < this_Deque->_nb_elems), "Deque::remove(i, ...) : i is out of bound");
     //shift to left or right
     if(i < (this_Deque->_nb_elems / 2))
     {
@@ -301,7 +300,7 @@ static void dq_clear(Deque* this_Deque)
 
 static void dq_replace(Deque* this_Deque, int i, Variant new_v)
 {
-    assert(this_Deque->_nb_elems > i);
+    CLUIGE_ASSERT((0 <= i) && (i < this_Deque->_nb_elems), "Deque::replace(i, ...) : i is out of bound");
     Variant* elem_ptr = dq__at_ptr(this_Deque, i);
     (*elem_ptr) = new_v;
 }
@@ -329,8 +328,8 @@ static int dq_default_compare_pair_key_func(const Deque* this_Deque, Variant va,
     //va and vb are pairs
     Pair* pa = (Pair*)(va.ptr);
     Pair* pb = (Pair*)(vb.ptr);
-    assert(pa != NULL);
-    assert(pb != NULL);
+    CLUIGE_ASSERT(pa != NULL, "Deque::default_compare_pair_key_func(va, vb) : va.ptr is null");
+    CLUIGE_ASSERT(pb != NULL, "Deque::default_compare_pair_key_func(va, vb) : vb.ptr is null");
     Variant key_a = pa->first;
     Variant key_b = pb->first;
     return this_Deque->_compare_sub_func(this_Deque, key_a, key_b);
@@ -339,7 +338,7 @@ static int dq_default_compare_pair_key_func(const Deque* this_Deque, Variant va,
 static void dq_bsearch_rec(const Deque* this_Deque, Variant searched_elem, struct _BSearchData* bsd)
 {
     //assert(bsd->_i_min <= bsd->_i_max);
-    assert(this_Deque->_nb_elems > 0);
+    CLUIGE_ASSERT(this_Deque->_nb_elems > 0, "Deque::bsearch_rec() : deque is empty");
     int comp;
 
     //end of recursivity
@@ -391,7 +390,7 @@ static void dq_bsearch_rec(const Deque* this_Deque, Variant searched_elem, struc
 
 static int dq_bsearch(const Deque* this_Deque, ...)
 {
-    assert(this_Deque->_sorted);
+    CLUIGE_ASSERT(this_Deque->_sorted, "Deque::bsearch(...) : deque is not sorted");
     int this_size = iCluige.iDeque.size(this_Deque);
     if(this_size == 0)
     {

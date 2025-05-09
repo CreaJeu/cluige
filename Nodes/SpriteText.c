@@ -5,7 +5,6 @@
 #include "SpriteText.h"
 
 #include <string.h>
-#include <assert.h>
 #include <curses.h>
 #include <math.h>
 
@@ -26,10 +25,20 @@ static void sprtx_delete_SpriteText(Node* this_Node)
 		this_Node->pre_process_Node(this_Node);
 	}
     free(this_SpriteText->text);
-    assert(this_SpriteText->_sub_class == NULL);
+    CLUIGE_ASSERT(this_SpriteText->_sub_class == NULL, "SpriteText::delete_SpriteText() : not null subclass found");
     free(this_SpriteText);
     this_Node2D->_sub_class = NULL;
     delete_Node2D(this_Node);
+}
+
+static void sprtx_enter_tree_SpriteText(Node* this_Node)
+{
+    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+    SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
+	CLUIGE_ASSERT(
+		this_SpriteText->_allocated_text_length >= 0,
+		"SpriteText::enter_tree() : text must be given before entering tree");
+	this_SpriteText->enter_tree_Node2D(this_Node);//super()
 }
 
 static void sprtx_pre_process_Node(Node* this_Node)
@@ -54,7 +63,7 @@ static void sprtx_pre_process_Node(Node* this_Node)
             &orig);
     int flat_i = 0;
     Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-    assert(current_camera != NULL);
+    CLUIGE_ASSERT(current_camera != NULL, "SpriteText::pre_process_Node() : current_camera is null");
 
     float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
     float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
@@ -141,7 +150,7 @@ static void sprtx_post_process_Node(Node* this_Node)
             &orig);
     int flat_i = 0;
     Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-    assert(current_camera != NULL);
+    CLUIGE_ASSERT(current_camera != NULL, "SpriteText::post_process_Node() : current_camera is null");
 
     float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
     float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
@@ -216,10 +225,12 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
 
     new_SpriteText->offset = (Vector2) { 0., 0. };
     new_SpriteText->text = NULL;//the ASCII art / unicode art
+    new_SpriteText->_allocated_text_length = -1;
     new_SpriteText->nb_lines = 0;
 	new_SpriteText->_this_Node2D = new_Node2D;
 	new_SpriteText->_sub_class = NULL;
 	new_SpriteText->delete_Node2D = new_Node->delete_Node;
+	new_SpriteText->enter_tree_Node2D = new_Node->enter_tree;
 	new_SpriteText->pre_process_Node2D = new_Node->pre_process_Node;
 	new_SpriteText->post_process_Node2D = new_Node->post_process_Node;
 
@@ -233,6 +244,7 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
     new_Node2D->_sub_class = new_SpriteText;
 
     new_Node->delete_Node = sprtx_delete_SpriteText;
+    new_Node->enter_tree = sprtx_enter_tree_SpriteText;
     new_Node->pre_process_Node = sprtx_pre_process_Node;
     new_Node->post_process_Node = sprtx_post_process_Node;
 
@@ -266,20 +278,17 @@ static void sprtx__bake_text(SpriteText* this_SpriteText)
 
 static void sprtx_set_text(SpriteText* this_SpriteText, const char* new_text)
 {
-    if(this_SpriteText->text != NULL)
-    {
-//        for(int i=0; i<this_SpriteText->nb_lines; i++)
-//        {
-//            free(this_SpriteText->text[i]);
-//        }
-        free(this_SpriteText->text);
-    }
-//    this_SpriteText->text =
-//        iCluige.iStringBuilder.split(new_text, "\n", &(this_SpriteText->nb_lines));
-    int total_length = strlen(new_text);
-    StringBuilder sb;
-    this_SpriteText->text = iCluige.iStringBuilder.string_alloc(&sb, total_length);
-    iCluige.iStringBuilder.append(&sb, new_text);
+	int new_total_length = strlen(new_text);
+	if(this_SpriteText->_allocated_text_length < new_total_length)
+	{
+		if(this_SpriteText->text != NULL)
+		{
+			free(this_SpriteText->text);
+		}
+		this_SpriteText->text = iCluige.checked_malloc((new_total_length + 1) * sizeof(char));
+		this_SpriteText->_allocated_text_length = new_total_length;
+	}
+	strcpy(this_SpriteText->text, new_text);
     sprtx__bake_text(this_SpriteText);
 }
 
@@ -295,9 +304,10 @@ static Node* sprtx_instanciate(const SortedDictionary* params)
     //sans param modifié
     //à part texte et pos"
     utils_vector2_from_parsed(&(res_SpriteText->offset), params, "offset");
-    assert(res_SpriteText->text == NULL);
+    CLUIGE_ASSERT(res_SpriteText->text == NULL, "SpriteText::instanciate() : trying to instanciate() into non empty object");
     utils_str_from_parsed(&(res_SpriteText->text), params, "text");
-    assert(res_SpriteText->text != NULL);
+    CLUIGE_ASSERT(res_SpriteText->text != NULL, "SpriteText::instanciate() : text not instanciated, missing 'text' field?");
+    res_SpriteText->_allocated_text_length = strlen(res_SpriteText->text);
     sprtx__bake_text(res_SpriteText);
     return res_node;
 }

@@ -18,9 +18,11 @@ struct _SpriteText
 	//private
 	Node2D* _this_Node2D;
 	void* _sub_class;
+	int _allocated_text_length;
 
 	//virtual methods
 	void (*delete_Node2D)(Node*);
+	void (*enter_tree_Node2D)(Node*);
 	void (*pre_process_Node2D)(Node*);
 	void (*post_process_Node2D)(Node*);
 	//in .c : void pre_process_Node(Node*);

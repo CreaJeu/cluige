@@ -1,6 +1,4 @@
 
-#include <assert.h>
-
 #include "cluige.h"
 #include "PackedScene.h"
 
@@ -54,7 +52,7 @@ static void pksc_pre_delete_PackedScene(PackedScene* this_PackedScene)
 static PackedScene* pksc_get_packed_node(PackedScene* root, const char* path)
 {
 	int child_name_len = strlen(path);
-	assert(child_name_len > 0);
+	CLUIGE_ASSERT(child_name_len > 0, "PackedScene::get_packed_node() : path is empty");
 	const char* first_slash = strchr(path, '/');
 	if(first_slash != NULL)
 	{
@@ -92,7 +90,7 @@ static Node* pksc_instanciate(const PackedScene* this_PackedScene)
 	const char* t = this_PackedScene->type;
 	const SortedDictionary* fcties = &(iCluige.iNode.node_factories);
 	Checked_Variant got = iCluige.iSortedDictionary.get(fcties, t);
-	assert(got.valid || 00 == "type found in PackedScene in unknown by cluige");
+	CLUIGE_ASSERT(got.valid, "PackedScene::instanciate() : type found in PackedScene in unknown by cluige");
 	const NodeFactory* fcty = (const NodeFactory*)(got.v.ptr);
 	Node* new_node = fcty->instanciate(&(this_PackedScene->dico_node));
 

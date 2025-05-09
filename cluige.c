@@ -89,16 +89,6 @@ void cluige_init()
 
     //...
     //...
-
-    //curses  //TODO separate from core cluige via 'display server'
-    initscr();
-    nodelay(stdscr, true);
-    cbreak();
-    //nl();//?
-    noecho();
-    curs_set(0);
-    timeout(0);// for getch() : 0=blocking 0=return ERR/...
-    keypad(stdscr, true);
 }
 
 enum ProcessPass
@@ -153,6 +143,16 @@ static void process_tree(Node* root, enum ProcessPass pass)
 
 void cluige_run()
 {
+    //curses  //TODO separate from core cluige via 'display server'
+    initscr();
+    nodelay(stdscr, true);
+    cbreak();
+    //nl();//?
+    noecho();
+    curs_set(0);
+    timeout(0);// for getch() : 0=blocking 0=return ERR/...
+    keypad(stdscr, true);
+
     process_tree(iCluige.private_root_2D, STARTING_LOOP_PASS);
 
     //game loop

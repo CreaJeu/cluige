@@ -1,7 +1,6 @@
 
-//#include <stdio.h> // in TscnParser.h
+//#include <stdio.h> // in TscnParser.h <= FileLineReader.h
 #include <string.h>
-#include <assert.h>
 #include "cluige.h"
 #include "TscnParser.h"
 
@@ -90,7 +89,7 @@ static bool tsnp_value(TscnParser* this_TscnParser)
 			this_TscnParser->_current_line = curr_line_i;
 			if(iCluige.iFileLineReader.feof(fr, curr_line_i))
 			{
-				assert(00 == "tscn file error : unclosed '{'");
+				CLUIGE_ASSERT(false, "TscnParser::value() : tscn file error : unclosed '{'");
 				return false;
 			}
 			current_token = iCluige.iFileLineReader.get_line(fr, curr_line_i);
@@ -254,7 +253,8 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 	if(type_xor_inst != 1)
 	{
 		free(tmp_name);
-		assert(00 == "Error in scene file reading : node with incorrect type or instance resource");
+		CLUIGE_ASSERT(false,
+			"TscnParser::node() : in scene file reading : node with incorrect type or instance resource");
 		return false;
 	}
 
@@ -262,7 +262,7 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 	tmp_len = strlen("\" parent=\"");
 	if(from == NULL)//ok != 0)
 	{
-		assert(this_TscnParser->scene_root == NULL);
+		CLUIGE_ASSERT(this_TscnParser->scene_root == NULL, "TscnParser::node() : scene_root is null");
 		ps->parent = NULL;
 		this_TscnParser->scene_root = ps;
 	}
@@ -325,11 +325,11 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 			char* svg_id;
 			bool ok = utils_id_str_from_ExtResource_parsed(&svg_id, keeped_val);
 			utils_breakpoint_trick(&ok, !ok);
-			assert(ok || 00=="texture id could not be read");
+			CLUIGE_ASSERT(ok, "TscnParser::node() : texture id could not be read");
 
 			SortedDictionary* dico_ids = &(this_TscnParser->_dico_ids);
 			cv = iCluige.iSortedDictionary.get(dico_ids, svg_id);
-			//assert(cv.valid || 0=="id of texture not found in tscn_parser dico");
+			//CLUIGE_ASSERT(cv.valid || 0=="id of texture not found in tscn_parser dico", "TscnParser::() : ");
 			if(cv.valid)
 			{
 				keeped_key = realloc(keeped_key, strlen("svg_file_path!") * sizeof(char));
@@ -351,7 +351,8 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 		//dbg_dic = iCluige.iSortedDictionary.debug_str_str(dic);
 		bool overwritten = (cv.valid);
 		utils_breakpoint_trick(NULL, overwritten);
-		assert(!overwritten || 00 == "parsed param-value would overwrite another param-value");
+		CLUIGE_ASSERT(!overwritten,
+			"TscnParser::node() : parsed param-value would overwrite another param-value");
 
 		parse_ok = this_TscnParser->param(this_TscnParser);
 	}
@@ -403,7 +404,8 @@ static bool tsnp_ext_res(TscnParser* this_TscnParser)
 	{
 		from = strstr(curr_line, "\" id=\"");
 		utils_breakpoint_trick(from, from == NULL);
-		assert(from != NULL || 0=="error in cluige or in tscn : 'id' not found for texture");
+		CLUIGE_ASSERT(from != NULL,
+			"TscnParser::ext_res() : error in cluige or in tscn : 'id' not found for texture");
 		tmp_len = strlen("\" id=\"");
 		from += tmp_len;//1_kwa0e"]
 		tmp_len = strcspn(from, "\"");
@@ -413,7 +415,8 @@ static bool tsnp_ext_res(TscnParser* this_TscnParser)
 
 		from = strstr(curr_line, "\" path=\"res://");
 		utils_breakpoint_trick(from, from == NULL);
-		assert(from != NULL || 0=="error in cluige or in tscn : 'path' not found for texture");
+		CLUIGE_ASSERT(from != NULL,
+			"TscnParser::ext_res() : error in cluige or in tscn : 'path' not found for texture");
 		tmp_len = strlen("\" path=\"res://");
 		from += tmp_len;//loupe.svg" id="1_kwa0e"]
 		tmp_len = strcspn(from, "\"");
@@ -494,7 +497,7 @@ static bool tsnp_parse_scene(TscnParser* this_TscnParser)
 
 static void tsnp_tscn_parser_alloc(struct _TscnParser* this_TscnParser, const char* file_path)
 {
-	assert(file_path != NULL);
+	CLUIGE_ASSERT(file_path != NULL, "TscnParser::tscn_parser_alloc() : file_path is null");
 	//public
 	this_TscnParser->scene_root = NULL;
 
@@ -506,7 +509,7 @@ static void tsnp_tscn_parser_alloc(struct _TscnParser* this_TscnParser, const ch
 	if(!ok)
 	{
 		printf("\n  ERROR : cannot read scene file %s\n\n", file_path);
-		assert(00 == "cannot read file");// && file_path);
+		CLUIGE_ASSERT(false, "TscnParser::tscn_parser_alloc() : cannot read file");
 	}
 	this_TscnParser->_current_line = -1;//first line of file is # 0
 
@@ -694,7 +697,7 @@ static bool _svp_parse_point(struct _SVGParser* this_SVGParser, FILE* file, char
 		parsed_point.y = iCluige.iDeque.at(&(this_SVGParser->coordinates_sequence), 1).f;
 		break;
 	default:
-		assert(false && "wrong svg path command in file");
+		CLUIGE_ASSERT(false && "wrong svg path command in file", "TscnParser::() : ");
 	}
 
 	if(absolute ||
@@ -772,7 +775,7 @@ static bool svp_prepare_parsing(struct _SVGParser* this_SVGParser, char* file_pa
 	if(file == 00)
 	{
 		printf("\n\n  ERROR : cannot read file %s\n\n", file_path);
-		assert((file != 00) && "cannot read file");// && file_path);
+		CLUIGE_ASSERT((file != 00) && "cannot read file");// && file_path, "TscnParser::() : ");
 		return false;
 	}
 

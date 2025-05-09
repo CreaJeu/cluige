@@ -2,7 +2,6 @@
 #include "cluige.h"
 #include "Variant.h"
 
-#include <assert.h>
 #include <stdarg.h>
 #include <string.h> //for memcmp()
 
@@ -49,7 +48,7 @@ static Variant vrt_from_s_args(VariantType val_type, struct _Structed_va_list* s
         res.ptr = va_arg(sargs->args, void*);
         break;
     default:
-        assert(false);//wrong type given to Variant.from_args(t,...)
+        CLUIGE_ASSERT(false, "Variant::from_s_args() : val_type is incorrect");
     }
 
     return res;
@@ -172,7 +171,7 @@ static int vrt_compare(VariantType val_type, Variant v1, Variant v2)
         }
         break;
     default:
-        assert(00 == "wrong type given to Variant.from_args(t,...)");
+        CLUIGE_ASSERT(false, "Variant::compare() : val_type is incorrect");
     }
     return res;
 }

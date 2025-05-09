@@ -2,9 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 
-//TODO good error logging for game designer instead of assert
-#include <assert.h>
-
 #include "cluige.h"
 #include "SVGParser.h"
 
@@ -141,7 +138,7 @@ static bool _svp_parse_point(struct _SVGParser* this_SVGParser, FILE* file, char
         parsed_point.y = iCluige.iDeque.at(&(this_SVGParser->coordinates_sequence), 1).f;
         break;
     default:
-        assert(false && "wrong svg path command in file");
+        CLUIGE_ASSERT(false, "SVGParser::parse_point() : wrong svg path command in file");
     }
 
     if(absolute ||
@@ -219,7 +216,7 @@ static bool svp_prepare_parsing(struct _SVGParser* this_SVGParser, char* file_pa
     if(file == 00)
     {
         printf("\n\n  ERROR : cannot read file %s\n\n", file_path);
-        assert((file != 00) && "cannot read file");// && file_path);
+        CLUIGE_ASSERT(file != 00, "SVGParser::prepare_parsing() : cannot read file");
         return false;
     }
 

@@ -1,7 +1,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 
 #include "cluige.h"
 #include "FileLineReader.h"
@@ -62,8 +61,7 @@ static void flr_pre_delete_FileLineReader(FileLineReader* this_FileLineReader)
 //beware : buffer can be reallocated, user should not store returned pointer, instead re-call get_line() each time
 static const char* flr_get_line(FileLineReader* this_FileLineReader, int i)
 {
-	utils_breakpoint_trick(this_FileLineReader, this_FileLineReader->_oldest_line > i);
-	assert(this_FileLineReader->_oldest_line <= i);// && i <= this_FileLineReader->_newest_line);
+	CLUIGE_ASSERT(this_FileLineReader->_oldest_line <= i, "FileLineReader::get_line() : asked line is too old, already forgotten; try calling forget_lines_before() less often");
 	if(i > this_FileLineReader->_eof_line)
 	{
 		return NULL;
@@ -86,7 +84,7 @@ static const char* flr_get_line(FileLineReader* this_FileLineReader, int i)
 		}
 		else if(res == NULL)
 		{
-			//assert(00 == "failed to read line"); or just a legitimate final empty line
+			//CLUIGE_ASSERT(00 == "failed to read line", "::() : "); or just a legitimate final empty line
 			return NULL;
 		}
 		int new_line_nb_read = strlen(append_here);
@@ -99,7 +97,7 @@ static const char* flr_get_line(FileLineReader* this_FileLineReader, int i)
 			//re-alloc longer
 			max_len *= 2;
 			this_FileLineReader->_capacity = max_len;
-			char* future_buffer = iCluige.checked_malloc(max_len * sizeof(char));
+			char* future_buffer = iCluige.checked_malloc(max_len * sizeof(char));//TODO realloc
 			int tmp_nb_chars_copied = 0;
 			for(int line = this_FileLineReader->_oldest_line;
 					line <= this_FileLineReader->_newest_line;
@@ -113,7 +111,7 @@ static const char* flr_get_line(FileLineReader* this_FileLineReader, int i)
 			strcpy(future_buffer + tmp_nb_chars_copied, append_here);
 			// no +1 to override ending \0 from last fgets() which was incomplete
 			tmp_nb_chars_copied += new_line_nb_read;
-			assert(tmp_nb_chars_copied + 1 == nb_read);
+			CLUIGE_ASSERT(tmp_nb_chars_copied + 1 == nb_read, "FileLineReader::get_line() : bug? I/O error?");
 			free(this_FileLineReader->_buffer);
 			this_FileLineReader->_buffer = future_buffer;
 
@@ -153,7 +151,7 @@ static const char* flr_get_line(FileLineReader* this_FileLineReader, int i)
 static void flr_forget_lines_before(FileLineReader* this_FileLineReader, int i)
 {
 	iCluige.iFileLineReader.get_line(this_FileLineReader, i);
-	assert(this_FileLineReader->_oldest_line <= i);
+	//CLUIGE_ASSERT(this_FileLineReader->_oldest_line <= i, "::() : ");//already done in get_line()
 	int nb_forget = 0;
 	char* line = this_FileLineReader->_buffer;
 	for(int c = this_FileLineReader->_oldest_line; c < i; c++)

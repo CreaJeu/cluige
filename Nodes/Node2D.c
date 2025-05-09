@@ -5,7 +5,6 @@
 #include "Node2D.h"
 
 #include <string.h>
-#include <assert.h>
 
 ////////////////////////////////// _Node2D /////////
 
@@ -13,7 +12,7 @@ static void n2d_delete_Node2D(Node* this_Node)
 {
     struct _Node2D* this_Node2D = (struct _Node2D*)(this_Node->_sub_class);
     void (*delete_Node)(Node*) = this_Node2D->delete_Node;
-    assert(this_Node2D->_sub_class == NULL);
+    CLUIGE_ASSERT(this_Node2D->_sub_class == NULL, "Node2D::delete_Node2D() : not null subclass found");
     free(this_Node2D);
     this_Node->_sub_class = NULL;
     delete_Node(this_Node);

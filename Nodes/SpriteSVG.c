@@ -5,7 +5,6 @@
 #include "../SVGParser.h"
 
 //#include <string.h>
-#include <assert.h>
 #include <curses.h>
 #include <math.h>
 
@@ -40,7 +39,7 @@ static void ssvg_delete_SpriteSVG(Node* this_Node)
     iCluige.iDeque.pre_delete_Deque(paths);
     //free(paths);
 
-    assert(this_SpriteSVG->_sub_class == NULL);
+    CLUIGE_ASSERT(this_SpriteSVG->_sub_class == NULL, "SpriteSVG::delete_SpriteSVG() : not null subclass found");
     free(this_SpriteSVG);
     this_Node2D->_sub_class = NULL;
     delete_Node2D(this_Node);
@@ -93,7 +92,7 @@ static void ssvg_pre_process_Node(Node* this_Node)
             &orig);
 
     Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-    assert(current_camera != NULL);
+    CLUIGE_ASSERT(current_camera != NULL, "SpriteSVG::pre_process_Node() : current_camera is null");
 
     float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
     float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
@@ -198,7 +197,7 @@ static void ssvg_post_process_Node(Node* this_Node)
             &orig);
 
     Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-    assert(current_camera != NULL);
+    CLUIGE_ASSERT(current_camera != NULL, "SpriteSVG::post_process_Node() : current_camera is null");
 
     float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
     float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
@@ -370,14 +369,14 @@ static Node* ssvg_instanciate(const SortedDictionary* params)
     //svg_file_path = "../some/where"
     utils_vector2_from_parsed(&(res_SpriteSVG->offset), params, "offset");
     utils_vector2_from_parsed(&(res_SpriteSVG->scale), params, "scale");
-    assert(iCluige.iDeque.empty(&(res_SpriteSVG->paths)));
+    CLUIGE_ASSERT(iCluige.iDeque.empty(&(res_SpriteSVG->paths)), "SpriteSVG::instanciate() : trying to instanciate() into non empty object");
     char* svg_file_path;
     //'texture'=>'path/to/file.svg' see TscnParser::node()
     bool ok = utils_nonquoted_str_from_parsed(&svg_file_path, params, "svg_file_path");
 //	char* dbg = iCluige.iSortedDictionary.debug_str_str(params);
 //	utils_breakpoint_trick(dbg, !ok);
     utils_breakpoint_trick(&ok, !ok);
-    assert(ok || 00=="missing 'texture' field");
+    CLUIGE_ASSERT(ok, "SpriteSVG::instanciate() : missing 'texture' field");
     ssvg_parse_file(res_SpriteSVG, svg_file_path);
     //free(svg_file_path);no need with utils_nonquoted_str_from_parsed()
     return res_node;

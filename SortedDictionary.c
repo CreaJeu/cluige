@@ -4,7 +4,6 @@
 #include "SortedDictionary.h"
 
 #include <stdarg.h>
-#include <assert.h>
 
 
 
@@ -255,8 +254,8 @@ static char* sd_debug_str_str(SortedDictionary* this_SortedDictionary)
 {
 	const SortedDictionary* dic = this_SortedDictionary;
 	int len = 16 + iCluige.iStringBuilder.DECIMAL_DIGITS_FOR_INT;//" - nb elems : ####\n"
-	assert(dic->_keys_type == VT_POINTER);
-	assert(dic->_values_type == VT_POINTER);
+	CLUIGE_ASSERT(dic->_keys_type == VT_POINTER, "SortedDictionary::debug_str_str() : keys type must be VT_POINTER");
+	CLUIGE_ASSERT(dic->_values_type == VT_POINTER, "SortedDictionary::debug_str_str() : (key,value) types must be (VT_POINTER,VT_POINTER)");
 	int n = iCluige.iSortedDictionary.size(dic);
 	for(int i=0; i<n; i++)
 	{

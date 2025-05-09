@@ -3,7 +3,6 @@
 
 //for print_tree_pretty()
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 #include "cluige.h"
 //#include "Node.h" //already in cluige.h
@@ -40,7 +39,7 @@ static void nde_delete_Node(Node* node)
         free(node->name);
     }
     free(node->_class_name);
-    assert(node->_sub_class == NULL);
+    CLUIGE_ASSERT(node->_sub_class == NULL, "Node::delete_Node() : not null subclass found");
 
     if(node->script != NULL)
     {
@@ -109,6 +108,7 @@ static int nde_get_index(const Node* node)
         while(sibling_i != node)
         {
             sibling_i = sibling_i->next_sibling;
+            CLUIGE_ASSERT(sibling_i != NULL, "Node::get_index() : internal bug? node not found as parent's child");
             res++;
         }
     }
@@ -127,30 +127,39 @@ static int nde_get_depth(const Node* node)
     return res;
 }
 
-//returns child at idx, last child if index is -1, else NULL
-//TODO test
-static Node* nde_get_child(const Node* ths_node, int idx)
+//returns child at i,
+//negative values can also be used to start from the end of the list
+//(-1 meaning last)
+//or returns NULL if out of those bounds
+static Node* nde_get_child(const Node* ths_node, int i)
 {
-    assert(ths_node != NULL);
-    assert(idx >= -1);
-
-    Node* next_sib = ths_node->children;
-    int count = 0;
-    while(next_sib != NULL && count != idx  )
+    CLUIGE_ASSERT(ths_node != NULL, "Node::get_child(i) : calling object is null");
+    CLUIGE_ASSERT(-(iCluige.iNode.get_child_count(ths_node)) < i && i < iCluige.iNode.get_child_count(ths_node),
+				"Node::get_child(i) : i is out of bound (even if negative for reverse order)");
+    int nb_steps = i;
+    if(i < 0)//reverse order
     {
-        if(idx == -1 && next_sib->next_sibling == NULL)// case -1 inx returns last child
-        {
-            return next_sib;
-        }
+        nb_steps = iCluige.iNode.get_child_count(ths_node) + i;
+    }
+    Node* next_sib = ths_node->children;
+    int curr_step = 0;
+//    while(next_sib != NULL && curr_step != nb_steps)
+//    {
+//        if(i == -1 && next_sib->next_sibling == NULL)// case -1 inx returns last child
+//        {
+//            return next_sib;
+//        }
+    while(curr_step < nb_steps)
+    {
         next_sib = next_sib->next_sibling;
-        count++;
+        curr_step++;
     }
     return next_sib;
 }
 
 static int nde_get_child_count(const Node* ths_node)
 {
-    assert(ths_node != NULL);
+    CLUIGE_ASSERT(ths_node != NULL, "Node::get_child_count() : calling object is null");
     int count = 0;
     Node* next_sib = ths_node->children;
     while(next_sib != NULL)
@@ -179,9 +188,9 @@ static Node* nde__on_level(Node* ths_node, const char* name)
 }
 
 //private util
-static Node* nde__get_node_rec(Node* ths_node,const char* node_path,bool absolute )//Not completed
+static Node* nde__get_node_rec(Node* ths_node, const char* node_path, bool absolute )//Not completed
 {
-    assert(node_path != NULL);
+    CLUIGE_ASSERT(node_path != NULL, "Node::get_node_rec() : node_path is null");
     int i =0;
     char element[iCluige.iNode._MAX_NAME_LENGTH];
     int size = strlen(node_path);
@@ -242,7 +251,7 @@ static Node* nde__get_node_rec(Node* ths_node,const char* node_path,bool absolut
 
 static Node* nde_get_node(Node* ths_node,const char* node_path )//Not completed
 {
-    assert(node_path != NULL);
+    CLUIGE_ASSERT(node_path != NULL, "Node::get_node() : node_path is null");
     bool absolute = node_path[0] == '/';
     Node* next_child;
     int ab = 0;
@@ -262,8 +271,8 @@ static Node* nde_get_node(Node* ths_node,const char* node_path )//Not completed
 //evaluates if a node is the parent (or grandparent etc..) of current node
 static bool nde_is_ancestor_of(Node* ths_node, Node* potential_ancestor)
 {
-    assert(ths_node != NULL);
-    assert(potential_ancestor != NULL);
+    CLUIGE_ASSERT(ths_node != NULL, "Node::is_ancestor_of() : calling object is null");
+    CLUIGE_ASSERT(potential_ancestor != NULL, "Node::is_ancestor_of() : potential_ancestor is null");
     if(ths_node == potential_ancestor)
     {
         return true;
@@ -347,7 +356,7 @@ static void nde__rec_get_path(const Node* ths_node, char* res, int remaining_pat
 
 static char* nde_get_path_mallocing(const Node* ths_node)
 {
-    assert(ths_node != NULL);
+    CLUIGE_ASSERT(ths_node != NULL, "Node::get_path_mallocing() : calling object is null");
     int max = nde__path_char_length(ths_node);
     char* res = iCluige.checked_malloc((max + 1) * sizeof(char));
 
@@ -403,7 +412,7 @@ static void nde_set_name(Node* n, const char* new_name)
     //allocate new name to prevent pointing to the stack
     int size = strlen(new_name);
 
-    assert(nde__valid_name(new_name) || 0 == "should contain none of : / \" % @ : .");
+    CLUIGE_ASSERT(nde__valid_name(new_name), "Node::set_name() : should contain none of : / \" % @ : .");
     char* next_name = iCluige.checked_malloc((size + 1) * sizeof(char));
     strcpy(next_name, new_name);
     //free old name
@@ -439,8 +448,8 @@ static void nde__auto_name(Node* node)
 //asserts that wanted child doesn't have already a parent
 static void nde_add_child(Node* parent, Node* child)
 {
-    assert(child->parent == NULL);
-    assert(child != parent);
+    CLUIGE_ASSERT(child->parent == NULL, "Node::add_child() : child must have no parent");
+    CLUIGE_ASSERT(child != parent, "Node::add_child() : same Node is asked for both child and parent");
     if(parent->children == NULL)
     {
         parent->children = child;
@@ -478,9 +487,9 @@ static void nde_add_child(Node* parent, Node* child)
 
 static void nde_remove_child( Node* ths_node, Node* child)
 {
-    assert(ths_node != NULL);
-    assert(child != NULL);
-    assert(child->parent == ths_node);//verify that the child given is indeed a child of ths_node
+    CLUIGE_ASSERT(ths_node != NULL, "Node::remove_child() : calling object is null ");
+    CLUIGE_ASSERT(child != NULL, "Node::remove_child() : asked child is null");
+    CLUIGE_ASSERT(child->parent == ths_node, "Node::remove_child() : child->parent != ths_node");
     int pos = nde_get_index(child);
 
     //link between parent and child
@@ -502,18 +511,23 @@ static void nde_remove_child( Node* ths_node, Node* child)
 
 static void nde_queue_free(Node* node)
 {
-    assert(node != NULL);
+    CLUIGE_ASSERT(node != NULL, "Node::queue_free() : calling object is null");
     int size = iCluige.iDeque.size(&_queue_freed_nodes);
     bool already_queue_freed = false;
     for(int i = 0; i < size; i++)
     {
         Node* node_in_deque = iCluige.iDeque.at(&_queue_freed_nodes,i).ptr;
 
-        already_queue_freed = nde_is_ancestor_of(node_in_deque,node);
+        already_queue_freed = nde_is_ancestor_of(node, node_in_deque);
         if(already_queue_freed)
         {
             break;
         }
+        //else if(nde_is_ancestor_of(node_in_deque, node))
+            //a descendant was already queue_freed
+            //but with the right order of processing the queue,
+            //the descendant will be removed/deleted first,
+            //so no seg fault
     }
     if(!already_queue_freed)
     {
@@ -537,10 +551,10 @@ static void nde_queue_free(Node* node)
 static void nde__do_all_queue_free()
 {
     int size = iCluige.iDeque.size(&_queue_freed_nodes);
-    for(int i = 0; i < size; size--)
+    for(int i = 0; i < size; i++)
     {
-        Node* node = iCluige.iDeque.at(&_queue_freed_nodes,i).ptr;
-        nde_remove_child(node->parent,node);
+        Node* node = iCluige.iDeque.at(&_queue_freed_nodes, i).ptr;
+        nde_remove_child(node->parent, node);
         node->delete_Node(node);
 //        nde_delete_Node(node);
         //iCluige.iDeque.remove(&_queue_freed_nodes,i);
@@ -552,10 +566,8 @@ static void nde__do_all_queue_free()
 static Node* nde_instanciate(const SortedDictionary* parsed_params)
 {
     Node* res = nde_new_Node();
-    //assert(this_Node->name == NULL);
     bool ok = utils_str_from_parsed(&(res->name), parsed_params, "name");
-    utils_breakpoint_trick(&ok, !ok);
-    assert(ok || 00=="missing 'name' field");
+    CLUIGE_ASSERT(ok, "Node::instanciate() : missing 'name' field");
     // TODO ? from godot process mode? // utils_bool_from_parsed(&(res->active), params, "active");
     return res;
 }

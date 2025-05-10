@@ -102,11 +102,6 @@ enum ProcessPass
 static void process_tree(Node* root, enum ProcessPass pass)
 {
     //recursion mode : DFS
-    if(root->children != NULL)
-    {
-        process_tree(root->children, pass);
-    }
-
     switch(pass)
     {
     case STARTING_LOOP_PASS:
@@ -116,23 +111,28 @@ static void process_tree(Node* root, enum ProcessPass pass)
         }
         break;
     case PRE_PROCESS_PASS:
-        if(root->pre_process_Node != NULL)
+        if(root->pre_process != NULL)
         {
-            root->pre_process_Node(root);
+            root->pre_process(root);
         }
         break;
     case PROCESS_PASS:
-        if(root->process_Node != NULL)
+        if(root->process != NULL)
         {
-            root->process_Node(root);
+            root->process(root);
         }
         break;
     case POST_PROCESS_PASS:
-        if(root->post_process_Node != NULL)
+        if(root->post_process != NULL)
         {
-            root->post_process_Node(root);
+            root->post_process(root);
         }
         break;
+    }
+
+    if(root->children != NULL)
+    {
+        process_tree(root->children, pass);
     }
 
     if(root->next_sibling != NULL)

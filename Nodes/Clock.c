@@ -11,13 +11,14 @@
 static void clk_delete_Clock(Node* this_Node)
 {
     struct _Clock* this_Clock = (struct _Clock*)(this_Node->_sub_class);
-    void (*delete_Node)(Node*) = this_Clock->delete_Node;
+    //tmp memorize function pointer before calling free(this)
+    void (*delete_super)(Node*) = this_Clock->_delete_super;
     free(this_Clock);
     this_Node->_sub_class = NULL;
-    delete_Node(this_Node);
+    delete_super(this_Node);
 }
 
-static void clk_pre_process_Clock(Node* this_Node)
+static void clk_pre_process(Node* this_Node)
 {
     struct _Clock* this_Clock = (struct _Clock*)(this_Node->_sub_class);
     clock_t new_tick = clock();
@@ -38,7 +39,9 @@ static struct _Clock* clk_new_Clock()
     new_clock->elapsed_seconds = 0.;
     new_clock->_last_tick = clock();
     new_clock->_this_Node = new_node;
-    new_clock->delete_Node = new_node->delete_Node;
+
+    //virtual methods - private copies of mother class pointers
+    new_clock->_delete_super = new_node->delete_Node;
     //new_clock->delete_Clock = clk_delete_Clock;
     //new_clock->pre_process_Clock = clk_pre_process_Clock;
 
@@ -50,7 +53,7 @@ static struct _Clock* clk_new_Clock()
     iCluige.iStringBuilder.append(&sb, "NodeClock");
 
     new_node->delete_Node = clk_delete_Clock;
-    new_node->pre_process_Node = clk_pre_process_Clock;
+    new_node->pre_process = clk_pre_process;
 
     return new_clock;
 }

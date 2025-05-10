@@ -12,11 +12,11 @@ struct _Clock
 	clock_t _last_tick;
 	Node* _this_Node;
 
-	//virtual methods
-	void (*delete_Node)(Node*);
-	//in .c : void (*delete_Clock)(Node*);
+	//virtual methods - private copies of mother class pointers
+	void (*_delete_super)(Node*);
 
-	//in .c : void (*preprocess_Clock)(Node*);
+	//virtual methods in .c :
+	//void (*pre_process)(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

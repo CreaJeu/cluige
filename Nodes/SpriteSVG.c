@@ -19,12 +19,13 @@ static void ssvg_delete_SpriteSVG(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
-    void (*delete_Node2D)(Node*) = this_SpriteSVG->delete_Node2D;
+    //tmp memorize function pointer before calling free(this)
+    void (*delete_super)(Node*) = this_SpriteSVG->_delete_super;
 
     //clear display
 	if(this_Node2D->visible && !(iCluige.quit_asked))
 	{
-		this_Node->pre_process_Node(this_Node);
+		this_Node->pre_process(this_Node);
 	}
     //delete my attributes
     //Deque<Path2D* > paths
@@ -42,7 +43,7 @@ static void ssvg_delete_SpriteSVG(Node* this_Node)
     CLUIGE_ASSERT(this_SpriteSVG->_sub_class == NULL, "SpriteSVG::delete_SpriteSVG() : not null subclass found");
     free(this_SpriteSVG);
     this_Node2D->_sub_class = NULL;
-    delete_Node2D(this_Node);
+    delete_super(this_Node);
 }
 
 //utility function
@@ -71,7 +72,7 @@ static void ssvg_draw_line(const float start_x, const float start_y, const float
 	}
 }
 
-static void ssvg_pre_process_Node(Node* this_Node)
+static void ssvg_pre_process(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     if(!(this_Node2D->visible))
@@ -80,7 +81,7 @@ static void ssvg_pre_process_Node(Node* this_Node)
     }
     SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
     //call super()
-    this_SpriteSVG->pre_process_Node2D(this_Node);
+    this_SpriteSVG->_pre_process_super(this_Node);
 
     //clear old one (unless immobile? => no, because other masking things
     //could have moved and made this sprite visible again;
@@ -176,7 +177,7 @@ static void ssvg_pre_process_Node(Node* this_Node)
     }
 }
 
-static void ssvg_post_process_Node(Node* this_Node)
+static void ssvg_post_process(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     if(!(this_Node2D->visible))
@@ -185,7 +186,7 @@ static void ssvg_post_process_Node(Node* this_Node)
     }
     SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
     //call super()
-    this_SpriteSVG->post_process_Node2D(this_Node);
+    this_SpriteSVG->_post_process_super(this_Node);
 
     //clear old one (unless immobile? => no, because other masking things
     //could have moved and made this sprite visible again;
@@ -294,9 +295,15 @@ static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
 
 	new_SpriteSVG->_this_Node2D = new_Node2D;
 	new_SpriteSVG->_sub_class = NULL;
-	new_SpriteSVG->delete_Node2D = new_Node->delete_Node;
-	new_SpriteSVG->pre_process_Node2D = new_Node->pre_process_Node;
-	new_SpriteSVG->post_process_Node2D = new_Node->post_process_Node;
+
+	//virtual methods - private copies of mother class pointers
+	//	constructors of all ancestors in inheritance hierarchy
+	//	have already been called, so :
+	//	new_Node virtual methods pointers are already pointing to
+	//	overriding methods (if any)
+	new_SpriteSVG->_delete_super = new_Node->delete_Node;
+	new_SpriteSVG->_pre_process_super = new_Node->pre_process;
+	new_SpriteSVG->_post_process_super = new_Node->post_process;
 
     new_Node2D->_sub_class = new_SpriteSVG;
 
@@ -308,8 +315,8 @@ static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
     new_Node2D->_sub_class = new_SpriteSVG;
 
     new_Node->delete_Node = ssvg_delete_SpriteSVG;
-    new_Node->pre_process_Node = ssvg_pre_process_Node;
-    new_Node->post_process_Node = ssvg_post_process_Node;
+    new_Node->pre_process = ssvg_pre_process;
+    new_Node->post_process = ssvg_post_process;
 
     return new_SpriteSVG;
 }

@@ -37,9 +37,9 @@ struct _Node
 	void (*delete_Node)(Node*);
 	void (*enter_tree)(Node*);
 	void (*on_loop_starting)(Node*);
-	void (*pre_process_Node)(Node*);
-	void (*process_Node)(Node*);
-	void (*post_process_Node)(Node*);
+	void (*pre_process)(Node*);
+	void (*process)(Node*);
+	void (*post_process)(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

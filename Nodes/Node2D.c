@@ -11,26 +11,27 @@
 static void n2d_delete_Node2D(Node* this_Node)
 {
     struct _Node2D* this_Node2D = (struct _Node2D*)(this_Node->_sub_class);
-    void (*delete_Node)(Node*) = this_Node2D->delete_Node;
+    //tmp memorize function pointer before calling free(this)
+    void (*delete_super)(Node*) = this_Node2D->_delete_super;
     CLUIGE_ASSERT(this_Node2D->_sub_class == NULL, "Node2D::delete_Node2D() : not null subclass found");
     free(this_Node2D);
     this_Node->_sub_class = NULL;
-    delete_Node(this_Node);
+    delete_super(this_Node);
 }
 
-static void n2d_pre_process_Node(Node* this_Node)
+static void n2d_pre_process(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     this_Node2D->_local_position_changed = false;
 }
 
-static void n2d_post_process_Node(Node* this_Node)
+static void n2d_post_process(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     Node* n = this_Node;
     bool must_update_global_pos = false;
-    while((n->parent != NULL) && !must_update_global_pos)
-    {
+    while((n->parent != NULL) && !must_update_global_pos)//TODO benefit from DFS, see cluige::process_tree()
+    {//first Node2D parent was already updated
         void* n_subclass = n->_sub_class;
         if(n_subclass != NULL)
         {
@@ -68,17 +69,17 @@ static void n2d_post_process_Node(Node* this_Node)
     }
 }
 
-static void n2d_enter_tree_Node2D(Node* this_Node)
-{
-    struct _Node2D* this_Node2D = (struct _Node2D*)(this_Node->_sub_class);
-    this_Node2D->enter_tree_Node(this_Node);//calls script.enter_tree()
-}
+//static void n2d_enter_tree_Node2D(Node* this_Node)
+//{
+//    struct _Node2D* this_Node2D = (struct _Node2D*)(this_Node->_sub_class);
+//    this_Node2D->enter_tree_Node(this_Node);//calls script.enter_tree()
+//}
 
 static void n2d_on_loop_starting_Node2D(Node* this_Node)
 {
     struct _Node2D* this_Node2D = (struct _Node2D*)(this_Node->_sub_class);
     this_Node2D->_local_position_changed = true;
-    n2d_post_process_Node(this_Node);//compute _tmp_global_position
+    n2d_post_process(this_Node);//compute _tmp_global_position
 }
 
 
@@ -95,10 +96,12 @@ static Node2D* n2d_new_Node2D_from_Node(Node* new_node)
 
     new_node2D->_this_Node = new_node;
     new_node2D->_sub_class = NULL;
-    new_node2D->delete_Node = new_node->delete_Node;
-    new_node2D->delete_Node2D = n2d_delete_Node2D;
-    new_node2D->enter_tree_Node = new_node->enter_tree;
-    new_node->enter_tree = n2d_enter_tree_Node2D;
+
+	//virtual methods - private copies of mother class pointers
+    new_node2D->_delete_super = new_node->delete_Node;
+//    new_node2D->delete_Node2D = n2d_delete_Node2D;
+//    new_node2D->enter_tree_Node = new_node->enter_tree;
+//    new_node->enter_tree = n2d_enter_tree_Node2D;
 
     new_node->_sub_class = new_node2D;
 
@@ -109,8 +112,8 @@ static Node2D* n2d_new_Node2D_from_Node(Node* new_node)
     new_node->_sub_class = new_node2D;
 
     new_node->delete_Node = n2d_delete_Node2D;
-    new_node->pre_process_Node = n2d_pre_process_Node;
-    new_node->post_process_Node = n2d_post_process_Node;
+    new_node->pre_process = n2d_pre_process;
+    new_node->post_process = n2d_post_process;
     new_node->on_loop_starting = n2d_on_loop_starting_Node2D;
 
     return new_node2D;

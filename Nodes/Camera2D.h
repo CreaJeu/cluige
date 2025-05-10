@@ -64,9 +64,9 @@ struct _Camera2D
     //respectively Left Top Right Bottom
     float* limits[4];
 
-	//virtual methods
-	void (*delete_Node2D)(Node*);
-	void (*post_process_Node2D)(Node*);
+	//virtual methods - private copies of mother class pointers
+	void (*_delete_super)(Node*);
+//	void (*_post_process_super)(Node*);
 };
 
 struct iiCamera2D

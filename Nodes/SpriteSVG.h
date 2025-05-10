@@ -21,12 +21,14 @@ struct _SpriteSVG
 	Node2D* _this_Node2D;
 	void* _sub_class;
 
-	//virtual methods
-	void (*delete_Node2D)(Node*);
-	void (*pre_process_Node2D)(Node*);
-	void (*post_process_Node2D)(Node*);
-	//in .c : void pre_process_Node(Node*);
-	//in .c : void post_process_Node(Node*);
+	//virtual methods - private copies of mother class pointers
+	void (*_delete_super)(Node*);
+	void (*_pre_process_super)(Node*);
+	void (*_post_process_super)(Node*);
+
+	//virtual methods in .c :
+	//void pre_process_Node(Node*);
+	//void post_process_Node(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

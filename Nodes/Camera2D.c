@@ -57,12 +57,14 @@ static Camera2D* c2d__get_camera_from_node(Node* this_node)
     return nde_cam_2d;
 }
 
-static void c2d_delete_camera2d(Node* this_node)
+static void c2d_delete_Camera2D(Node* this_node)
 {
     CLUIGE_ASSERT(this_node != NULL, "Camera2D::delete_camera2d() : calling object is null");
     Node2D* this_node2d = (Node2D*)(this_node->_sub_class);
     Camera2D* this_cam2d = (Camera2D*)(this_node2d->_sub_class);
-    void (*delete_Node2D)(Node*) = this_cam2d->delete_Node2D;
+
+    //tmp memorize function pointer before calling free(this)
+    void (*delete_super)(Node*) = this_cam2d->_delete_super;
 
 //    if(iCluige.iCamera2D.current_camera == this_cam2d && iCluige.iCamera2D.default_camera != iCluige.iCamera2D.current_camera)
 //    {
@@ -80,7 +82,7 @@ static void c2d_delete_camera2d(Node* this_node)
     CLUIGE_ASSERT(this_cam2d->_sub_class == NULL, "Camera2D::delete_camera2d() : not null subclass found");
     free(this_cam2d);
     this_node2d->_sub_class = NULL;
-    delete_Node2D(this_node);
+    delete_super(this_node);
 }
 
 static Vector2 c2d_get_zoom(const Camera2D* c2d)
@@ -148,7 +150,7 @@ static void c2d__pre_draw(Node* this_Node)
 {
     Node2D* node2d  = (Node2D*) (this_Node->_sub_class);
     Camera2D* cam = (Camera2D*) (node2d->_sub_class);
-    cam->post_process_Node2D(this_Node);//super
+    this_Node->post_process(this_Node);//super
 
     //updates values
     if(cam->anchor_mode == ANCHOR_MODE_FIXED_TOP_LEFT)
@@ -266,8 +268,13 @@ static struct _Camera2D* c2d_new_Camera2D()
     //private attribute of Node2D
     new_Node2D->_sub_class = new_camera2D;
 
-    new_camera2D->delete_Node2D = new_Node2D->delete_Node2D;
-    new_camera2D->post_process_Node2D = new_Node->post_process_Node;
+	//virtual methods - private copies of mother class pointers
+	//	constructors of all ancestors in inheritance hierarchy
+	//	have already been called, so :
+	//	new_Node virtual methods pointers are already pointing to
+	//	overriding methods (if any)
+    new_camera2D->_delete_super = new_Node->delete_Node;
+//    new_camera2D->_post_process_super = new_Node->post_process;
 
     free(new_Node->_class_name); //TODO static value to avoid free
     StringBuilder sb;
@@ -289,7 +296,7 @@ static struct _Camera2D* c2d_new_Camera2D()
     {
         iCluige.iCamera2D.current_camera = new_camera2D;
     }
-    new_Node->delete_Node = c2d_delete_camera2d;
+    new_Node->delete_Node = c2d_delete_Camera2D;
 
     return new_camera2D;
 }

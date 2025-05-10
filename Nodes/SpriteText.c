@@ -14,7 +14,8 @@ static void sprtx_delete_SpriteText(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
-    void (*delete_Node2D)(Node*) = this_SpriteText->delete_Node2D;
+    //tmp memorize function pointer before calling free(this)
+    void (*delete_super)(Node*) = this_SpriteText->_delete_super;
 //    for(int i=0; i<this_SpriteText->nb_lines; i++)
 //    {
 //        free(this_SpriteText->text[i]);
@@ -22,31 +23,31 @@ static void sprtx_delete_SpriteText(Node* this_Node)
 	//clear display
 	if(this_Node2D->visible && !(iCluige.quit_asked))
 	{
-		this_Node->pre_process_Node(this_Node);
+		this_Node->pre_process(this_Node);
 	}
     free(this_SpriteText->text);
     CLUIGE_ASSERT(this_SpriteText->_sub_class == NULL, "SpriteText::delete_SpriteText() : not null subclass found");
     free(this_SpriteText);
     this_Node2D->_sub_class = NULL;
-    delete_Node2D(this_Node);
+    delete_super(this_Node);
 }
 
-static void sprtx_enter_tree_SpriteText(Node* this_Node)
-{
-    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
-    SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
-	CLUIGE_ASSERT(
-		this_SpriteText->_allocated_text_length >= 0,
-		"SpriteText::enter_tree() : text must be given before entering tree");
-	this_SpriteText->enter_tree_Node2D(this_Node);//super()
-}
+//static void sprtx_enter_tree_SpriteText(Node* this_Node)
+//{
+//    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+//    SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
+//	CLUIGE_ASSERT(
+//		this_SpriteText->_allocated_text_length >= 0,
+//		"SpriteText::enter_tree() : text must be given before entering tree");
+//	this_SpriteText->enter_tree_Node2D(this_Node);//super()
+//}
 
-static void sprtx_pre_process_Node(Node* this_Node)
+static void sprtx_pre_process(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
     //call super()
-    this_SpriteText->pre_process_Node2D(this_Node);
+    this_SpriteText->_pre_process_super(this_Node);
 
     if(!(this_Node2D->visible))
     {
@@ -128,12 +129,12 @@ static void sprtx_pre_process_Node(Node* this_Node)
     }
 }
 
-static void sprtx_post_process_Node(Node* this_Node)
+static void sprtx_post_process(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
     //call super()
-    this_SpriteText->post_process_Node2D(this_Node);
+    this_SpriteText->_post_process_super(this_Node);
 
     if(!(this_Node2D->visible))
     {
@@ -229,10 +230,16 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
     new_SpriteText->nb_lines = 0;
 	new_SpriteText->_this_Node2D = new_Node2D;
 	new_SpriteText->_sub_class = NULL;
-	new_SpriteText->delete_Node2D = new_Node->delete_Node;
-	new_SpriteText->enter_tree_Node2D = new_Node->enter_tree;
-	new_SpriteText->pre_process_Node2D = new_Node->pre_process_Node;
-	new_SpriteText->post_process_Node2D = new_Node->post_process_Node;
+
+	//virtual methods - private copies of mother class pointers
+	//	constructors of all ancestors in inheritance hierarchy
+	//	have already been called, so :
+	//	new_Node virtual methods pointers are already pointing to
+	//	overriding methods (if any)
+	new_SpriteText->_delete_super = new_Node->delete_Node;
+//	new_SpriteText->_enter_tree_super = new_Node->enter_tree;
+	new_SpriteText->_pre_process_super = new_Node->pre_process;
+	new_SpriteText->_post_process_super = new_Node->post_process;
 
     new_Node2D->_sub_class = new_SpriteText;
 
@@ -244,9 +251,9 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
     new_Node2D->_sub_class = new_SpriteText;
 
     new_Node->delete_Node = sprtx_delete_SpriteText;
-    new_Node->enter_tree = sprtx_enter_tree_SpriteText;
-    new_Node->pre_process_Node = sprtx_pre_process_Node;
-    new_Node->post_process_Node = sprtx_post_process_Node;
+//    new_Node->enter_tree = sprtx_enter_tree_SpriteText;
+    new_Node->pre_process = sprtx_pre_process;
+    new_Node->post_process = sprtx_post_process;
 
     return new_SpriteText;
 }

@@ -10,7 +10,8 @@
 static void inp_delete_Input(Node* this_Node)
 {
     struct _Input* this_Input = (struct _Input*)(this_Node->_sub_class);
-    void (*delete_Node)(Node*) = this_Input->delete_Node;
+    //tmp memorize function pointer before calling free(this)
+    void (*delete_super)(Node*) = this_Input->_delete_super;
 
     for(int i=0; i < iCluige.iDeque.size(&(this_Input->available_actions)); i++)
     {
@@ -35,7 +36,7 @@ static void inp_delete_Input(Node* this_Node)
 
     free(this_Input);
     this_Node->_sub_class = NULL;
-    delete_Node(this_Node);
+    delete_super(this_Node);
 }
 
 // private utility functions
@@ -65,7 +66,7 @@ static int inp__find_action(const Deque* action_ids, int32_t id_action)
     return -1;
 }
 
-static void inp_pre_process_Input(Node* this_Node)
+static void inp_pre_process(Node* this_Node)
 {
     struct _Input* this_Input = (struct _Input*)(this_Node->_sub_class);
     //reinit all "just_XXX"
@@ -122,9 +123,11 @@ static struct _Input* inp_new_Input()
     new_node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, strlen("NodeInput"));
     iCluige.iStringBuilder.append(&sb, "NodeInput");
 
-    new_input->delete_Node = new_node->delete_Node;
+	//virtual methods - private copies of mother class pointers
+    new_input->_delete_super = new_node->delete_Node;
+
     new_node->delete_Node = inp_delete_Input;
-    new_node->pre_process_Node = inp_pre_process_Input;
+    new_node->pre_process = inp_pre_process;
 
     iCluige.iDeque.deque_alloc(&(new_input->available_actions), VT_POINTER, 20);
     iCluige.iDeque.deque_alloc(&(new_input->bound_keys), VT_POINTER, 40);

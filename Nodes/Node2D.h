@@ -20,13 +20,14 @@ struct _Node2D
 	Node* _this_Node;
 	void* _sub_class;
 
-	//virtual methods
-	void (*delete_Node)(Node*);
-	void (*delete_Node2D)(Node*);
-	void (*enter_tree_Node)(Node*);
-	//in .c : void pre_process_Node(Node*);
-	//in .c : void post_process_Node(Node*);
-	//in .c : void on_loop_starting_Node2D(Node*);
+	//virtual methods - private copies of mother class pointers
+	void (*_delete_super)(Node*);
+//	void (*_enter_tree_super)(Node*);
+
+	//virtual methods in .c :
+	//void pre_process_Node(Node*);
+	//void post_process_Node(Node*);
+	//void on_loop_starting_Node2D(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

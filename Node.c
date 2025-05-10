@@ -61,7 +61,7 @@ static void nde_enter_tree(Node* this_Node)
 //on_loop_starting = NULL for Node
 //pre_process_Node = NULL for Node
 
-static void nde_process_Node(Node* this_Node)
+static void nde_process(Node* this_Node)
 {
     if((this_Node->script != NULL) && (this_Node->script->process != NULL))
     {
@@ -92,9 +92,9 @@ static Node* nde_new_Node()
     node->delete_Node = nde_delete_Node;
     node->enter_tree = nde_enter_tree;
     node->on_loop_starting = NULL;
-    node->pre_process_Node = NULL;
-    node->process_Node = nde_process_Node;
-    node->post_process_Node = NULL;
+    node->pre_process = NULL;
+    node->process = nde_process;
+    node->post_process = NULL;
     node->_sub_class = NULL;
     return node;
 }

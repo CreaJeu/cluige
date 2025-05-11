@@ -25,6 +25,7 @@ struct _Node
 	Script* script;
 	char* name;//must not point to the stack, see set_name()
 	bool active;
+	int process_priority;//lower is processed sooner, default = 0
 
 	//private
 	bool _already_entered_tree;

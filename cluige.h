@@ -53,20 +53,23 @@ struct iiCluige
 	struct iiCamera2D iCamera2D;
 	struct iiTscnParser iTscnParser;
 
-
 	//for target FPS, 15 fps by default
 	float wanted_frame_seconds;//TODO rename wanted_seconds_per_frame
 
 	//to quit a game
 	bool quit_asked;
 
+	//private
 	//for cluige nodes like clock
-	Node* private_root_2D;
+	Node* _private_root_2D;
 
 	//for user nodes
 	Node* public_root_2D;
 
 	float EPSILON;
+
+	//private
+	SortedDictionary _prioritized_nodes_to_process;//maybe one day : the equivalent for z-index
 
 	//void* checked_malloc(size_t)
 	void* (*checked_malloc)(size_t);

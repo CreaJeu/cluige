@@ -55,6 +55,7 @@ static struct _Clock* clk_new_Clock()
     new_node->delete_Node = clk_delete_Clock;
     new_node->pre_process = clk_pre_process;
 
+    new_node->process_priority = INT_MIN;
     return new_clock;
 }
 

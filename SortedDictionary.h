@@ -37,7 +37,7 @@ struct iiSortedDictionary
     Checked_Variant (*get)(const SortedDictionary* this_SortedDictionary, ...);
 
     //for loops ; returned Variant .ptr is to the Pair at i
-    Variant (*at)(const SortedDictionary* this_SortedDictionary, int i);
+    Pair (*at)(const SortedDictionary* this_SortedDictionary, int i);
 
     int (*size)(const SortedDictionary* this_SortedDictionary);
     bool (*is_empty)(const SortedDictionary* this_SortedDictionary);

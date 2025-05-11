@@ -90,10 +90,12 @@ static Checked_Variant sd_get(const SortedDictionary* this_SortedDictionary, ...
     }
 }
 
-static Variant sd_at(const SortedDictionary* this_SortedDictionary, int i)
+static Pair sd_at(const SortedDictionary* this_SortedDictionary, int i)
 {
     const Deque* _pairs = &(this_SortedDictionary->_pairs);
-    return iCluige.iDeque.at(_pairs, i);
+	Variant v_pair_i = iCluige.iDeque.at(_pairs, i);
+	Pair* pair_i = (Pair*)(v_pair_i.ptr);
+	return *pair_i;
 }
 
 static int sd_size(const SortedDictionary* this_SortedDictionary)
@@ -259,20 +261,18 @@ static char* sd_debug_str_str(SortedDictionary* this_SortedDictionary)
 	int n = iCluige.iSortedDictionary.size(dic);
 	for(int i=0; i<n; i++)
 	{
-		Variant v_pair_i = iCluige.iSortedDictionary.at(dic, i);
-		Pair* pair_i = (Pair*)(v_pair_i.ptr);
-		const char* key = (const char*)(pair_i->first.ptr);
-		const char* val = (const char*)(pair_i->second.ptr);
+		Pair pair_i = iCluige.iSortedDictionary.at(dic, i);
+		const char* key = (const char*)(pair_i.first.ptr);
+		const char* val = (const char*)(pair_i.second.ptr);
 		len += 4 + strlen(key) + strlen(val);//"key = val\n"
 	}
 	StringBuilder sb;
 	iCluige.iStringBuilder.string_alloc(&sb, len);
 	for(int i=0; i<n; i++)
 	{
-		Variant v_pair_i = iCluige.iSortedDictionary.at(dic, i);
-		Pair* pair_i = (Pair*)(v_pair_i.ptr);
-		const char* key = (const char*)(pair_i->first.ptr);
-		const char* val = (const char*)(pair_i->second.ptr);
+		Pair pair_i = iCluige.iSortedDictionary.at(dic, i);
+		const char* key = (const char*)(pair_i.first.ptr);
+		const char* val = (const char*)(pair_i.second.ptr);
 		iCluige.iStringBuilder.append(&sb, "%s = %s\n", key, val);
 	}
 	iCluige.iStringBuilder.append(&sb, " - nb elems : %d", n);

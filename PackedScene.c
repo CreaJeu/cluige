@@ -128,10 +128,9 @@ static char* pksc_debug(const PackedScene* this_PackedScene)
 	int n = iCluige.iSortedDictionary.size(dic);
 	for(int i=0; i<n; i++)
 	{
-		Variant v_pair_i = iCluige.iSortedDictionary.at(dic, i);
-		Pair* pair_i = (Pair*)(v_pair_i.ptr);
-		const char* key = (const char*)(pair_i->first.ptr);
-		const char* val = (const char*)(pair_i->second.ptr);
+		Pair pair_i = iCluige.iSortedDictionary.at(dic, i);
+		const char* key = (const char*)(pair_i.first.ptr);
+		const char* val = (const char*)(pair_i.second.ptr);
 		if(strcmp(key, "name") != 0)
 		{
 			len += 4 + strlen(key) + strlen(val);//"key = val\n"
@@ -159,10 +158,9 @@ static char* pksc_debug(const PackedScene* this_PackedScene)
 	}
 	for(int i=0; i<n; i++)
 	{
-		Variant v_pair_i = iCluige.iSortedDictionary.at(dic, i);
-		Pair* pair_i = (Pair*)(v_pair_i.ptr);
-		const char* key = (const char*)(pair_i->first.ptr);
-		const char* val = (const char*)(pair_i->second.ptr);
+		Pair pair_i = iCluige.iSortedDictionary.at(dic, i);
+		const char* key = (const char*)(pair_i.first.ptr);
+		const char* val = (const char*)(pair_i.second.ptr);
 		if(strcmp(key, "name") != 0)
 		{
 			iCluige.iStringBuilder.append(&sb, "%s = %s\n", key, val);

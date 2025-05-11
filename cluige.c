@@ -50,8 +50,8 @@ void cluige_init()
     iiStringBuilder_init();
     iiPackedScene_init();
     iiNode_init();
-    iCluige.private_root_2D = iCluige.iNode.new_Node();
-    iCluige.iNode.set_name(iCluige.private_root_2D, "private_root_2D");
+    iCluige._private_root_2D = iCluige.iNode.new_Node();
+    iCluige.iNode.set_name(iCluige._private_root_2D, "private_root_2D");
 
     iiScript_init();
     iiVector2_init();
@@ -63,24 +63,24 @@ void cluige_init()
 
     iiClock_init();
     iCluige.clock = iCluige.iClock.new_Clock();
-    iCluige.iNode.add_child(iCluige.private_root_2D, iCluige.clock->_this_Node);
+    iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.clock->_this_Node);
 
     iiInput_init();
     iCluige.input = iCluige.iInput.new_Input();
-    iCluige.iNode.add_child(iCluige.private_root_2D, iCluige.input->_this_Node);
+    iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.input->_this_Node);
 
     iiCamera2D_init();
     Camera2D* default_camera = iCluige.iCamera2D.new_Camera2D();
     iCluige.iCamera2D.current_camera = default_camera;
     iCluige.iNode.set_name(iCluige.iCamera2D.current_camera->_this_Node2D->_this_Node,"default_camera");
     default_camera->anchor_mode = ANCHOR_MODE_FIXED_TOP_LEFT;
-    iCluige.iNode.add_child(iCluige.private_root_2D, iCluige.iCamera2D.current_camera->_this_Node2D->_this_Node);
+    iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.iCamera2D.current_camera->_this_Node2D->_this_Node);
     iCluige.iCamera2D.default_camera = default_camera;
     //iCluige.iNode.print_tree_pretty(iCluige.private_root_2D);
 
     iCluige.public_root_2D = iCluige.iNode.new_Node();
     iCluige.iNode.set_name(iCluige.public_root_2D, "public_root_2D");
-    iCluige.iNode.add_child(iCluige.private_root_2D, iCluige.public_root_2D);
+    iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.public_root_2D);
 
     iiTscnParser_init();
 
@@ -89,6 +89,9 @@ void cluige_init()
 
     //...
     //...
+	iCluige.iSortedDictionary.sorted_dictionary_alloc(
+		&(iCluige._prioritized_nodes_to_process),
+		VT_INT64, VT_POINTER, 7);
 }
 
 enum ProcessPass
@@ -98,6 +101,25 @@ enum ProcessPass
     PROCESS_PASS,
     POST_PROCESS_PASS
 };
+
+static void _do_process_prioritized()
+{
+	SortedDictionary* dico = &(iCluige._prioritized_nodes_to_process);
+	int nb_deques = iCluige.iSortedDictionary.size(dico);
+	for(int dico_i=0; dico_i < nb_deques; dico_i++)
+	{
+		Pair pair_p = iCluige.iSortedDictionary.at(dico, dico_i);
+		Deque* nodes_with_prio_p = (Deque*)(pair_p.second.ptr);
+		int nb_nodes = iCluige.iDeque.size(nodes_with_prio_p);
+		for(int n_i=0; n_i < nb_nodes; n_i++)
+		{
+			Node* n = (Node*)(iCluige.iDeque.at(nodes_with_prio_p, n_i).ptr);
+			//if(n->process != NULL) already checked in process_tree()
+			n->process(n);
+		}
+		iCluige.iDeque.clear(nodes_with_prio_p);
+	}
+}
 
 static void process_tree(Node* root, enum ProcessPass pass)
 {
@@ -119,7 +141,23 @@ static void process_tree(Node* root, enum ProcessPass pass)
     case PROCESS_PASS:
         if(root->process != NULL)
         {
-            root->process(root);
+			//root->process(root);
+			int64_t p = root->process_priority;
+			SortedDictionary* dico = &(iCluige._prioritized_nodes_to_process);
+			Checked_Variant found = iCluige.iSortedDictionary.get(dico, p);
+			Deque* nodes_with_prio_p;
+			if(found.valid)
+			{
+				nodes_with_prio_p = (Deque*)(found.v.ptr);
+			}
+			else
+			{
+				//never deleted but usually used for the whole game execution
+				nodes_with_prio_p = iCluige.checked_malloc(sizeof(Deque));
+				iCluige.iDeque.deque_alloc(nodes_with_prio_p, VT_POINTER, 15);
+				iCluige.iSortedDictionary.insert(dico, p, nodes_with_prio_p);
+			}
+			iCluige.iDeque.push_back(nodes_with_prio_p, root);
         }
         break;
     case POST_PROCESS_PASS:
@@ -153,16 +191,17 @@ void cluige_run()
     timeout(0);// for getch() : 0=blocking 0=return ERR/...
     keypad(stdscr, true);
 
-    process_tree(iCluige.private_root_2D, STARTING_LOOP_PASS);
+    process_tree(iCluige._private_root_2D, STARTING_LOOP_PASS);
 
     //game loop
     while(!(iCluige.quit_asked))
     {
-        process_tree(iCluige.private_root_2D, PRE_PROCESS_PASS);
-        process_tree(iCluige.private_root_2D, PROCESS_PASS);
+        process_tree(iCluige._private_root_2D, PRE_PROCESS_PASS);
+        process_tree(iCluige._private_root_2D, PROCESS_PASS);//just computes priorities
+        _do_process_prioritized();//actually processes
         Camera2D* curr_cam = iCluige.iCamera2D.current_camera;
         iCluige.iCamera2D._predraw(curr_cam->_this_Node2D->_this_Node);
-        process_tree(iCluige.private_root_2D, POST_PROCESS_PASS);
+        process_tree(iCluige._private_root_2D, POST_PROCESS_PASS);
 
         refresh();
         iCluige.iNode._do_all_queue_free();
@@ -181,7 +220,7 @@ void cluige_run()
 int cluige_finish()
 {
     //iCluige.iNode.delete_Node(iCluige.private_root_2D);
-    iCluige.private_root_2D->delete_Node(iCluige.private_root_2D);
+    iCluige._private_root_2D->delete_Node(iCluige._private_root_2D);
     //close files
     //free tmp locks
     //...

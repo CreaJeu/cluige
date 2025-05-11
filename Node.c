@@ -84,6 +84,7 @@ static Node* nde_new_Node()
     node->script = NULL;
     node->name = NULL;
     node->active = true;
+    node->process_priority = 0;
 
     StringBuilder sb;
     node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, 4);

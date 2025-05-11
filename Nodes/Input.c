@@ -129,6 +129,8 @@ static struct _Input* inp_new_Input()
     new_node->delete_Node = inp_delete_Input;
     new_node->pre_process = inp_pre_process;
 
+    new_node->process_priority = INT_MIN;
+
     iCluige.iDeque.deque_alloc(&(new_input->available_actions), VT_POINTER, 20);
     iCluige.iDeque.deque_alloc(&(new_input->bound_keys), VT_POINTER, 40);
     ///// TODO     standard actions? //ui_accept ui_cancel ui_left ui_right ui_up ui_down

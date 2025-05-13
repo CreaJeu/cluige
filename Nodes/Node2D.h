@@ -15,18 +15,25 @@ struct _Node2D
 
 	//private
 	Vector2 _tmp_global_position;//don't change directly, use methods
-	bool _local_position_changed;
+
+	struct
+	{
+		bool visible;
+		bool position_changed;
+	} _state_changes;
 
 	Node* _this_Node;
 	void* _sub_class;
 
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
+	void (*_erase_super)(Node*);
+	void (*_post_process_super)(Node*);
 //	void (*_enter_tree_super)(Node*);
 
 	//virtual methods in .c :
-	//void pre_process_Node(Node*);
-	//void post_process_Node(Node*);
+	//void erase(Node*);
+	//void post_process(Node*);
 	//void on_loop_starting_Node2D(Node*);
 };
 

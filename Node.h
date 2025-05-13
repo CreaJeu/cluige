@@ -24,11 +24,22 @@ struct _Node
 	Node* children;
 	Script* script;
 	char* name;//must not point to the stack, see set_name()
-	bool active;
+//	bool active;
 	int process_priority;//lower is processed sooner, default = 0
 
 	//private
-	bool _already_entered_tree;
+	struct
+	{
+		Node* parent;
+		Node* next_sibling;
+		Node* children;
+		Script* script;
+		char* name;//must not point to the stack, see set_name()
+//		bool active;
+		int process_priority;//lower is processed sooner, default = 0
+		bool already_entered_tree;
+		bool marked_for_queue_free;
+	} _state_changes;
 
 	//for inheritance
 	char* _class_name;
@@ -38,7 +49,7 @@ struct _Node
 	void (*delete_Node)(Node*);
 	void (*enter_tree)(Node*);
 	void (*on_loop_starting)(Node*);
-	void (*pre_process)(Node*);
+	void (*erase)(Node*);
 	void (*process)(Node*);
 	void (*post_process)(Node*);
 };

@@ -19,10 +19,12 @@ static void n2d_delete_Node2D(Node* this_Node)
     delete_super(this_Node);
 }
 
-static void n2d_pre_process(Node* this_Node)
+static void n2d_erase(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
-    this_Node2D->_local_position_changed = false;
+    this_Node2D->_state_changes.visible = this_Node2D->visible;
+    this_Node2D->_state_changes.position_changed = false;
+    this_Node2D->_erase_super(this_Node);
 }
 
 static void n2d_post_process(Node* this_Node)
@@ -39,7 +41,7 @@ static void n2d_post_process(Node* this_Node)
             if(found == n->_class_name) //n is a Node2D
             {
                 Node2D* n2d = (Node2D*)(n->_sub_class);
-                must_update_global_pos = n2d->_local_position_changed;
+                must_update_global_pos = n2d->_state_changes.position_changed;
             }
         }
         n = n->parent;
@@ -66,6 +68,7 @@ static void n2d_post_process(Node* this_Node)
             }
             n = n->parent;
         }
+        this_Node2D->_state_changes.position_changed = true;
     }
 }
 
@@ -78,7 +81,7 @@ static void n2d_post_process(Node* this_Node)
 static void n2d_on_loop_starting_Node2D(Node* this_Node)
 {
     struct _Node2D* this_Node2D = (struct _Node2D*)(this_Node->_sub_class);
-    this_Node2D->_local_position_changed = true;
+    this_Node2D->_state_changes.position_changed = true;
     n2d_post_process(this_Node);//compute _tmp_global_position
 }
 
@@ -92,13 +95,17 @@ static Node2D* n2d_new_Node2D_from_Node(Node* new_node)
     new_node2D->visible = true;
     new_node2D->position = (Vector2){0., 0.};
     new_node2D->_tmp_global_position = (Vector2){0., 0.};
-    new_node2D->_local_position_changed = false;
+
+    new_node2D->_state_changes.visible = new_node2D->visible;
+    new_node2D->_state_changes.position_changed = true;
 
     new_node2D->_this_Node = new_node;
     new_node2D->_sub_class = NULL;
 
 	//virtual methods - private copies of mother class pointers
     new_node2D->_delete_super = new_node->delete_Node;
+    new_node2D->_erase_super = new_node->erase;
+    new_node2D->_post_process_super = new_node->post_process;
 //    new_node2D->delete_Node2D = n2d_delete_Node2D;
 //    new_node2D->enter_tree_Node = new_node->enter_tree;
 //    new_node->enter_tree = n2d_enter_tree_Node2D;
@@ -112,7 +119,7 @@ static Node2D* n2d_new_Node2D_from_Node(Node* new_node)
     new_node->_sub_class = new_node2D;
 
     new_node->delete_Node = n2d_delete_Node2D;
-    new_node->pre_process = n2d_pre_process;
+    new_node->erase = n2d_erase;
     new_node->post_process = n2d_post_process;
     new_node->on_loop_starting = n2d_on_loop_starting_Node2D;
 
@@ -142,13 +149,13 @@ static void n2d_move_local(Node2D* this_Node2D, Vector2 depl)
         &(depl),
         &(this_Node2D->position)
         );
-    this_Node2D->_local_position_changed = true;
+    this_Node2D->_state_changes.position_changed = true;
 }
 
 static void n2d_set_local_position(Node2D* this_Node2D, Vector2 new_pos)
 {
     this_Node2D->position = new_pos;
-    this_Node2D->_local_position_changed = true;
+    this_Node2D->_state_changes.position_changed = true;
 }
 
 static Node* n2d_instanciate(const SortedDictionary* params)

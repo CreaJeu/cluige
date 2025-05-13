@@ -23,7 +23,7 @@ static void sprtx_delete_SpriteText(Node* this_Node)
 	//clear display
 	if(this_Node2D->visible && !(iCluige.quit_asked))
 	{
-		this_Node->pre_process(this_Node);
+		this_Node->erase(this_Node);
 	}
     free(this_SpriteText->text);
     CLUIGE_ASSERT(this_SpriteText->_sub_class == NULL, "SpriteText::delete_SpriteText() : not null subclass found");
@@ -42,12 +42,12 @@ static void sprtx_delete_SpriteText(Node* this_Node)
 //	this_SpriteText->enter_tree_Node2D(this_Node);//super()
 //}
 
-static void sprtx_pre_process(Node* this_Node)
+static void sprtx_erase(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
     //call super()
-    this_SpriteText->_pre_process_super(this_Node);
+    this_SpriteText->_erase_super(this_Node);
 
     if(!(this_Node2D->visible))
     {
@@ -64,7 +64,7 @@ static void sprtx_pre_process(Node* this_Node)
             &orig);
     int flat_i = 0;
     Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-    CLUIGE_ASSERT(current_camera != NULL, "SpriteText::pre_process_Node() : current_camera is null");
+    CLUIGE_ASSERT(current_camera != NULL, "SpriteText::erase() : current_camera is null");
 
     float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
     float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
@@ -127,6 +127,7 @@ static void sprtx_pre_process(Node* this_Node)
         }
         flat_i++;
     }
+    this_SpriteText->_state_changes.text_changed = false;
 }
 
 static void sprtx_post_process(Node* this_Node)
@@ -230,6 +231,7 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
     new_SpriteText->nb_lines = 0;
 	new_SpriteText->_this_Node2D = new_Node2D;
 	new_SpriteText->_sub_class = NULL;
+	new_SpriteText->_state_changes.text_changed = true;
 
 	//virtual methods - private copies of mother class pointers
 	//	constructors of all ancestors in inheritance hierarchy
@@ -238,7 +240,7 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
 	//	overriding methods (if any)
 	new_SpriteText->_delete_super = new_Node->delete_Node;
 //	new_SpriteText->_enter_tree_super = new_Node->enter_tree;
-	new_SpriteText->_pre_process_super = new_Node->pre_process;
+	new_SpriteText->_erase_super = new_Node->erase;
 	new_SpriteText->_post_process_super = new_Node->post_process;
 
     new_Node2D->_sub_class = new_SpriteText;
@@ -252,7 +254,7 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
 
     new_Node->delete_Node = sprtx_delete_SpriteText;
 //    new_Node->enter_tree = sprtx_enter_tree_SpriteText;
-    new_Node->pre_process = sprtx_pre_process;
+    new_Node->erase = sprtx_erase;
     new_Node->post_process = sprtx_post_process;
 
     return new_SpriteText;
@@ -297,6 +299,7 @@ static void sprtx_set_text(SpriteText* this_SpriteText, const char* new_text)
 	}
 	strcpy(this_SpriteText->text, new_text);
     sprtx__bake_text(this_SpriteText);
+    this_SpriteText->_state_changes.text_changed = true;
 }
 
 static Node* sprtx_instanciate(const SortedDictionary* params)

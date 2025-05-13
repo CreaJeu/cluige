@@ -44,7 +44,7 @@ struct _Input
 
 	//virtual methods in .c :
 	//void (*delete_Input)(Node*);
-	//void (*pre_process_Input)(Node*);
+	//void (*process)(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

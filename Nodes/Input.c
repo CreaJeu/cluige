@@ -66,7 +66,7 @@ static int inp__find_action(const Deque* action_ids, int32_t id_action)
     return -1;
 }
 
-static void inp_pre_process(Node* this_Node)
+static void inp_process(Node* this_Node)
 {
     struct _Input* this_Input = (struct _Input*)(this_Node->_sub_class);
     //reinit all "just_XXX"
@@ -127,7 +127,7 @@ static struct _Input* inp_new_Input()
     new_input->_delete_super = new_node->delete_Node;
 
     new_node->delete_Node = inp_delete_Input;
-    new_node->pre_process = inp_pre_process;
+    new_node->process = inp_process;
 
     new_node->process_priority = INT_MIN;
 

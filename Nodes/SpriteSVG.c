@@ -25,7 +25,7 @@ static void ssvg_delete_SpriteSVG(Node* this_Node)
     //clear display
 	if(this_Node2D->visible && !(iCluige.quit_asked))
 	{
-		this_Node->pre_process(this_Node);
+		this_Node->erase(this_Node);
 	}
     //delete my attributes
     //Deque<Path2D* > paths
@@ -72,16 +72,16 @@ static void ssvg_draw_line(const float start_x, const float start_y, const float
 	}
 }
 
-static void ssvg_pre_process(Node* this_Node)
+static void ssvg_erase(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+    SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
+    //call super()
+    this_SpriteSVG->_erase_super(this_Node);
     if(!(this_Node2D->visible))
     {
         return;
     }
-    SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
-    //call super()
-    this_SpriteSVG->_pre_process_super(this_Node);
 
     //clear old one (unless immobile? => no, because other masking things
     //could have moved and made this sprite visible again;
@@ -93,7 +93,7 @@ static void ssvg_pre_process(Node* this_Node)
             &orig);
 
     Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-    CLUIGE_ASSERT(current_camera != NULL, "SpriteSVG::pre_process_Node() : current_camera is null");
+    CLUIGE_ASSERT(current_camera != NULL, "SpriteSVG::erase() : current_camera is null");
 
     float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
     float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
@@ -302,7 +302,7 @@ static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
 	//	new_Node virtual methods pointers are already pointing to
 	//	overriding methods (if any)
 	new_SpriteSVG->_delete_super = new_Node->delete_Node;
-	new_SpriteSVG->_pre_process_super = new_Node->pre_process;
+	new_SpriteSVG->_erase_super = new_Node->erase;
 	new_SpriteSVG->_post_process_super = new_Node->post_process;
 
     new_Node2D->_sub_class = new_SpriteSVG;
@@ -315,7 +315,7 @@ static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
     new_Node2D->_sub_class = new_SpriteSVG;
 
     new_Node->delete_Node = ssvg_delete_SpriteSVG;
-    new_Node->pre_process = ssvg_pre_process;
+    new_Node->erase = ssvg_erase;
     new_Node->post_process = ssvg_post_process;
 
     return new_SpriteSVG;

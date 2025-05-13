@@ -43,7 +43,7 @@ static void c2d_make_current(Camera2D* c2d)
     CLUIGE_ASSERT(c2d->enabled, "Camera2D::make_current() : calling object is not enabled");
 
     iCluige.iCamera2D.current_camera = c2d;
-    c2d->_this_Node2D->_local_position_changed = true;
+    c2d->_this_Node2D->_state_changes.position_changed = true;
 }
 
 //private uitl

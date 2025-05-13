@@ -97,7 +97,7 @@ void cluige_init()
 enum ProcessPass
 {
     STARTING_LOOP_PASS,
-    PRE_PROCESS_PASS,
+    ERASE_PASS,
     PROCESS_PASS,
     POST_PROCESS_PASS
 };
@@ -132,10 +132,10 @@ static void process_tree(Node* root, enum ProcessPass pass)
             root->on_loop_starting(root);
         }
         break;
-    case PRE_PROCESS_PASS:
-        if(root->pre_process != NULL)
+    case ERASE_PASS:
+        if(root->erase != NULL)
         {
-            root->pre_process(root);
+            root->erase(root);
         }
         break;
     case PROCESS_PASS:
@@ -196,7 +196,7 @@ void cluige_run()
     //game loop
     while(!(iCluige.quit_asked))
     {
-        process_tree(iCluige._private_root_2D, PRE_PROCESS_PASS);
+        process_tree(iCluige._private_root_2D, ERASE_PASS);
         process_tree(iCluige._private_root_2D, PROCESS_PASS);//just computes priorities
         _do_process_prioritized();//actually processes
         Camera2D* curr_cam = iCluige.iCamera2D.current_camera;

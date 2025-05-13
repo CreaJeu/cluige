@@ -16,6 +16,12 @@ struct _SpriteText
     int nb_lines;//TODO collection instead
 
 	//private
+	struct
+	{
+		bool text_changed;
+	} _state_changes;
+
+	//private
 	Node2D* _this_Node2D;
 	void* _sub_class;
 	int _allocated_text_length;
@@ -23,12 +29,12 @@ struct _SpriteText
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
 //	void (*_enter_tree_super)(Node*);
-	void (*_pre_process_super)(Node*);
+	void (*_erase_super)(Node*);
 	void (*_post_process_super)(Node*);
 
 	//virtual methods in .c :
-	//void pre_process_Node(Node*);
-	//void post_process_Node(Node*);
+	//void erase(Node*);
+	//void post_process(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

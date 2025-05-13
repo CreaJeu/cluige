@@ -18,7 +18,7 @@ static void clk_delete_Clock(Node* this_Node)
     delete_super(this_Node);
 }
 
-static void clk_pre_process(Node* this_Node)
+static void clk_process(Node* this_Node)
 {
     struct _Clock* this_Clock = (struct _Clock*)(this_Node->_sub_class);
     clock_t new_tick = clock();
@@ -53,7 +53,7 @@ static struct _Clock* clk_new_Clock()
     iCluige.iStringBuilder.append(&sb, "NodeClock");
 
     new_node->delete_Node = clk_delete_Clock;
-    new_node->pre_process = clk_pre_process;
+    new_node->process = clk_process;
 
     new_node->process_priority = INT_MIN;
     return new_clock;

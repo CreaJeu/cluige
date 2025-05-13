@@ -16,7 +16,7 @@ struct _Clock
 	void (*_delete_super)(Node*);
 
 	//virtual methods in .c :
-	//void (*pre_process)(Node*);
+	//void (*process)(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

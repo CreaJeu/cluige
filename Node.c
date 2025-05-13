@@ -59,7 +59,18 @@ static void nde_enter_tree(Node* this_Node)
 }
 
 //on_loop_starting = NULL for Node
-//pre_process_Node = NULL for Node
+
+//TODO maintain those data in all concerned methods instead of this systemtic copy each frame
+static void nde_erase(Node* this_Node)
+{
+    this_Node->_state_changes.parent = this_Node->parent;
+    this_Node->_state_changes.next_sibling = this_Node->next_sibling;
+    this_Node->_state_changes.children = this_Node->children;
+    this_Node->_state_changes.script = this_Node->script;
+    this_Node->_state_changes.name = this_Node->name;
+//    this_Node->_state_changes.active = this_Node->active;
+    this_Node->_state_changes.process_priority = this_Node->process_priority;
+}
 
 static void nde_process(Node* this_Node)
 {
@@ -69,7 +80,7 @@ static void nde_process(Node* this_Node)
     }
 }
 
-//post_process_Node = NULL for Node
+//post_process = NULL for Node
 
 
 ////////////////////////////////// iiNode /////////
@@ -83,17 +94,27 @@ static Node* nde_new_Node()
     node->children = NULL;
     node->script = NULL;
     node->name = NULL;
-    node->active = true;
+//    node->active = true;
     node->process_priority = 0;
 
     StringBuilder sb;
     node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, 4);
     iCluige.iStringBuilder.append(&sb, "Node");
 
+    node->_state_changes.parent = node->parent;
+    node->_state_changes.next_sibling = node->next_sibling;
+    node->_state_changes.children = node->children;
+    node->_state_changes.script = node->script;
+    node->_state_changes.name = node->name;
+//    node->_state_changes.active = node->active;
+    node->_state_changes.process_priority = node->process_priority;
+    node->_state_changes.already_entered_tree = false;
+    node->_state_changes.marked_for_queue_free = false;
+
     node->delete_Node = nde_delete_Node;
     node->enter_tree = nde_enter_tree;
     node->on_loop_starting = NULL;
-    node->pre_process = NULL;
+    node->erase = nde_erase;
     node->process = nde_process;
     node->post_process = NULL;
     node->_sub_class = NULL;
@@ -472,9 +493,9 @@ static void nde_add_child(Node* parent, Node* child)
     }
 
     //if script, call ready (not yet enter_tree())
-    if(!child->_already_entered_tree)
+    if(!child->_state_changes.already_entered_tree)
     {
-        child->_already_entered_tree = true;
+        child->_state_changes.already_entered_tree = true;
         if((child->script != NULL) && (child->script->ready != NULL))
         {
             child->script->ready(child->script);
@@ -493,46 +514,43 @@ static void nde_remove_child( Node* ths_node, Node* child)
     CLUIGE_ASSERT(child->parent == ths_node, "Node::remove_child() : child->parent != ths_node");
     int pos = nde_get_index(child);
 
-    //link between parent and child
-    if(ths_node->children == child) //if there is more than one children to ths_node
+    if(pos == 0 )
     {
-        ths_node->children = child->next_sibling;
+    	ths_node->children = child->next_sibling;
     }
-
-    //link between siblings
-    if(pos > 0 )
-    {
-        Node* node_to_mod = ths_node->children;  //take the node before the one we want to remove
-        Node* node_to_point = child->next_sibling;           //take the node after we the one we want to remove
-        node_to_mod->next_sibling = node_to_point;          //link both
-    }
+    else
+	{
+		Node* node_to_mod = iCluige.iNode.get_child(ths_node, pos-1);
+		node_to_mod->next_sibling = child->next_sibling;
+	}
     child->next_sibling = NULL;                         //remove the link between the child and the rest
     child->parent = NULL;
 }
 
+static void nde__mark_branch_for_queue_free(Node* root)
+{
+	root->_state_changes.marked_for_queue_free = true;
+    if(root->children != NULL)
+    {
+        nde__mark_branch_for_queue_free(root->children);
+    }
+
+    if(root->next_sibling != NULL)
+    {
+        nde__mark_branch_for_queue_free(root->next_sibling);
+    }
+}
+
 static void nde_queue_free(Node* node)
 {
-    CLUIGE_ASSERT(node != NULL, "Node::queue_free() : calling object is null");
-    int size = iCluige.iDeque.size(&_queue_freed_nodes);
-    bool already_queue_freed = false;
-    for(int i = 0; i < size; i++)
-    {
-        Node* node_in_deque = iCluige.iDeque.at(&_queue_freed_nodes,i).ptr;
-
-        already_queue_freed = nde_is_ancestor_of(node, node_in_deque);
-        if(already_queue_freed)
-        {
-            break;
-        }
-        //else if(nde_is_ancestor_of(node_in_deque, node))
-            //a descendant was already queue_freed
-            //but with the right order of processing the queue,
-            //the descendant will be removed/deleted first,
-            //so no seg fault
-    }
-    if(!already_queue_freed)
+    if(!node->_state_changes.marked_for_queue_free)
     {
         iCluige.iDeque.append(&_queue_freed_nodes, node);
+        node->_state_changes.marked_for_queue_free = true;
+        if(node->children != NULL)
+		{
+			nde__mark_branch_for_queue_free(node->children);
+		}
     }
 }
 
@@ -551,6 +569,7 @@ static void nde_queue_free(Node* node)
 
 static void nde__do_all_queue_free()
 {
+//	nde__debug_dq();
     int size = iCluige.iDeque.size(&_queue_freed_nodes);
     for(int i = 0; i < size; i++)
     {
@@ -561,7 +580,6 @@ static void nde__do_all_queue_free()
         //iCluige.iDeque.remove(&_queue_freed_nodes,i);
     }
     iCluige.iDeque.clear(&_queue_freed_nodes);
-    //nde__debug_dq();
 }
 
 static Node* nde_instanciate(const SortedDictionary* parsed_params)

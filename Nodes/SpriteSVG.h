@@ -30,11 +30,10 @@ struct _SpriteSVG
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
 	void (*_erase_super)(Node*);
-	void (*_post_process_super)(Node*);
 
 	//virtual methods in .c :
 	//void erase_Node(Node*);
-	//void post_process_Node(Node*);
+	//void draw(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

@@ -80,7 +80,8 @@ static void nde_process(Node* this_Node)
     }
 }
 
-//post_process = NULL for Node
+//pre_draw = NULL for Node
+//draw = NULL for Node
 
 
 ////////////////////////////////// iiNode /////////
@@ -116,7 +117,8 @@ static Node* nde_new_Node()
     node->on_loop_starting = NULL;
     node->erase = nde_erase;
     node->process = nde_process;
-    node->post_process = NULL;
+    node->pre_draw = NULL;
+    node->draw = NULL;
     node->_sub_class = NULL;
     return node;
 }

@@ -67,7 +67,7 @@ struct _Camera2D
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
 	void (*_erase_super)(Node*);
-//	void (*_post_process_super)(Node*);
+	void (*_pre_draw_super)(Node*);
 };
 
 struct iiCamera2D
@@ -98,7 +98,7 @@ struct iiCamera2D
 	Camera2D* (*new_Camera2D)();
 
 	//private method
-	void (*_predraw)(Node* this_node);
+	//void (*_predraw)(Node* this_node);//now virtual
 
 	//temporary TODO
 	float _SCREEN_HEIGHT;

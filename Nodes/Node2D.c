@@ -27,7 +27,7 @@ static void n2d_erase(Node* this_Node)
     this_Node2D->_erase_super(this_Node);
 }
 
-static void n2d_post_process(Node* this_Node)
+static void n2d_pre_draw(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     Node* n = this_Node;
@@ -82,7 +82,7 @@ static void n2d_on_loop_starting_Node2D(Node* this_Node)
 {
     struct _Node2D* this_Node2D = (struct _Node2D*)(this_Node->_sub_class);
     this_Node2D->_state_changes.position_changed = true;
-    n2d_post_process(this_Node);//compute _tmp_global_position
+    n2d_pre_draw(this_Node);//compute _tmp_global_position
 }
 
 
@@ -105,7 +105,7 @@ static Node2D* n2d_new_Node2D_from_Node(Node* new_node)
 	//virtual methods - private copies of mother class pointers
     new_node2D->_delete_super = new_node->delete_Node;
     new_node2D->_erase_super = new_node->erase;
-    new_node2D->_post_process_super = new_node->post_process;
+//    new_node2D->_post_process_super = new_node->post_process;
 //    new_node2D->delete_Node2D = n2d_delete_Node2D;
 //    new_node2D->enter_tree_Node = new_node->enter_tree;
 //    new_node->enter_tree = n2d_enter_tree_Node2D;
@@ -120,7 +120,7 @@ static Node2D* n2d_new_Node2D_from_Node(Node* new_node)
 
     new_node->delete_Node = n2d_delete_Node2D;
     new_node->erase = n2d_erase;
-    new_node->post_process = n2d_post_process;
+    new_node->pre_draw = n2d_pre_draw;
     new_node->on_loop_starting = n2d_on_loop_starting_Node2D;
 
     return new_node2D;

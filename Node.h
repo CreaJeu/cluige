@@ -51,7 +51,8 @@ struct _Node
 	void (*on_loop_starting)(Node*);
 	void (*erase)(Node*);
 	void (*process)(Node*);
-	void (*post_process)(Node*);
+	void (*pre_draw)(Node*);
+	void (*draw)(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

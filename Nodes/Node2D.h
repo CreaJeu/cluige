@@ -28,7 +28,7 @@ struct _Node2D
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
 	void (*_erase_super)(Node*);
-	void (*_post_process_super)(Node*);
+//	void (*_post_process_super)(Node*);
 //	void (*_enter_tree_super)(Node*);
 
 	//virtual methods in .c :

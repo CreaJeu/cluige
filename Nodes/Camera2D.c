@@ -151,12 +151,12 @@ static void c2d_erase(Node* this_Node)
     cam->_erase_super(this_Node);
 }
 
-//function called before post_process to apply offsets and limits on camera
-static void c2d__pre_draw(Node* this_Node)
+//apply offsets and limits on camera
+static void c2d_pre_draw(Node* this_Node)
 {
     Node2D* node2d  = (Node2D*) (this_Node->_sub_class);
     Camera2D* cam = (Camera2D*) (node2d->_sub_class);
-	//update _state_changes
+	//backup state
 	if(iCluige.iCamera2D._state_changes.state_changed)
 	{
 		iCluige.iCamera2D._state_changes.anchor_mode = cam->anchor_mode;
@@ -170,7 +170,7 @@ static void c2d__pre_draw(Node* this_Node)
 	{
 		return;
 	}
-    this_Node->post_process(this_Node);//super
+    cam->_pre_draw_super(this_Node);//super
 
     //updates values
     if(cam->anchor_mode == ANCHOR_MODE_FIXED_TOP_LEFT)
@@ -305,6 +305,7 @@ static struct _Camera2D* c2d_new_Camera2D()
 	//	overriding methods (if any)
     new_camera2D->_delete_super = new_Node->delete_Node;
     new_camera2D->_erase_super = new_Node->erase;
+    new_camera2D->_pre_draw_super = new_Node->pre_draw;
 //    new_camera2D->_post_process_super = new_Node->post_process;
 
     free(new_Node->_class_name); //TODO static value to avoid free
@@ -329,6 +330,7 @@ static struct _Camera2D* c2d_new_Camera2D()
     }
     new_Node->delete_Node = c2d_delete_Camera2D;
     new_Node->erase = c2d_erase;
+    new_Node->pre_draw = c2d_pre_draw;
 
     return new_camera2D;
 }
@@ -349,7 +351,6 @@ void iiCamera2D_init()
     iCluige.iCamera2D.set_zoom = c2d_set_zoom;
     iCluige.iCamera2D.set_enabled = c2d_set_enabled;
     iCluige.iCamera2D.is_enabled = c2d_is_enabled;
-    iCluige.iCamera2D._predraw = c2d__pre_draw;
     iCluige.iCamera2D.make_current = c2d_make_current;
     iCluige.iCamera2D.set_rotation_degrees = c2d_set_rotation_degrees;
     iCluige.iCamera2D.get_rotation_degrees = c2d_get_rotation_degrees;

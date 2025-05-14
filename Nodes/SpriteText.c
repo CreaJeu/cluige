@@ -137,12 +137,12 @@ static void sprtx_erase(Node* this_Node)
     this_SpriteText->_state_changes.text_changed = false;
 }
 
-static void sprtx_post_process(Node* this_Node)
+static void sprtx_draw(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
     //call super()
-    this_SpriteText->_post_process_super(this_Node);
+//    this_SpriteText->_post_process_super(this_Node);//no, just pre_draw in Node2D, not overridden here
 
     if(!(this_Node2D->visible))
     {
@@ -159,7 +159,7 @@ static void sprtx_post_process(Node* this_Node)
             &orig);
     int flat_i = 0;
     Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-    CLUIGE_ASSERT(current_camera != NULL, "SpriteText::post_process_Node() : current_camera is null");
+    CLUIGE_ASSERT(current_camera != NULL, "SpriteText::draw() : current_camera is null");
 
     float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
     float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
@@ -248,7 +248,7 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
 	new_SpriteText->_delete_super = new_Node->delete_Node;
 //	new_SpriteText->_enter_tree_super = new_Node->enter_tree;
 	new_SpriteText->_erase_super = new_Node->erase;
-	new_SpriteText->_post_process_super = new_Node->post_process;
+//	new_SpriteText->_post_process_super = new_Node->post_process;
 
     new_Node2D->_sub_class = new_SpriteText;
 
@@ -262,7 +262,7 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
     new_Node->delete_Node = sprtx_delete_SpriteText;
 //    new_Node->enter_tree = sprtx_enter_tree_SpriteText;
     new_Node->erase = sprtx_erase;
-    new_Node->post_process = sprtx_post_process;
+    new_Node->draw = sprtx_draw;
 
     return new_SpriteText;
 }

@@ -18,8 +18,6 @@
 					<Add option="-DCLUIGE_DEBUG" />
 				</Compiler>
 				<Linker>
-					<Add option="-static-libgcc" />
-					<Add option="-static" />
 					<Add library="../pdcurses_debug/pdcurses_debug/bin/Debug/libpdcurses_debug.a" />
 				</Linker>
 			</Target>

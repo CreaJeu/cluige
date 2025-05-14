@@ -99,7 +99,8 @@ enum ProcessPass
     STARTING_LOOP_PASS,
     ERASE_PASS,
     PROCESS_PASS,
-    POST_PROCESS_PASS
+    PRE_DRAW_PASS,
+    DRAW_PASS
 };
 
 static void _do_process_prioritized()
@@ -160,10 +161,16 @@ static void process_tree(Node* root, enum ProcessPass pass)
 			iCluige.iDeque.push_back(nodes_with_prio_p, root);
         }
         break;
-    case POST_PROCESS_PASS:
-        if(root->post_process != NULL)
+    case PRE_DRAW_PASS:
+        if(root->pre_draw != NULL)
         {
-            root->post_process(root);
+            root->pre_draw(root);
+        }
+        break;
+    case DRAW_PASS:
+        if(root->draw != NULL)
+        {
+            root->draw(root);
         }
         break;
     }
@@ -200,8 +207,9 @@ void cluige_run()
         process_tree(iCluige._private_root_2D, PROCESS_PASS);//just computes priorities
         _do_process_prioritized();//actually processes
         Camera2D* curr_cam = iCluige.iCamera2D.current_camera;
-        iCluige.iCamera2D._predraw(curr_cam->_this_Node2D->_this_Node);
-        process_tree(iCluige._private_root_2D, POST_PROCESS_PASS);
+        //iCluige.iCamera2D._predraw(curr_cam->_this_Node2D->_this_Node);//now generic for all nodes
+        process_tree(iCluige._private_root_2D, PRE_DRAW_PASS);
+        process_tree(iCluige._private_root_2D, DRAW_PASS);
 
         refresh();
         iCluige.iNode._do_all_queue_free();

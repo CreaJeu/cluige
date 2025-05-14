@@ -66,6 +66,7 @@ struct _Camera2D
 
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
+	void (*_erase_super)(Node*);
 //	void (*_post_process_super)(Node*);
 };
 
@@ -81,12 +82,25 @@ struct iiCamera2D
     //default camera which is created at every lunch of cluige
 	Camera2D* default_camera;
 
+	//private
+	//not in _Camera2D because current_camera can change
+	struct
+	{
+		bool state_changed;
+		enum AnchorMode anchor_mode;
+		Vector2 _tmp_limited_offseted_global_position;
+		Vector2 zoom;
+		bool ignore_rotation;
+		float global_tmp_cos_rotation;
+		float global_tmp_sin_rotation;
+	} _state_changes;
+
 	Camera2D* (*new_Camera2D)();
 
 	//private method
 	void (*_predraw)(Node* this_node);
 
-	//temporary
+	//temporary TODO
 	float _SCREEN_HEIGHT;
 	float _SCREEN_ANCHOR_CENTER_Y;
 	float _SCREEN_ANCHOR_CENTER_X;

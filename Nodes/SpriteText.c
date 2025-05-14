@@ -46,33 +46,37 @@ static void sprtx_erase(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
-    //call super()
-    this_SpriteText->_erase_super(this_Node);
 
-    if(!(this_Node2D->visible))
+    bool must_erase = this_Node2D->_state_changes.visible;//was visible last time
+    must_erase = must_erase &&
+        (
+            this_Node2D->_state_changes.position_changed ||
+            iCluige.iCamera2D._state_changes.state_changed ||
+            (!(this_Node2D->visible)) ||
+            this_SpriteText->_state_changes.text_changed ||
+            this_Node->_state_changes.marked_for_queue_free
+        );
+    if(!must_erase)
     {
+        this_SpriteText->_erase_super(this_Node);
         return;
     }
 
-    //clear old one (unless immobile? => no, because other masking things
-    //could have moved and made this sprite visible again;
-    //and curses already has characters cache)
+    //clear old one
     Vector2 orig;
     iCluige.iVector2.add(
             &(this_Node2D->_tmp_global_position),
             &(this_SpriteText->offset),
             &orig);
     int flat_i = 0;
-    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-    CLUIGE_ASSERT(current_camera != NULL, "SpriteText::erase() : current_camera is null");
 
-    float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
-    float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+    float x_camera = iCluige.iCamera2D._state_changes._tmp_limited_offseted_global_position.x;
+    float y_camera = iCluige.iCamera2D._state_changes._tmp_limited_offseted_global_position.y;
     float res_x;
     float res_y;
     float res_zoom_x;
     float res_zoom_y;
-    Vector2 zoom = current_camera->zoom;
+    Vector2 zoom = iCluige.iCamera2D._state_changes.zoom;
 
     for(int line = 0; line < this_SpriteText->nb_lines; line++)
     {
@@ -87,13 +91,13 @@ static void sprtx_erase(Node* this_Node)
             {
                 res_zoom_x = ((lrintf(orig.x) + col) - x_camera) * zoom.x;
                 res_zoom_y = ((lrintf(orig.y) + line) - y_camera) *zoom.y ;
-                if(!current_camera->ignore_rotation)
+                if(!iCluige.iCamera2D._state_changes.ignore_rotation)
                 {
-                    //float rotation_angle = -current_camera->rotation;
-                    float cf =  current_camera->global_tmp_cos_rotation;
-                    float sf = current_camera->global_tmp_sin_rotation;
+                    //float rotation_angle = -iCluige.iCamera2D._state_changes.rotation;
+                    float cf =  iCluige.iCamera2D._state_changes.global_tmp_cos_rotation;
+                    float sf = iCluige.iCamera2D._state_changes.global_tmp_sin_rotation;
 
-                    if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
+                    if(iCluige.iCamera2D._state_changes.anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
                     {
                         float drag_center_offset_x = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X;
                         float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
@@ -127,6 +131,9 @@ static void sprtx_erase(Node* this_Node)
         }
         flat_i++;
     }
+
+    //call super()
+    this_SpriteText->_erase_super(this_Node);
     this_SpriteText->_state_changes.text_changed = false;
 }
 

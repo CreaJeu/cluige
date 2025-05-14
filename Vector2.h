@@ -23,7 +23,8 @@ struct iiVector2
     bool (*is_normalized)(const Vector2* v);
     float (*distance_to)(const Vector2* v1, const Vector2* v2);
     float (*distance_squared_to)(const Vector2* v1, const Vector2* v2);
-    bool (*is_zero)(const Vector2* v);
+    bool (*is_zero_approx)(const Vector2* v);
+    bool (*is_equal_approx)(const Vector2* v1, const Vector2* v2);
 
 };
 

@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 
 //for sscanf
 #include <stdio.h>
@@ -24,6 +25,11 @@ void utils_breakpoint_trick(const void* anything, bool breakpoint)
 //{
 //	mvaddstr(y, x, msg);
 //}
+
+bool is_equal_approx(float a, float b)
+{
+	return fabs(a - b) < iCluige.EPSILON;
+}
 
 int clamp_int(int x, int min, int max)
 {

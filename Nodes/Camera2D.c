@@ -144,12 +144,32 @@ static bool c2d_is_enabled(const Camera2D* c2d)
     return c2d->enabled;
 }
 
+static void c2d_erase(Node* this_Node)
+{
+    Node2D* node2d  = (Node2D*) (this_Node->_sub_class);
+    Camera2D* cam = (Camera2D*) (node2d->_sub_class);
+    cam->_erase_super(this_Node);
+}
 
 //function called before post_process to apply offsets and limits on camera
 static void c2d__pre_draw(Node* this_Node)
 {
     Node2D* node2d  = (Node2D*) (this_Node->_sub_class);
     Camera2D* cam = (Camera2D*) (node2d->_sub_class);
+	//update _state_changes
+	if(iCluige.iCamera2D._state_changes.state_changed)
+	{
+		iCluige.iCamera2D._state_changes.anchor_mode = cam->anchor_mode;
+		iCluige.iCamera2D._state_changes._tmp_limited_offseted_global_position = cam->_tmp_limited_offseted_global_position;
+		iCluige.iCamera2D._state_changes.zoom = cam->zoom;
+		iCluige.iCamera2D._state_changes.ignore_rotation = cam->ignore_rotation;
+		iCluige.iCamera2D._state_changes.global_tmp_cos_rotation = cam->global_tmp_cos_rotation;
+		iCluige.iCamera2D._state_changes.global_tmp_sin_rotation = cam->global_tmp_sin_rotation;
+	}
+	if(cam != iCluige.iCamera2D.current_camera)
+	{
+		return;
+	}
     this_Node->post_process(this_Node);//super
 
     //updates values
@@ -173,6 +193,14 @@ static void c2d__pre_draw(Node* this_Node)
         cam->_tmp_limited_offseted_global_position.y =
             clamp_float(node2d->_tmp_global_position.y , cam->limit_top,cam->limit_bottom) + cam->offset.y - offset_adapted_y;
     }
+
+	iCluige.iCamera2D._state_changes.state_changed =
+		!iCluige.iVector2.is_equal_approx(&(cam->_tmp_limited_offseted_global_position),
+			&(iCluige.iCamera2D._state_changes._tmp_limited_offseted_global_position)) ||
+		!is_equal_approx(cam->global_tmp_cos_rotation, iCluige.iCamera2D._state_changes.global_tmp_cos_rotation) ||
+		!iCluige.iVector2.is_equal_approx(&(cam->zoom), &(iCluige.iCamera2D._state_changes.zoom)) ||
+		cam->anchor_mode != iCluige.iCamera2D._state_changes.anchor_mode ||
+		cam->ignore_rotation != iCluige.iCamera2D._state_changes.ignore_rotation;
 }
 
 
@@ -261,6 +289,8 @@ static struct _Camera2D* c2d_new_Camera2D()
     new_camera2D->global_tmp_sin_rotation = 0;
     new_camera2D->global_tmp_cos_rotation = 1;
 
+    //new_camera2D->_state_changes.state_changed = true;//see make_current()
+
     //private attributes of camera2D
 	new_camera2D->_this_Node2D = new_Node2D;
 	new_camera2D->_sub_class = NULL;
@@ -274,6 +304,7 @@ static struct _Camera2D* c2d_new_Camera2D()
 	//	new_Node virtual methods pointers are already pointing to
 	//	overriding methods (if any)
     new_camera2D->_delete_super = new_Node->delete_Node;
+    new_camera2D->_erase_super = new_Node->erase;
 //    new_camera2D->_post_process_super = new_Node->post_process;
 
     free(new_Node->_class_name); //TODO static value to avoid free
@@ -297,6 +328,7 @@ static struct _Camera2D* c2d_new_Camera2D()
         iCluige.iCamera2D.current_camera = new_camera2D;
     }
     new_Node->delete_Node = c2d_delete_Camera2D;
+    new_Node->erase = c2d_erase;
 
     return new_camera2D;
 }

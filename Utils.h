@@ -19,6 +19,7 @@ void utils_breakpoint_trick(const void* anything, bool breakpoint);
 //TODO good error logging for game designer instead of assert
 //void utils_cluige_printf(int x, int y, const char* msg);
 
+bool is_equal_approx(float a, float b);
 int clamp_int(int x, int min, int max);
 float clamp_float(float x, float min, float max);
 

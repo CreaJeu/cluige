@@ -60,17 +60,17 @@ static void nde_enter_tree(Node* this_Node)
 
 //on_loop_starting = NULL for Node
 
-//TODO maintain those data in all concerned methods instead of this systemtic copy each frame
-static void nde_erase(Node* this_Node)
-{
-    this_Node->_state_changes.parent = this_Node->parent;
-    this_Node->_state_changes.next_sibling = this_Node->next_sibling;
-    this_Node->_state_changes.children = this_Node->children;
-    this_Node->_state_changes.script = this_Node->script;
-    this_Node->_state_changes.name = this_Node->name;
-//    this_Node->_state_changes.active = this_Node->active;
-    this_Node->_state_changes.process_priority = this_Node->process_priority;
-}
+////better: maintain those data in all concerned methods instead of this systemtic copy each frame
+//static void nde_erase(Node* this_Node)
+//{
+//    this_Node->_state_changes.parent = this_Node->parent;
+//    this_Node->_state_changes.next_sibling = this_Node->next_sibling;
+//    this_Node->_state_changes.children = this_Node->children;
+//    this_Node->_state_changes.script = this_Node->script;
+//    this_Node->_state_changes.name = this_Node->name;
+////    this_Node->_state_changes.active = this_Node->active;
+//    this_Node->_state_changes.process_priority = this_Node->process_priority;
+//}
 
 static void nde_process(Node* this_Node)
 {
@@ -102,22 +102,24 @@ static Node* nde_new_Node()
     node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, 4);
     iCluige.iStringBuilder.append(&sb, "Node");
 
-    node->_state_changes.parent = node->parent;
-    node->_state_changes.next_sibling = node->next_sibling;
-    node->_state_changes.children = node->children;
-    node->_state_changes.script = node->script;
-    node->_state_changes.name = node->name;
-//    node->_state_changes.active = node->active;
-    node->_state_changes.process_priority = node->process_priority;
-    node->_state_changes.already_entered_tree = false;
-    node->_state_changes.marked_for_queue_free = false;
+//    node->_state_changes.parent = node->parent;
+//    node->_state_changes.next_sibling = node->next_sibling;
+//    node->_state_changes.children = node->children;
+//    node->_state_changes.script = node->script;
+//    node->_state_changes.name = node->name;
+////    node->_state_changes.active = node->active;
+//    node->_state_changes.process_priority = node->process_priority;
+//    node->_state_changes.already_entered_tree = false;
+//    node->_state_changes.marked_for_queue_free = false;
+    node->_already_entered_tree = false;
+    node->_marked_for_queue_free = false;
 
     node->delete_Node = nde_delete_Node;
     node->enter_tree = nde_enter_tree;
-    node->on_loop_starting = NULL;
-    node->erase = nde_erase;
+//    node->on_loop_starting = NULL;
+    node->erase = NULL;//nde_erase;
     node->process = nde_process;
-    node->pre_draw = NULL;
+    node->bake = NULL;
     node->draw = NULL;
     node->_sub_class = NULL;
     return node;
@@ -495,9 +497,9 @@ static void nde_add_child(Node* parent, Node* child)
     }
 
     //if script, call ready (not yet enter_tree())
-    if(!child->_state_changes.already_entered_tree)
+    if(!child->_already_entered_tree)
     {
-        child->_state_changes.already_entered_tree = true;
+        child->_already_entered_tree = true;
         if((child->script != NULL) && (child->script->ready != NULL))
         {
             child->script->ready(child->script);
@@ -531,7 +533,7 @@ static void nde_remove_child( Node* ths_node, Node* child)
 
 static void nde__mark_branch_for_queue_free(Node* root)
 {
-	root->_state_changes.marked_for_queue_free = true;
+	root->_marked_for_queue_free = true;
     if(root->children != NULL)
     {
         nde__mark_branch_for_queue_free(root->children);
@@ -545,10 +547,10 @@ static void nde__mark_branch_for_queue_free(Node* root)
 
 static void nde_queue_free(Node* node)
 {
-    if(!node->_state_changes.marked_for_queue_free)
+    if(!node->_marked_for_queue_free)
     {
         iCluige.iDeque.append(&_queue_freed_nodes, node);
-        node->_state_changes.marked_for_queue_free = true;
+        node->_marked_for_queue_free = true;
         if(node->children != NULL)
 		{
 			nde__mark_branch_for_queue_free(node->children);
@@ -569,7 +571,7 @@ static void nde_queue_free(Node* node)
 //    printf("\n");
 //}
 
-static void nde__do_all_queue_free()
+static void nde__do_all_queue_free_early_step()
 {
 //	nde__debug_dq();
     int size = iCluige.iDeque.size(&_queue_freed_nodes);
@@ -577,9 +579,17 @@ static void nde__do_all_queue_free()
     {
         Node* node = iCluige.iDeque.at(&_queue_freed_nodes, i).ptr;
         nde_remove_child(node->parent, node);
+    }
+}
+
+static void nde__do_all_queue_free_late_step()
+{
+//	nde__debug_dq();
+    int size = iCluige.iDeque.size(&_queue_freed_nodes);
+    for(int i = 0; i < size; i++)
+    {
+        Node* node = iCluige.iDeque.at(&_queue_freed_nodes, i).ptr;
         node->delete_Node(node);
-//        nde_delete_Node(node);
-        //iCluige.iDeque.remove(&_queue_freed_nodes,i);
     }
     iCluige.iDeque.clear(&_queue_freed_nodes);
 }
@@ -618,7 +628,8 @@ void iiNode_init()
     iCluige.iNode.add_child = nde_add_child;
     iCluige.iNode.remove_child = nde_remove_child;
     iCluige.iNode.queue_free = nde_queue_free;
-    iCluige.iNode._do_all_queue_free = nde__do_all_queue_free;
+    iCluige.iNode._do_all_queue_free_early_step = nde__do_all_queue_free_early_step;
+    iCluige.iNode._do_all_queue_free_late_step = nde__do_all_queue_free_late_step;
 
     SortedDictionary* fcties = &(iCluige.iNode.node_factories);
     NodeFactory* fcty = &(iCluige.iNode._Node_factory);

@@ -96,10 +96,10 @@ void cluige_init()
 
 enum ProcessPass
 {
-    STARTING_LOOP_PASS,
-    ERASE_PASS,
+//    STARTING_LOOP_PASS,
     PROCESS_PASS,
-    PRE_DRAW_PASS,
+    BAKE_PASS,
+    ERASE_PASS,
     DRAW_PASS
 };
 
@@ -127,12 +127,12 @@ static void process_tree(Node* root, enum ProcessPass pass)
     //recursion mode : DFS
     switch(pass)
     {
-    case STARTING_LOOP_PASS:
-        if(root->on_loop_starting != NULL)
-        {
-            root->on_loop_starting(root);
-        }
-        break;
+//    case STARTING_LOOP_PASS:
+//        if(root->on_loop_starting != NULL)
+//        {
+//            root->on_loop_starting(root);
+//        }
+//        break;
     case ERASE_PASS:
         if(root->erase != NULL)
         {
@@ -161,10 +161,10 @@ static void process_tree(Node* root, enum ProcessPass pass)
 			iCluige.iDeque.push_back(nodes_with_prio_p, root);
         }
         break;
-    case PRE_DRAW_PASS:
-        if(root->pre_draw != NULL)
+    case BAKE_PASS:
+        if(root->bake != NULL)
         {
-            root->pre_draw(root);
+            root->bake(root);
         }
         break;
     case DRAW_PASS:
@@ -198,30 +198,31 @@ void cluige_run()
     timeout(0);// for getch() : 0=blocking 0=return ERR/...
     keypad(stdscr, true);
 
-    process_tree(iCluige._private_root_2D, STARTING_LOOP_PASS);
+//    process_tree(iCluige._private_root_2D, STARTING_LOOP_PASS);
 
     //game loop
     while(!(iCluige.quit_asked))
     {
+        process_tree(iCluige._private_root_2D, BAKE_PASS);
         process_tree(iCluige._private_root_2D, ERASE_PASS);
-        process_tree(iCluige._private_root_2D, PROCESS_PASS);//just computes priorities
-        _do_process_prioritized();//actually processes
-        Camera2D* curr_cam = iCluige.iCamera2D.current_camera;
-        //iCluige.iCamera2D._predraw(curr_cam->_this_Node2D->_this_Node);//now generic for all nodes
-        process_tree(iCluige._private_root_2D, PRE_DRAW_PASS);
+        iCluige.iNode._do_all_queue_free_early_step();
         process_tree(iCluige._private_root_2D, DRAW_PASS);
 
         refresh();
-        iCluige.iNode._do_all_queue_free();
+        iCluige.iNode._do_all_queue_free_late_step();
         //curses
         int sleep_frame_milliseconds = 1;
-
         if(iCluige.clock->elapsed_seconds < iCluige.wanted_frame_seconds)
         {
             float sleep_frame_seconds = iCluige.wanted_frame_seconds - iCluige.clock->elapsed_seconds;
             sleep_frame_milliseconds = (int)(sleep_frame_seconds * 1000);
         }
         napms(sleep_frame_milliseconds);//sleep to avoid 100% CPU
+
+        process_tree(iCluige._private_root_2D, PROCESS_PASS);//just computes priorities
+        _do_process_prioritized();//actually processes
+        //while test about quit_asked is executed just after process
+        // to avoid unnecessary erase, draw, and free
     }
 }
 

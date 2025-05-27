@@ -28,18 +28,20 @@ struct _Node
 	int process_priority;//lower is processed sooner, default = 0
 
 	//private
-	struct
-	{
-		Node* parent;
-		Node* next_sibling;
-		Node* children;
-		Script* script;
-		char* name;//must not point to the stack, see set_name()
-//		bool active;
-		int process_priority;//lower is processed sooner, default = 0
-		bool already_entered_tree;
-		bool marked_for_queue_free;
-	} _state_changes;
+	bool _already_entered_tree;
+	bool _marked_for_queue_free;
+//	struct
+//	{
+//		Node* parent;
+//		Node* next_sibling;
+//		Node* children;
+//		Script* script;
+//		char* name;//must not point to the stack, see set_name()
+////		bool active;
+//		int process_priority;//lower is processed sooner, default = 0
+//		bool already_entered_tree;
+//		bool marked_for_queue_free;
+//	} _state_changes;//see old_baked/new_baked in Node2D for example if needed
 
 	//for inheritance
 	char* _class_name;
@@ -48,11 +50,11 @@ struct _Node
 	//virtual methods
 	void (*delete_Node)(Node*);
 	void (*enter_tree)(Node*);
-	void (*on_loop_starting)(Node*);
-	void (*erase)(Node*);
+//	void (*on_loop_starting)(Node*);
+	void (*erase)(Node*);//abstract (null)
 	void (*process)(Node*);
-	void (*pre_draw)(Node*);
-	void (*draw)(Node*);
+	void (*bake)(Node*);//abstract (null)
+	void (*draw)(Node*);//abstract (null)
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
@@ -121,7 +123,8 @@ struct iiNode
 	void (*queue_free)(Node* node);
 
 	//Only for cluige internal logic
-	void (*_do_all_queue_free)();
+	void (*_do_all_queue_free_early_step)();//remove from tree
+	void (*_do_all_queue_free_late_step)();//free, separated to be called between refresh() and sleep()
 };
 //iNode : in iiCluige
 

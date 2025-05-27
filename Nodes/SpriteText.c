@@ -20,11 +20,6 @@ static void sprtx_delete_SpriteText(Node* this_Node)
 //    {
 //        free(this_SpriteText->text[i]);
 //    }
-	//clear display
-	if(this_Node2D->visible && !(iCluige.quit_asked))
-	{
-		this_Node->erase(this_Node);
-	}
     free(this_SpriteText->text);
     CLUIGE_ASSERT(this_SpriteText->_sub_class == NULL, "SpriteText::delete_SpriteText() : not null subclass found");
     free(this_SpriteText);
@@ -47,36 +42,36 @@ static void sprtx_erase(Node* this_Node)
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
 
-    bool must_erase = this_Node2D->_state_changes.visible;//was visible last time
+    bool must_erase = this_Node2D->_old_baked.visible;//was visible last time
     must_erase = must_erase &&
         (
-            this_Node2D->_state_changes.position_changed ||
-            iCluige.iCamera2D._state_changes.state_changed ||
+            this_Node2D->_position_changed ||
+            iCluige.iCamera2D._old_baked.state_changed ||
             (!(this_Node2D->visible)) ||
-            this_SpriteText->_state_changes.text_changed ||
-            this_Node->_state_changes.marked_for_queue_free
+            this_SpriteText->_text_changed ||
+            this_Node->_marked_for_queue_free
         );
     if(!must_erase)
     {
-        this_SpriteText->_erase_super(this_Node);
+//        this_SpriteText->_erase_super(this_Node);//NULL
         return;
     }
 
     //clear old one
     Vector2 orig;
     iCluige.iVector2.add(
-            &(this_Node2D->_tmp_global_position),
+            &(this_Node2D->_old_baked.tmp_global_position),
             &(this_SpriteText->offset),
             &orig);
     int flat_i = 0;
 
-    float x_camera = iCluige.iCamera2D._state_changes._tmp_limited_offseted_global_position.x;
-    float y_camera = iCluige.iCamera2D._state_changes._tmp_limited_offseted_global_position.y;
+    float x_camera = iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position.x;
+    float y_camera = iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position.y;
     float res_x;
     float res_y;
     float res_zoom_x;
     float res_zoom_y;
-    Vector2 zoom = iCluige.iCamera2D._state_changes.zoom;
+    Vector2 zoom = iCluige.iCamera2D._old_baked.zoom;
 
     for(int line = 0; line < this_SpriteText->nb_lines; line++)
     {
@@ -91,16 +86,16 @@ static void sprtx_erase(Node* this_Node)
             {
                 res_zoom_x = ((lrintf(orig.x) + col) - x_camera) * zoom.x;
                 res_zoom_y = ((lrintf(orig.y) + line) - y_camera) *zoom.y ;
-                if(!iCluige.iCamera2D._state_changes.ignore_rotation)
+                if(!iCluige.iCamera2D._old_baked.ignore_rotation)
                 {
                     //float rotation_angle = -iCluige.iCamera2D._state_changes.rotation;
-                    float cf =  iCluige.iCamera2D._state_changes.global_tmp_cos_rotation;
-                    float sf = iCluige.iCamera2D._state_changes.global_tmp_sin_rotation;
+                    float cf =  iCluige.iCamera2D._old_baked.global_tmp_cos_rotation;
+                    float sf = iCluige.iCamera2D._old_baked.global_tmp_sin_rotation;
 
-                    if(iCluige.iCamera2D._state_changes.anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
+                    if(iCluige.iCamera2D._old_baked.anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
                     {
-                        float drag_center_offset_x = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X;
-                        float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
+                        float drag_center_offset_x = iCluige.iCamera2D._old_baked._screen_anchor_center_x;
+                        float drag_center_offset_y = iCluige.iCamera2D._old_baked._screen_anchor_center_y;
 
                         //substract the point you want to turn around (here the camera offset )
 
@@ -133,8 +128,8 @@ static void sprtx_erase(Node* this_Node)
     }
 
     //call super()
-    this_SpriteText->_erase_super(this_Node);
-    this_SpriteText->_state_changes.text_changed = false;
+//    this_SpriteText->_erase_super(this_Node);//NULL
+    this_SpriteText->_text_changed = false;
 }
 
 static void sprtx_draw(Node* this_Node)
@@ -154,7 +149,7 @@ static void sprtx_draw(Node* this_Node)
     //and curses already has characters cache)
     Vector2 orig;
     iCluige.iVector2.add(
-            &(this_Node2D->_tmp_global_position),
+            &(this_Node2D->_new_baked.tmp_global_position),
             &(this_SpriteText->offset),
             &orig);
     int flat_i = 0;
@@ -190,8 +185,8 @@ static void sprtx_draw(Node* this_Node)
 
                     if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
                     {
-                        float drag_center_offset_x = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X;
-                        float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
+                        float drag_center_offset_x = iCluige.iCamera2D._screen_anchor_center_x;
+                        float drag_center_offset_y = iCluige.iCamera2D._screen_anchor_center_y;
 
                         //substract the point you want to turn around (here the camera offset )
 
@@ -238,7 +233,7 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
     new_SpriteText->nb_lines = 0;
 	new_SpriteText->_this_Node2D = new_Node2D;
 	new_SpriteText->_sub_class = NULL;
-	new_SpriteText->_state_changes.text_changed = true;
+	new_SpriteText->_text_changed = true;
 
 	//virtual methods - private copies of mother class pointers
 	//	constructors of all ancestors in inheritance hierarchy
@@ -247,7 +242,7 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
 	//	overriding methods (if any)
 	new_SpriteText->_delete_super = new_Node->delete_Node;
 //	new_SpriteText->_enter_tree_super = new_Node->enter_tree;
-	new_SpriteText->_erase_super = new_Node->erase;
+//	new_SpriteText->_erase_super = new_Node->erase;//NULL
 //	new_SpriteText->_post_process_super = new_Node->post_process;
 
     new_Node2D->_sub_class = new_SpriteText;
@@ -306,7 +301,7 @@ static void sprtx_set_text(SpriteText* this_SpriteText, const char* new_text)
 	}
 	strcpy(this_SpriteText->text, new_text);
     sprtx__bake_text(this_SpriteText);
-    this_SpriteText->_state_changes.text_changed = true;
+    this_SpriteText->_text_changed = true;
 }
 
 static Node* sprtx_instanciate(const SortedDictionary* params)

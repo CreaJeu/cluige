@@ -22,11 +22,6 @@ static void ssvg_delete_SpriteSVG(Node* this_Node)
     //tmp memorize function pointer before calling free(this)
     void (*delete_super)(Node*) = this_SpriteSVG->_delete_super;
 
-    //clear display
-	if(this_Node2D->visible && !(iCluige.quit_asked))
-	{
-		this_Node->erase(this_Node);
-	}
     //delete my attributes
     //Deque<Path2D* > paths
     Deque* paths = &(this_SpriteSVG->paths);
@@ -77,30 +72,30 @@ static void ssvg_erase(Node* this_Node)
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
 
-    bool must_erase = this_Node2D->_state_changes.visible;//was visible last time
+    bool must_erase = this_Node2D->_old_baked.visible;//was visible last time
     must_erase = must_erase &&
         (
-            this_Node2D->_state_changes.position_changed ||
+            this_Node2D->_position_changed ||
             (!(this_Node2D->visible)) ||
-            iCluige.iCamera2D._state_changes.state_changed ||
-            this_Node->_state_changes.marked_for_queue_free ||
-            this_SpriteSVG->_state_changes.state_changed
+            iCluige.iCamera2D._old_baked.state_changed ||
+            this_Node->_marked_for_queue_free //||
+//            this_SpriteSVG->_state_changes.state_changed
         );
     if(!must_erase)
     {
-        this_SpriteSVG->_erase_super(this_Node);
+//        this_SpriteSVG->_erase_super(this_Node);//NULL
         return;
     }
 
     //clear old one
     Vector2 orig;
     iCluige.iVector2.add(
-            &(this_Node2D->_tmp_global_position),
+            &(this_Node2D->_old_baked.tmp_global_position),
             &(this_SpriteSVG->offset),
             &orig);
 
-    float x_camera = iCluige.iCamera2D._state_changes._tmp_limited_offseted_global_position.x;
-    float y_camera = iCluige.iCamera2D._state_changes._tmp_limited_offseted_global_position.y;
+    float x_camera = iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position.x;
+    float y_camera = iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position.y;
     float res_x_1 ;
     float res_y_1 ;
     float res_x_2 ;
@@ -109,7 +104,7 @@ static void ssvg_erase(Node* this_Node)
     float res_zoom_y_1;
     float res_zoom_x_2;
     float res_zoom_y_2;
-    Vector2 zoom = iCluige.iCamera2D._state_changes.zoom;
+    Vector2 zoom = iCluige.iCamera2D._old_baked.zoom;
 
     float sX = this_SpriteSVG->scale.x;
     float sY = this_SpriteSVG->scale.y;
@@ -132,16 +127,16 @@ static void ssvg_erase(Node* this_Node)
                 res_zoom_x_2 = (((orig.x + ((p2->x) * sX)) - x_camera)*zoom.x);
                 res_zoom_y_2 = (((orig.y + ((p2->y) * sY)) - y_camera)*zoom.y);
 
-                if(!iCluige.iCamera2D._state_changes.ignore_rotation)
+                if(!iCluige.iCamera2D._old_baked.ignore_rotation)
                 {
                     //float rotation_angle = -iCluige.iCamera2D.iCluige.iCamera2D._state_changes.rotation;
-                    float cf =  iCluige.iCamera2D._state_changes.global_tmp_cos_rotation;
-                    float sf = iCluige.iCamera2D._state_changes.global_tmp_sin_rotation;
+                    float cf =  iCluige.iCamera2D._old_baked.global_tmp_cos_rotation;
+                    float sf = iCluige.iCamera2D._old_baked.global_tmp_sin_rotation;
 
-                    if(iCluige.iCamera2D._state_changes.anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
+                    if(iCluige.iCamera2D._old_baked.anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
                     {
-                        float drag_center_offset_x = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X;
-                        float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
+                        float drag_center_offset_x = iCluige.iCamera2D._old_baked._screen_anchor_center_x;
+                        float drag_center_offset_y = iCluige.iCamera2D._old_baked._screen_anchor_center_y;
 
                         res_x_1 = (res_zoom_x_1 - drag_center_offset_x)  * cf - (res_zoom_y_1 - drag_center_offset_y)  * sf;
                         res_y_1 = (res_zoom_x_1 - drag_center_offset_x)  * sf + (res_zoom_y_1 - drag_center_offset_y)  * cf;
@@ -180,8 +175,8 @@ static void ssvg_erase(Node* this_Node)
         }
     }
     //call super()
-    this_SpriteSVG->_erase_super(this_Node);
-    this_SpriteSVG->_state_changes.state_changed = false;
+//    this_SpriteSVG->_erase_super(this_Node);//NULL
+//    this_SpriteSVG->_state_changes.state_changed = false;
 }
 
 static void ssvg_draw(Node* this_Node)
@@ -200,7 +195,7 @@ static void ssvg_draw(Node* this_Node)
     //and curses already has characters cache)
     Vector2 orig;
     iCluige.iVector2.add(
-            &(this_Node2D->_tmp_global_position),
+            &(this_Node2D->_new_baked.tmp_global_position),
             &(this_SpriteSVG->offset),
             &orig);
 
@@ -248,8 +243,8 @@ static void ssvg_draw(Node* this_Node)
 
                     if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
                     {
-                        float drag_center_offset_x = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_X;
-                        float drag_center_offset_y = iCluige.iCamera2D._SCREEN_ANCHOR_CENTER_Y;
+                        float drag_center_offset_x = iCluige.iCamera2D._screen_anchor_center_x;
+                        float drag_center_offset_y = iCluige.iCamera2D._screen_anchor_center_y;
 
                         res_x_1 = (res_zoom_x_1 - drag_center_offset_x)  * cf - (res_zoom_y_1 - drag_center_offset_y)  * sf;
                         res_y_1 = (res_zoom_x_1 - drag_center_offset_x)  * sf + (res_zoom_y_1 - drag_center_offset_y)  * cf;
@@ -309,7 +304,7 @@ static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
 	//	new_Node virtual methods pointers are already pointing to
 	//	overriding methods (if any)
 	new_SpriteSVG->_delete_super = new_Node->delete_Node;
-	new_SpriteSVG->_erase_super = new_Node->erase;
+//	new_SpriteSVG->_erase_super = new_Node->erase;
 //	new_SpriteSVG->_post_process_super = new_Node->post_process;
 
     new_Node2D->_sub_class = new_SpriteSVG;

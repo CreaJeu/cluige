@@ -14,27 +14,26 @@ struct _Node2D
 	//later : colorModulate, transform2D, rotation
 
 	//private
-	Vector2 _tmp_global_position;//don't change directly, use methods
+	//Vector2 _tmp_global_position;//don't change directly, use methods
+	bool _position_changed;
 
 	struct
 	{
 		bool visible;
-		bool position_changed;
-	} _state_changes;
+		Vector2 tmp_global_position;
+	} _new_baked, _old_baked;
 
 	Node* _this_Node;
 	void* _sub_class;
 
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
-	void (*_erase_super)(Node*);
+//	void (*_erase_super)(Node*);
 //	void (*_post_process_super)(Node*);
 //	void (*_enter_tree_super)(Node*);
 
 	//virtual methods in .c :
-	//void erase(Node*);
-	//void post_process(Node*);
-	//void on_loop_starting_Node2D(Node*);
+	//void bake(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

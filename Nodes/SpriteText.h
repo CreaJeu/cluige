@@ -16,10 +16,11 @@ struct _SpriteText
     int nb_lines;//TODO collection instead
 
 	//private
-	struct
-	{
-		bool text_changed;
-	} _state_changes;
+	bool _text_changed;
+//	struct
+//	{
+//		bool text_changed;
+//	} _state_changes;//see old_baked/new_baked in Node2D for example if needed
 
 	//private
 	Node2D* _this_Node2D;
@@ -29,7 +30,7 @@ struct _SpriteText
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
 //	void (*_enter_tree_super)(Node*);
-	void (*_erase_super)(Node*);
+//	void (*_erase_super)(Node*);
 //	void (*_post_process_super)(Node*);
 
 	//virtual methods in .c :

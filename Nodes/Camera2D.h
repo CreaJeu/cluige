@@ -66,8 +66,8 @@ struct _Camera2D
 
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
-	void (*_erase_super)(Node*);
-	void (*_pre_draw_super)(Node*);
+//	void (*_erase_super)(Node*);
+	void (*_bake_super)(Node*);
 };
 
 struct iiCamera2D
@@ -87,13 +87,16 @@ struct iiCamera2D
 	struct
 	{
 		bool state_changed;
+		Camera2D* current_camera;
 		enum AnchorMode anchor_mode;
 		Vector2 _tmp_limited_offseted_global_position;
 		Vector2 zoom;
 		bool ignore_rotation;
 		float global_tmp_cos_rotation;
 		float global_tmp_sin_rotation;
-	} _state_changes;
+		float _screen_anchor_center_y;
+		float _screen_anchor_center_x;
+	} _old_baked;//see old_baked/new_baked in Node2D for more generic example
 
 	Camera2D* (*new_Camera2D)();
 
@@ -101,10 +104,10 @@ struct iiCamera2D
 	//void (*_predraw)(Node* this_node);//now virtual
 
 	//temporary TODO
-	float _SCREEN_HEIGHT;
-	float _SCREEN_ANCHOR_CENTER_Y;
-	float _SCREEN_ANCHOR_CENTER_X;
-	float _SCREEN_WIDTH;
+	float _screen_height;
+	float _screen_anchor_center_y;
+	float _screen_anchor_center_x;
+	float _screen_width;
 
 
 	Vector2 (*get_zoom)(const Camera2D* c2d);

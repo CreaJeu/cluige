@@ -18,10 +18,10 @@ struct _SpriteSVG
     Deque paths;//Deque<Path2D* > all paths of the svg
 
 	//private
-	struct
-	{
-		bool state_changed;
-	} _state_changes;
+//	struct
+//	{
+//		bool state_changed;
+//	} _state_changes;//see old_baked/new_baked in Node2D for example if needed
 
 	//private
 	Node2D* _this_Node2D;
@@ -29,7 +29,7 @@ struct _SpriteSVG
 
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
-	void (*_erase_super)(Node*);
+//	void (*_erase_super)(Node*);
 
 	//virtual methods in .c :
 	//void erase_Node(Node*);

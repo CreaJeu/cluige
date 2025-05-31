@@ -377,14 +377,13 @@ static Node* ssvg_instanciate(const SortedDictionary* params)
     //scale = Vector2(2.265, -3.2)
     //svg_file_path = "../some/where"
     utils_vector2_from_parsed(&(res_SpriteSVG->offset), params, "offset");
-    utils_vector2_from_parsed(&(res_SpriteSVG->scale), params, "scale");
+    utils_vector2_from_parsed(&(res_SpriteSVG->scale), params, "scale");//TODO scale in Node2D instead
     CLUIGE_ASSERT(iCluige.iDeque.empty(&(res_SpriteSVG->paths)), "SpriteSVG::instanciate() : trying to instanciate() into non empty object");
     char* svg_file_path;
     //'texture'=>'path/to/file.svg' see TscnParser::node()
     bool ok = utils_nonquoted_str_from_parsed(&svg_file_path, params, "svg_file_path");
 //	char* dbg = iCluige.iSortedDictionary.debug_str_str(params);
 //	utils_breakpoint_trick(dbg, !ok);
-    utils_breakpoint_trick(&ok, !ok);
     CLUIGE_ASSERT(ok, "SpriteSVG::instanciate() : missing 'texture' field");
     ssvg_parse_file(res_SpriteSVG, svg_file_path);
     //free(svg_file_path);no need with utils_nonquoted_str_from_parsed()
@@ -401,12 +400,9 @@ void iiSpriteSVG_init()
     iCluige.iSpriteSVG.add_path_from_array_relative = ssvg_add_path_from_array_relative;
     iCluige.iSpriteSVG.add_path_from_parsed_deque = ssvg_add_path_from_parsed_deque;
     iCluige.iSpriteSVG.parse_file = ssvg_parse_file;
-    SortedDictionary* fcties = &(iCluige.iNode.node_factories);
-    NodeFactory* fcty = &(iCluige.iSpriteSVG._SpriteSVG_factory);
-    fcty->instanciate = ssvg_instanciate;
-    char* fcty_key = iCluige.checked_malloc(9 * sizeof(char));
-    strncpy(fcty_key, "Sprite2D", 9);
-    iCluige.iSortedDictionary.insert(fcties, fcty_key, fcty);
+
+    iCluige.iSpriteSVG._SpriteSVG_factory.instanciate = ssvg_instanciate;
+    iCluige.iNode.register_NodeFactory("Sprite2D", &(iCluige.iSpriteSVG._SpriteSVG_factory));
 
     iiSVGParser_init(&(iCluige.iSpriteSVG.iSVGParser));
     iCluige.iSpriteSVG.iSVGParser.SVGParser_alloc(&_svg_parser);

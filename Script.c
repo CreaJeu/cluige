@@ -25,7 +25,9 @@ static Script* scpt_new_Script(Node* node)
     this_Script->_sub_class = NULL;
 
     this_Script->delete_Script = scpt_delete_Script;
+    this_Script->enter_tree = NULL;
     this_Script->ready = NULL;
+    this_Script->exit_tree = NULL;
     this_Script->process = NULL;
     return this_Script;
 }

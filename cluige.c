@@ -71,11 +71,12 @@ void cluige_init()
 
     iiCamera2D_init();
     Camera2D* default_camera = iCluige.iCamera2D.new_Camera2D();
-    iCluige.iCamera2D.current_camera = default_camera;
-    iCluige.iNode.set_name(iCluige.iCamera2D.current_camera->_this_Node2D->_this_Node,"default_camera");
+    iCluige.iNode.set_name(default_camera->_this_Node2D->_this_Node,"default_camera");
     default_camera->anchor_mode = ANCHOR_MODE_FIXED_TOP_LEFT;
-    iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.iCamera2D.current_camera->_this_Node2D->_this_Node);
+    iCluige.iNode.add_child(iCluige._private_root_2D, default_camera->_this_Node2D->_this_Node);
     iCluige.iCamera2D.default_camera = default_camera;
+//    iCluige.iCamera2D.current_camera = default_camera;
+	iCluige.iCamera2D.make_current(default_camera);
     //iCluige.iNode.print_tree_pretty(iCluige.private_root_2D);
 
     iCluige.public_root_2D = iCluige.iNode.new_Node();
@@ -199,18 +200,49 @@ void cluige_run()
     keypad(stdscr, true);
 
 //    process_tree(iCluige._private_root_2D, STARTING_LOOP_PASS);
+	//in case remove_child() was called before loop
+	iCluige.iDeque.clear(&(iCluige.iNode._just_removed_nodes));
 
     //game loop
     while(!(iCluige.quit_asked))
     {
+    	//BAKE
         process_tree(iCluige._private_root_2D, BAKE_PASS);
+        int nb_just_removed = iCluige.iDeque.size(&(iCluige.iNode._just_removed_nodes));
+        for(int i=0; i<nb_just_removed; i++)
+		{
+			Node* n = (Node*)iCluige.iDeque.at(&(iCluige.iNode._just_removed_nodes), i).ptr;
+			if(n->bake != NULL)
+			{
+				n->bake(n);
+			}
+		}
+
+		//ERASE
         process_tree(iCluige._private_root_2D, ERASE_PASS);
+        for(int i=0; i<nb_just_removed; i++)
+		{
+			Node* n = (Node*)iCluige.iDeque.at(&(iCluige.iNode._just_removed_nodes), i).ptr;
+			if(n->erase != NULL)
+			{
+				n->erase(n);
+			}
+		}
+
+		//queue_free_early
         iCluige.iNode._do_all_queue_free_early_step();
+
+        //DRAW
         process_tree(iCluige._private_root_2D, DRAW_PASS);
 
+        //curses refresh
         refresh();
+
+        //queue_free_late
         iCluige.iNode._do_all_queue_free_late_step();
-        //curses
+		iCluige.iDeque.clear(&(iCluige.iNode._just_removed_nodes));
+
+        //curses sleep
         int sleep_frame_milliseconds = 1;
         if(iCluige.clock->elapsed_seconds < iCluige.wanted_frame_seconds)
         {
@@ -219,10 +251,11 @@ void cluige_run()
         }
         napms(sleep_frame_milliseconds);//sleep to avoid 100% CPU
 
+        //PROCESS
         process_tree(iCluige._private_root_2D, PROCESS_PASS);//just computes priorities
         _do_process_prioritized();//actually processes
-        //while test about quit_asked is executed just after process
-        // to avoid unnecessary erase, draw, and free
+        //while-test about quit_asked is executed just after process
+        // to avoid unnecessary erase, draw, free...
     }
 }
 

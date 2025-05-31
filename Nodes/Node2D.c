@@ -193,12 +193,7 @@ void iiNode2D_init()
     iCluige.iNode2D.move_local = n2d_move_local;
     iCluige.iNode2D.set_local_position = n2d_set_local_position;
 
-    SortedDictionary* fcties = &(iCluige.iNode.node_factories);
-    NodeFactory* fcty = &(iCluige.iNode2D._Node2D_factory);
-    fcty->instanciate = n2d_instanciate;
-
-    char* fcty_key = iCluige.checked_malloc(7 * sizeof(char));
-    strncpy(fcty_key, "Node2D", 7);
-    iCluige.iSortedDictionary.insert(fcties, fcty_key, fcty);
+    iCluige.iNode2D._Node2D_factory.instanciate = n2d_instanciate;
+    iCluige.iNode.register_NodeFactory("Node2D", &(iCluige.iNode2D._Node2D_factory));
 }
 

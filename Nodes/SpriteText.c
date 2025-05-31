@@ -332,12 +332,7 @@ void iiSpriteText_init()
     iCluige.iSpriteText.new_SpriteText_from_Node2D = sprtx_new_SpriteText_from_Node2D;
     iCluige.iSpriteText.set_text = sprtx_set_text;
 
-    SortedDictionary* fcties = &(iCluige.iNode.node_factories);
-    NodeFactory* fcty = &(iCluige.iSpriteText._SpriteText_factory);
-    fcty->instanciate = sprtx_instanciate;
-
-    char* fcty_key = iCluige.checked_malloc(6 * sizeof(char));
-    strncpy(fcty_key, "Label", 6);
-    iCluige.iSortedDictionary.insert(fcties, fcty_key, fcty);
+    iCluige.iSpriteText._SpriteText_factory.instanciate = sprtx_instanciate;
+    iCluige.iNode.register_NodeFactory("Label", &(iCluige.iSpriteText._SpriteText_factory));
 }
 

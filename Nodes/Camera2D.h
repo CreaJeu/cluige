@@ -9,7 +9,8 @@ enum AnchorMode
 {
     ANCHOR_MODE_FIXED_TOP_LEFT,
     ANCHOR_MODE_DRAG_CENTER
-};
+};//warning : keep same order in this enum than Godot
+//see https://docs.godotengine.org/en/stable/classes/class_camera2d.html#enum-camera2d-anchormode
 
 struct _Camera2D
 {
@@ -18,7 +19,8 @@ struct _Camera2D
 
 	//if false camera won't be current if true and if the camera is the highest camera in tree becomes current camera
 	//MUST use methods to modify
-	bool enabled;
+	//removed from cluige because even in Godot this is useless and confusing
+//	bool enabled;
 
 	bool ignore_rotation;
 
@@ -62,16 +64,21 @@ struct _Camera2D
     enum AnchorMode anchor_mode;
 
     //respectively Left Top Right Bottom
-    float* limits[4];
+    //float* limits[4];
 
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
+//	void (*_enter_tree_super)(Node*);
+	void (*_exit_tree_super)(Node*);
 //	void (*_erase_super)(Node*);
 	void (*_bake_super)(Node*);
 };
 
 struct iiCamera2D
 {
+	// ~private static
+	NodeFactory _Camera2D_factory;
+
     //default camera is the camera in private_root
     //is updated automatically when disabling and enabling cameras
     // or by deleting a camera from tree
@@ -115,10 +122,10 @@ struct iiCamera2D
 	//must be used, don't directly access zoom;
     void (*set_zoom)(Camera2D* c2d, Vector2 v);
 
-    //must be used, don't directly access enabled;
-    void (*set_enabled)(Camera2D* c2d, bool enab);
-
-    bool (*is_enabled)(const Camera2D* c2d);
+//    //must be used, don't directly access enabled;
+//    void (*set_enabled)(Camera2D* c2d, bool enab);
+//
+//    bool (*is_enabled)(const Camera2D* c2d);
     void (*make_current)(Camera2D* c2d);
 
     //Must use this methods to set the rotation and get the rotation

@@ -43,13 +43,24 @@ struct _Node
 //		bool marked_for_queue_free;
 //	} _state_changes;//see old_baked/new_baked in Node2D for example if needed
 
+	//overview of the game loop :
+	//all process() functions all called
+	//	they read/write only raw data
+	//then all bake()  functions all called
+	//	they cook raw to baked data
+	//		(and keep a backup of their previous values from frame N-1)
+	//then all erase(), then all draw()
+	//	they only read, and only from baked data
+
 	//for inheritance
 	char* _class_name;
 	void* _sub_class;
 
 	//virtual methods
 	void (*delete_Node)(Node*);
-	void (*enter_tree)(Node*);
+	void (*enter_tree)(Node*);//called at each tree entering
+	void (*ready)(Node*);//called after enter_tree, but only on the 1st entering ever
+	void (*exit_tree)(Node*);//called just before remove_child logic
 //	void (*on_loop_starting)(Node*);
 	void (*erase)(Node*);//abstract (null)
 	void (*process)(Node*);
@@ -68,6 +79,9 @@ struct iiNode
 
 	// ~private static
 	NodeFactory _Node_factory;
+
+	// ~private static
+	Deque _just_removed_nodes;
 
 	//void (*initZero)(Node*);// no : would encourage not freeable nodes on the stack
 
@@ -125,6 +139,8 @@ struct iiNode
 	//Only for cluige internal logic
 	void (*_do_all_queue_free_early_step)();//remove from tree
 	void (*_do_all_queue_free_late_step)();//free, separated to be called between refresh() and sleep()
+
+	void (*register_NodeFactory)(const char* key, NodeFactory* factory);
 };
 //iNode : in iiCluige
 

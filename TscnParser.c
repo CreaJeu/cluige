@@ -324,7 +324,6 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 			//we must extract the id, then find filepath from it
 			char* svg_id;
 			bool ok = utils_id_str_from_ExtResource_parsed(&svg_id, keeped_val);
-			utils_breakpoint_trick(&ok, !ok);
 			CLUIGE_ASSERT(ok, "TscnParser::node() : texture id could not be read");
 
 			SortedDictionary* dico_ids = &(this_TscnParser->_dico_ids);
@@ -350,7 +349,6 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 				keeped_val);
 		//dbg_dic = iCluige.iSortedDictionary.debug_str_str(dic);
 		bool overwritten = (cv.valid);
-		utils_breakpoint_trick(NULL, overwritten);
 		CLUIGE_ASSERT(!overwritten,
 			"TscnParser::node() : parsed param-value would overwrite another param-value");
 
@@ -403,7 +401,6 @@ static bool tsnp_ext_res(TscnParser* this_TscnParser)
 	if(strncmp(from, "Texture2D\"", tmp_len+1) == 0)
 	{
 		from = strstr(curr_line, "\" id=\"");
-		utils_breakpoint_trick(from, from == NULL);
 		CLUIGE_ASSERT(from != NULL,
 			"TscnParser::ext_res() : error in cluige or in tscn : 'id' not found for texture");
 		tmp_len = strlen("\" id=\"");
@@ -414,7 +411,6 @@ static bool tsnp_ext_res(TscnParser* this_TscnParser)
 		keeped_key[tmp_len] = '\0';
 
 		from = strstr(curr_line, "\" path=\"res://");
-		utils_breakpoint_trick(from, from == NULL);
 		CLUIGE_ASSERT(from != NULL,
 			"TscnParser::ext_res() : error in cluige or in tscn : 'path' not found for texture");
 		tmp_len = strlen("\" path=\"res://");

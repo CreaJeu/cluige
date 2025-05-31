@@ -22,7 +22,7 @@ static void sbr_connect_existing_string(StringBuilder* sb, char* dest)
 {
     sb->built_string = dest;
     sb->next_char = sb->built_string;
-    sb->remaining_size = strlen(dest);
+    sb->remaining_size = strlen(dest);//TODO really strlen(dest) ?
 }
 
 static void sbr__append_from_args(StringBuilder* sb, const char* formatted_tail, va_list args)

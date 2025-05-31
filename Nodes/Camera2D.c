@@ -8,7 +8,7 @@
 
 ////////////////////////////////// _Camera2D /////////
 
-static Node* c2d__highest_node_excluding_one_nde(Node* parent, const char* class_name, const Node* camera_node);
+//static Node* c2d__highest_node_excluding_one_nde(Node* parent, const char* class_name, const Node* camera_node);
 
 //given in degrees not radians
 static void c2d_set_rotation_degrees(Camera2D* c2d, float angle_degrees)
@@ -25,8 +25,6 @@ static void c2d_set_rotation_degrees(Camera2D* c2d, float angle_degrees)
     }
 
     c2d->rotation_radians = angle_degrees * 3.1415926 / 180;
-    c2d->global_tmp_cos_rotation = cosf(c2d->rotation_radians);
-    c2d->global_tmp_sin_rotation = sinf(c2d->rotation_radians);
 }
 
 //in degrees
@@ -39,23 +37,22 @@ static float c2d_get_rotation_degrees(Camera2D* c2d)
 //TODO not finished
 static void c2d_make_current(Camera2D* c2d)
 {
-    CLUIGE_ASSERT(c2d != NULL, "Camera2D::make_current() : calling object is null");
-    CLUIGE_ASSERT(c2d->enabled, "Camera2D::make_current() : calling object is not enabled");
-
+//    CLUIGE_ASSERT(c2d != NULL, "Camera2D::make_current() : calling object is null");
+//    CLUIGE_ASSERT(c2d->enabled, "Camera2D::make_current() : calling object is not enabled");
     iCluige.iCamera2D.current_camera = c2d;
     c2d->_this_Node2D->_position_changed = true;
 }
 
-//private uitl
-static Camera2D* c2d__get_camera_from_node(Node* this_node)
-{
-    CLUIGE_ASSERT(this_node != NULL, "Camera2D::_get_camera_from_node() : calling object is null");
-    Node2D* nde_2d = (Node2D*)(this_node->_sub_class);
-    CLUIGE_ASSERT(nde_2d != NULL, "Camera2D::_get_camera_from_node() : calling object _sub_class is null");
-    Camera2D* nde_cam_2d = (Camera2D*) (nde_2d->_sub_class);
-    CLUIGE_ASSERT(nde_cam_2d != NULL, "Camera2D::_get_camera_from_node() : calling object _sub_class->_sub_class is null");
-    return nde_cam_2d;
-}
+////private uitl
+//static Camera2D* c2d__get_camera_from_node(Node* this_node)
+//{
+//    CLUIGE_ASSERT(this_node != NULL, "Camera2D::_get_camera_from_node() : calling object is null");
+//    Node2D* nde_2d = (Node2D*)(this_node->_sub_class);
+//    CLUIGE_ASSERT(nde_2d != NULL, "Camera2D::_get_camera_from_node() : calling object _sub_class is null");
+//    Camera2D* nde_cam_2d = (Camera2D*) (nde_2d->_sub_class);
+//    CLUIGE_ASSERT(nde_cam_2d != NULL, "Camera2D::_get_camera_from_node() : calling object _sub_class->_sub_class is null");
+//    return nde_cam_2d;
+//}
 
 static void c2d_delete_Camera2D(Node* this_node)
 {
@@ -97,52 +94,68 @@ static void c2d_set_zoom(Camera2D* c2d, Vector2 v)
     //CLUIGE_ASSERT(!is_near_zero(v), "Camera2D::() : ");
     if(fabs(v.x) > .01 && fabs(v.y) > .01)
     {
-        //TODO gné?
-        iCluige.iCamera2D._screen_width = iCluige.iCamera2D._screen_width * (1/v.x);
-        iCluige.iCamera2D._screen_height = iCluige.iCamera2D._screen_height * (1/v.y);
-        iCluige.iCamera2D._screen_anchor_center_x = iCluige.iCamera2D._screen_width/2;
-        iCluige.iCamera2D._screen_anchor_center_y = iCluige.iCamera2D._screen_height/2;
-        c2d->zoom = (Vector2){v.x,v.y};
+        c2d->zoom = v;
     }
 }
 
-static void c2d_set_enabled(Camera2D* c2d, bool enab)
+//static void c2d_enter_tree(Node* this_Node)
+//{
+//	Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+//	Camera2D*c2d = (Camera2D*)(this_Node2D->_sub_class);
+//	...logic here ?
+//	c2d->_enter_tree_super(this_Node);
+//}
+
+static void c2d_exit_tree(Node* this_Node)
 {
-    CLUIGE_ASSERT(c2d != NULL, "Camera2D::set_enabled() : calling object is null");
-    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-    Node* node_current_camera = current_camera->_this_Node2D->_this_Node;
-    Node* node_c2d = c2d->_this_Node2D->_this_Node;
-
-    bool is_greater = iCluige.iNode.is_higher_than(node_c2d, node_current_camera);
-    //true if current_camera is higher than camera in parameter
-
-    if(enab && !is_greater)
-    {
-        //make_current must have in parameter a enabled camera
-        c2d->enabled = enab;
-        c2d_make_current(c2d);
-    }
-    else if (!enab && c2d == current_camera)// if user want to desactivate the current camera
-    {
-        Node* node_found = c2d__highest_node_excluding_one_nde(iCluige.public_root_2D,"NodeNode2DCamera2D",
-                                                               current_camera->_this_Node2D->_this_Node);
-        if(node_found == NULL)//no other camera in tree
-        {
-            c2d_make_current(iCluige.iCamera2D.default_camera);
-        }
-        else                    //higher camera in tree become current_camera
-        {
-            c2d_make_current(c2d__get_camera_from_node(node_found));
-        }
-    }
-    c2d->enabled = enab;
+	Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+	Camera2D*c2d = (Camera2D*)(this_Node2D->_sub_class);
+	//a bit different from godot behaviour, but anyway
+	if(iCluige.iCamera2D.current_camera == c2d)
+	{
+		iCluige.iCamera2D.make_current(iCluige.iCamera2D.default_camera);
+	}
+	c2d->_exit_tree_super(this_Node);
 }
 
-static bool c2d_is_enabled(const Camera2D* c2d)
-{
-    CLUIGE_ASSERT(c2d != NULL, "Camera2D::is_enabled() : calling object is null");
-    return c2d->enabled;
-}
+//static void c2d_set_enabled(Camera2D* c2d, bool enab)
+//{
+//    CLUIGE_ASSERT(c2d != NULL, "Camera2D::set_enabled() : calling object is null");
+//    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
+//    Node* node_current_camera = current_camera->_this_Node2D->_this_Node;
+//    Node* node_c2d = c2d->_this_Node2D->_this_Node;
+//
+//    //TODO check if really like godot
+//    bool is_greater = iCluige.iNode.is_higher_than(node_c2d, node_current_camera);
+//    //true if current_camera is higher than camera in parameter
+//
+//    if(enab && !is_greater)
+//    {
+//        //make_current must have in parameter a enabled camera
+//        c2d->enabled = enab;
+//        c2d_make_current(c2d);
+//    }
+//    else if (!enab && c2d == current_camera)// if user want to desactivate the current camera
+//    {
+//        Node* node_found = c2d__highest_node_excluding_one_nde(iCluige.public_root_2D,"NodeNode2DCamera2D",
+//                                                               current_camera->_this_Node2D->_this_Node);
+//        if(node_found == NULL)//no other camera in tree
+//        {
+//            c2d_make_current(iCluige.iCamera2D.default_camera);
+//        }
+//        else                    //higher camera in tree become current_camera
+//        {
+//            c2d_make_current(c2d__get_camera_from_node(node_found));
+//        }
+//    }
+//    c2d->enabled = enab;
+//}
+
+//static bool c2d_is_enabled(const Camera2D* c2d)
+//{
+//    CLUIGE_ASSERT(c2d != NULL, "Camera2D::is_enabled() : calling object is null");
+//    return c2d->enabled;
+//}
 
 //static void c2d_erase(Node* this_Node)
 //{
@@ -174,6 +187,15 @@ static void c2d_bake(Node* this_Node)
 		iCluige.iCamera2D._old_baked._screen_anchor_center_x = iCluige.iCamera2D._screen_anchor_center_x;
 	}
     cam->_bake_super(this_Node);//super
+
+    cam->global_tmp_cos_rotation = cosf(cam->rotation_radians);
+    cam->global_tmp_sin_rotation = sinf(cam->rotation_radians);
+
+	//TODO gné?
+	iCluige.iCamera2D._screen_width = iCluige.iCamera2D._screen_width * (1/cam->zoom.x);
+	iCluige.iCamera2D._screen_height = iCluige.iCamera2D._screen_height * (1/cam->zoom.y);
+	iCluige.iCamera2D._screen_anchor_center_x = iCluige.iCamera2D._screen_width/2;
+	iCluige.iCamera2D._screen_anchor_center_y = iCluige.iCamera2D._screen_height/2;
 
     //updates values
     if(cam->anchor_mode == ANCHOR_MODE_FIXED_TOP_LEFT)
@@ -210,69 +232,68 @@ static void c2d_bake(Node* this_Node)
 
 /////////////////////////////////// iiCamera2D //////////
 
-/*
-@param Node* parent any node in the tree, the search will start from this node
-@param char* class_name the name of the class you want to search
-@param Node* excluded_node the node you want to exclude of the search
+///*
+//@param Node* parent any node in the tree, the search will start from this node
+//@param char* class_name the name of the class you want to search
+//@param Node* excluded_node the node you want to exclude of the search
+//
+//
+//@returns the highest node in tree hierarchy by class_name excluding one node of the tree
+//*/
+////TODO not sure it works perfectly + not sure if it's relevant for Cluige
+//static Node* c2d__highest_node_excluding_one_nde(Node* parent, const char* class_name, const Node* excluded_node) {
+//    CLUIGE_ASSERT(parent != NULL, "Camera2D::_highest_node_excluding_one_nde() : parent is null");
+//    Node* highest_camera = NULL;
+//    int highest_depth = -1;
+//
+//    Deque queue;
+//    iCluige.iDeque.deque_alloc(&queue, VT_POINTER, 10);
+//    iCluige.iDeque.append(&queue, parent);
+//
+//    int current_depth = 0;
+//    while (iCluige.iDeque.size(&queue) > 0)
+//    {
+//        int queue_size = iCluige.iDeque.size(&queue);
+//        for (int i = 0; i < queue_size; i++)
+//        {
+//            Variant front_variant = iCluige.iDeque.front(&queue);
+//            Node* current_node = (Node*)front_variant.ptr;
+//            iCluige.iDeque.pop_front(&queue);
+//
+//            if (current_node != excluded_node && strcmp(current_node->_class_name, class_name) == 0)
+//            {
+//                Node2D* node2Dfound = current_node->_sub_class;
+//                Camera2D* camera_found = node2Dfound->_sub_class;
+//                if (camera_found->enabled && current_depth > highest_depth)
+//                {
+//                    highest_camera = current_node;
+//                    highest_depth = current_depth;
+//                }
+//            }
+//
+//            if (current_node->children != NULL)
+//            {
+//                iCluige.iDeque.append(&queue, current_node->children);
+//            }
+//
+//            if (current_node->next_sibling != NULL)
+//            {
+//                iCluige.iDeque.append(&queue, current_node->next_sibling);
+//            }
+//        }
+//        current_depth++;
+//    }
+//    iCluige.iDeque.pre_delete_Deque(&queue);
+//    return highest_camera;
+//}
 
-
-@returns the highest node in tree hierarchy by class_name excluding one node of the tree
-*/
-//TODO not sure it works perfectly + not sure if it's relevant for Cluige
-static Node* c2d__highest_node_excluding_one_nde(Node* parent, const char* class_name, const Node* excluded_node) {
-    CLUIGE_ASSERT(parent != NULL, "Camera2D::_highest_node_excluding_one_nde() : parent is null");
-    Node* highest_camera = NULL;
-    int highest_depth = -1;
-
-    Deque queue;
-    iCluige.iDeque.deque_alloc(&queue, VT_POINTER, 10);
-    iCluige.iDeque.append(&queue, parent);
-
-    int current_depth = 0;
-    while (iCluige.iDeque.size(&queue) > 0)
-    {
-        int queue_size = iCluige.iDeque.size(&queue);
-        for (int i = 0; i < queue_size; i++)
-        {
-            Variant front_variant = iCluige.iDeque.front(&queue);
-            Node* current_node = (Node*)front_variant.ptr;
-            iCluige.iDeque.pop_front(&queue);
-
-            if (current_node != excluded_node && strcmp(current_node->_class_name, class_name) == 0)
-            {
-                Node2D* node2Dfound = current_node->_sub_class;
-                Camera2D* camera_found = node2Dfound->_sub_class;
-                if (camera_found->enabled && current_depth > highest_depth)
-                {
-                    highest_camera = current_node;
-                    highest_depth = current_depth;
-                }
-            }
-
-            if (current_node->children != NULL)
-            {
-                iCluige.iDeque.append(&queue, current_node->children);
-            }
-
-            if (current_node->next_sibling != NULL)
-            {
-                iCluige.iDeque.append(&queue, current_node->next_sibling);
-            }
-        }
-        current_depth++;
-    }
-    iCluige.iDeque.pre_delete_Deque(&queue);
-    return highest_camera;
-}
-
-static struct _Camera2D* c2d_new_Camera2D()
+static Camera2D* c2d_new_Camera2D_from_Node2D(Node2D* new_Node2D)
 {
-    Node2D* new_Node2D = iCluige.iNode2D.new_Node2D();
 	Node* new_Node = new_Node2D->_this_Node;
     Camera2D* new_camera2D = iCluige.checked_malloc(sizeof(Camera2D));
 
-    //enabled must be set with the method set_enabled
-    new_camera2D->enabled = true;
+//    //enabled must be set with the method set_enabled
+//    new_camera2D->enabled = true;
     new_camera2D->ignore_rotation = true;
     new_camera2D->rotation_radians = 0;
 
@@ -286,10 +307,10 @@ static struct _Camera2D* c2d_new_Camera2D()
     new_camera2D->anchor_mode = ANCHOR_MODE_DRAG_CENTER;
 
     //respectively Left Top Right Bottom
-    new_camera2D->limits[0] = &new_camera2D->limit_left;
-    new_camera2D->limits[1] = &new_camera2D->limit_top;
-    new_camera2D->limits[2] = &new_camera2D->limit_right;
-    new_camera2D->limits[3] = &new_camera2D->limit_bottom;
+//    new_camera2D->limits[0] = &new_camera2D->limit_left;
+//    new_camera2D->limits[1] = &new_camera2D->limit_top;
+//    new_camera2D->limits[2] = &new_camera2D->limit_right;
+//    new_camera2D->limits[3] = &new_camera2D->limit_bottom;
     new_camera2D->global_tmp_sin_rotation = 0;
     new_camera2D->global_tmp_cos_rotation = 1;
 
@@ -308,6 +329,8 @@ static struct _Camera2D* c2d_new_Camera2D()
 	//	new_Node virtual methods pointers are already pointing to
 	//	overriding methods (if any)
     new_camera2D->_delete_super = new_Node->delete_Node;
+//    new_camera2D->_enter_tree_super = new_Node->enter_tree;
+    new_camera2D->_exit_tree_super = new_Node->exit_tree;
 //    new_camera2D->_erase_super = new_Node->erase;
     new_camera2D->_bake_super = new_Node->bake;
 //    new_camera2D->_post_process_super = new_Node->post_process;
@@ -318,25 +341,57 @@ static struct _Camera2D* c2d_new_Camera2D()
             &sb, strlen("NodeNode2DCamera2D"));
     iCluige.iStringBuilder.append(&sb, "NodeNode2DCamera2D");
 
-    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-
-    //checks if the new camera should be the current or not
-    if(current_camera != NULL)
-    {
-        if(current_camera == iCluige.iCamera2D.default_camera)//default camera is the current_camera
-        {
-            c2d_make_current(new_camera2D);
-        }
-    }
-    else //first camera created
-    {
-        iCluige.iCamera2D.current_camera = new_camera2D;
-    }
+//    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
+//    //checks if the new camera should be the current or not
+//    if(current_camera != NULL)
+//    {
+//        if(current_camera == iCluige.iCamera2D.default_camera)//default camera is the current_camera
+//        {
+//            c2d_make_current(new_camera2D);
+//        }
+//    }
+//    else //first camera created
+//    {
+//        iCluige.iCamera2D.current_camera = new_camera2D;
+//    }
     new_Node->delete_Node = c2d_delete_Camera2D;
+//    new_Node->enter_tree = c2d_enter_tree;
+    new_Node->exit_tree = c2d_exit_tree;
 //    new_Node->erase = c2d_erase;
     new_Node->bake = c2d_bake;
 
     return new_camera2D;
+}
+
+static struct _Camera2D* c2d_new_Camera2D()
+{
+    Node2D* new_Node2D = iCluige.iNode2D.new_Node2D();
+    return c2d_new_Camera2D_from_Node2D(new_Node2D);
+}
+
+static Node* c2d_instanciate(const SortedDictionary* params)
+{
+    //mother class
+    Node* res_node = iCluige.iNode2D._Node2D_factory.instanciate(params);
+    Node2D* res_node2D = (Node2D*)(res_node->_sub_class);
+    Camera2D* res_Camera2D = c2d_new_Camera2D_from_Node2D(res_node2D);
+
+    utils_vector2_from_parsed(&(res_Camera2D->offset), params, "offset");
+//    utils_bool_from_parsed(&(res_Camera2D->enabled), params, "enabled");
+    utils_bool_from_parsed(&(res_Camera2D->ignore_rotation), params, "ignore_rotation");
+    utils_float_from_parsed(&(res_Camera2D->rotation_radians), params, "rotation");//TODO in Node2D instead
+    utils_vector2_from_parsed(&(res_Camera2D->zoom), params, "zoom");
+    utils_float_from_parsed(&(res_Camera2D->limit_left), params, "limit_left");
+    utils_float_from_parsed(&(res_Camera2D->limit_top), params, "limit_top");
+    utils_float_from_parsed(&(res_Camera2D->limit_right), params, "limit_right");
+    utils_float_from_parsed(&(res_Camera2D->limit_bottom), params, "limit_bottom");
+    int parsed_am;
+    bool ok = utils_int_from_parsed(&parsed_am, params, "anchor_mode");
+    if(ok)
+	{
+		res_Camera2D->anchor_mode = (enum AnchorMode)parsed_am;
+	}
+    return res_node;
 }
 
 
@@ -353,9 +408,12 @@ void iiCamera2D_init()
     iCluige.iCamera2D.new_Camera2D = c2d_new_Camera2D;
     iCluige.iCamera2D.get_zoom = c2d_get_zoom;
     iCluige.iCamera2D.set_zoom = c2d_set_zoom;
-    iCluige.iCamera2D.set_enabled = c2d_set_enabled;
-    iCluige.iCamera2D.is_enabled = c2d_is_enabled;
+//    iCluige.iCamera2D.set_enabled = c2d_set_enabled;
+//    iCluige.iCamera2D.is_enabled = c2d_is_enabled;
     iCluige.iCamera2D.make_current = c2d_make_current;
     iCluige.iCamera2D.set_rotation_degrees = c2d_set_rotation_degrees;
     iCluige.iCamera2D.get_rotation_degrees = c2d_get_rotation_degrees;
+
+    iCluige.iCamera2D._Camera2D_factory.instanciate = c2d_instanciate;
+    iCluige.iNode.register_NodeFactory("Camera2D", &(iCluige.iCamera2D._Camera2D_factory));
 }

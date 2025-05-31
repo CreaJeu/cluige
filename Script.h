@@ -13,8 +13,9 @@ struct _Script
 
 	//virtual methods
 	void (*delete_Script)(Script*);
+	void (*enter_tree)(Script*);
 	void (*ready)(Script*);
-	//TODO enter_tree()
+	void (*exit_tree)(Script*);
 	void (*process)(Script* this_Script, float delta);
 };
 

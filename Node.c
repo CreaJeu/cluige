@@ -51,11 +51,27 @@ static void nde_delete_Node(Node* node)
 
 static void nde_enter_tree(Node* this_Node)
 {
-    //TODO enter_tree in Script?
-//    if((this_Node->script != NULL) && (this_Node->script->enter_tree != NULL))
-//    {
-//        this_Node->script->enter_tree(this_Node->script);
-//    }
+    if((this_Node->script != NULL) && (this_Node->script->enter_tree != NULL))
+    {
+        this_Node->script->enter_tree(this_Node->script);
+    }
+}
+
+static void nde_ready(Node* this_Node)
+{
+    if((this_Node->script != NULL) && (this_Node->script->ready != NULL))
+    {
+        this_Node->script->ready(this_Node->script);
+    }
+}
+
+static void nde_exit_tree(Node* this_Node)
+{
+    if((this_Node->script != NULL) && (this_Node->script->exit_tree != NULL))
+    {
+        this_Node->script->exit_tree(this_Node->script);
+    }
+    iCluige.iDeque.push_back(&(iCluige.iNode._just_removed_nodes), this_Node);
 }
 
 //on_loop_starting = NULL for Node
@@ -116,6 +132,8 @@ static Node* nde_new_Node()
 
     node->delete_Node = nde_delete_Node;
     node->enter_tree = nde_enter_tree;
+    node->ready = nde_ready;
+    node->exit_tree = nde_exit_tree;
 //    node->on_loop_starting = NULL;
     node->erase = NULL;//nde_erase;
     node->process = nde_process;
@@ -455,20 +473,56 @@ static void nde__auto_name(Node* node)
 {
     int b2d = iCluige.iStringBuilder.DECIMAL_DIGITS_FOR_INT;
     int p2d = iCluige.iStringBuilder.DECIMAL_DIGITS_FOR_POINTER;
-    size_t name_size_max = b2d + p2d + 1;
-    if(node->parent != NULL)
+    size_t name_size_max = b2d + p2d + strlen(node->_class_name) + 3;
+    if(node->parent != NULL && node->parent->name != NULL)
     {
         name_size_max += 1 + strlen(node->parent->name);
     }
 
     StringBuilder sb;
     node->name = iCluige.iStringBuilder.string_alloc(&sb, name_size_max);
-    iCluige.iStringBuilder.append(&sb, "%p-%d", node, nde_get_index(node));
-
-    if(node->parent != NULL)
+    if(node->parent != NULL && node->parent->name != NULL)
     {
-        iCluige.iStringBuilder.append(&sb, "<%s", node->parent->name);
+        iCluige.iStringBuilder.append(&sb, "%s>", node->parent->name);
     }
+    iCluige.iStringBuilder.append(&sb, "%s@%p-%d", node->_class_name, node, nde_get_index(node));
+
+}
+
+static void nde__branch_enter_tree(Node* root)
+{
+	//godot order precisely specified at
+	//https://docs.godotengine.org/en/stable/classes/class_node.html#class-node-private-method-ready
+	//https://docs.godotengine.org/en/stable/classes/class_node.html#class-node-private-method-enter-tree
+	//first enter_tree in DFS order on all branch, even if already added-removed-readded
+	//then ready in reverse DFS but only once per node
+	root->enter_tree(root);
+	Node* child = root->children;
+	while(child != NULL)
+	{
+		nde__branch_enter_tree(child);
+		child = child->next_sibling;
+	}
+	if(!(root->_already_entered_tree))
+	{
+		root->_already_entered_tree = true;
+		root->ready(root);
+	}
+}
+
+static void nde__branch_exit_tree(Node* root)
+{
+	//https://docs.godotengine.org/en/stable/classes/class_node.html#class-node-private-method-exit-tree
+	//first exit_tree in reverse DFS order (on whole branch before starting remove_child logic?)
+	//then do remove_child logic
+	//then (but not implemented in cluige) tree_exited signal
+	Node* child = root->children;
+	while(child != NULL)
+	{
+		nde__branch_exit_tree(child);
+		child = child->next_sibling;
+	}
+	root->exit_tree(root);
 }
 
 //asserts that wanted child doesn't have already a parent
@@ -476,6 +530,9 @@ static void nde_add_child(Node* parent, Node* child)
 {
     CLUIGE_ASSERT(child->parent == NULL, "Node::add_child() : child must have no parent");
     CLUIGE_ASSERT(child != parent, "Node::add_child() : same Node is asked for both child and parent");
+	CLUIGE_ASSERT(
+			child->name == NULL || NULL == iCluige.iNode.get_node(parent, child->name),
+			"Node::add_child() : a Node with the same name already exists among future siblings");
     if(parent->children == NULL)
     {
         parent->children = child;
@@ -495,20 +552,10 @@ static void nde_add_child(Node* parent, Node* child)
     {
         nde__auto_name(child);
     }
-
-    //if script, call ready (not yet enter_tree())
-    if(!child->_already_entered_tree)
-    {
-        child->_already_entered_tree = true;
-        if((child->script != NULL) && (child->script->ready != NULL))
-        {
-            child->script->ready(child->script);
-        }
-    }
-    if(child->enter_tree != NULL)
-    {
-        child->enter_tree(child);
-    }
+    if(iCluige.iNode.is_ancestor_of(parent, iCluige._private_root_2D))
+	{
+		nde__branch_enter_tree(child);
+	}
 }
 
 static void nde_remove_child( Node* ths_node, Node* child)
@@ -516,6 +563,10 @@ static void nde_remove_child( Node* ths_node, Node* child)
     CLUIGE_ASSERT(ths_node != NULL, "Node::remove_child() : calling object is null ");
     CLUIGE_ASSERT(child != NULL, "Node::remove_child() : asked child is null");
     CLUIGE_ASSERT(child->parent == ths_node, "Node::remove_child() : child->parent != ths_node");
+    if(iCluige.iNode.is_ancestor_of(ths_node, iCluige._private_root_2D))
+	{
+		nde__branch_exit_tree(child);
+	}
     int pos = nde_get_index(child);
 
     if(pos == 0 )
@@ -527,7 +578,7 @@ static void nde_remove_child( Node* ths_node, Node* child)
 		Node* node_to_mod = iCluige.iNode.get_child(ths_node, pos-1);
 		node_to_mod->next_sibling = child->next_sibling;
 	}
-    child->next_sibling = NULL;                         //remove the link between the child and the rest
+    child->next_sibling = NULL;//remove the link between the child and the rest
     child->parent = NULL;
 }
 
@@ -599,8 +650,20 @@ static Node* nde_instanciate(const SortedDictionary* parsed_params)
     Node* res = nde_new_Node();
     bool ok = utils_str_from_parsed(&(res->name), parsed_params, "name");
     CLUIGE_ASSERT(ok, "Node::instanciate() : missing 'name' field");
+    //optional
+    utils_int_from_parsed(&(res->process_priority), parsed_params, "process_priority");
     // TODO ? from godot process mode? // utils_bool_from_parsed(&(res->active), params, "active");
     return res;
+}
+
+static void nde_register_NodeFactory(const char* key, NodeFactory* factory)
+{
+    SortedDictionary* fcties = &(iCluige.iNode.node_factories);
+    int key_len_term = strlen(key) + 1;
+    char* fcty_key = iCluige.checked_malloc(key_len_term * sizeof(char));
+    strncpy(fcty_key, key, key_len_term);
+    Checked_Variant found = iCluige.iSortedDictionary.insert(fcties, fcty_key, factory);
+    CLUIGE_ASSERT(!(found.valid), "Node::register_NodeFactory() : trying to register a factory with an already used key");
 }
 
 /////////////////////////////////// Node //////////
@@ -610,6 +673,7 @@ void iiNode_init()
 	iCluige.iNode._MAX_NAME_LENGTH = 150;
 
     iCluige.iDeque.deque_alloc(&_queue_freed_nodes, VT_POINTER, 20);
+    iCluige.iDeque.deque_alloc(&(iCluige.iNode._just_removed_nodes), VT_POINTER, 20);
 
     iCluige.iNode.new_Node = nde_new_Node;
     //iCluige.iNode.delete_Node = nde_delete_Node; // virtual
@@ -632,14 +696,12 @@ void iiNode_init()
     iCluige.iNode._do_all_queue_free_late_step = nde__do_all_queue_free_late_step;
 
     SortedDictionary* fcties = &(iCluige.iNode.node_factories);
-    NodeFactory* fcty = &(iCluige.iNode._Node_factory);
-    fcty->instanciate = nde_instanciate;
     iCluige.iSortedDictionary.sorted_dictionary_alloc(fcties, VT_POINTER, VT_POINTER, 20);
     iCluige.iSortedDictionary.set_compare_keys_func(fcties, iCluige.iDeque.default_compare_string_func);
+    iCluige.iNode.register_NodeFactory = nde_register_NodeFactory;
 
-    char* fcty_key = iCluige.checked_malloc(5 * sizeof(char));
-    strncpy(fcty_key, "Node", 5);
-    iCluige.iSortedDictionary.insert(fcties, fcty_key, fcty);
+    iCluige.iNode._Node_factory.instanciate = nde_instanciate;
+    iCluige.iNode.register_NodeFactory("Node", &(iCluige.iNode._Node_factory));
 }
 
 

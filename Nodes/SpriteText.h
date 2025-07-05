@@ -7,25 +7,24 @@ typedef struct _SpriteText SpriteText;
 
 struct _SpriteText
 {
-    //first character of first line will be drawn at
-    //Node2D.position - offset
-    Vector2 offset;
-
-    //char** text;//array of text lines, the ASCII art / unicode art
-    char* text;//text with all \n replaced by \0, the ASCII art / unicode art
-    int nb_lines;//TODO collection instead
-
 	//private
 	bool _text_changed;
-//	struct
-//	{
-//		bool text_changed;
-//	} _state_changes;//see old_baked/new_baked in Node2D for example if needed
+
+	struct
+	{
+		//first character of first line will be drawn at
+		//Node2D.position - offset
+		Vector2 offset;
+
+		char* text;//the ASCII art / unicode art
+
+		int nb_chars;
+		int allocated_text_length;
+	} _new_baked, _old_baked;
 
 	//private
 	Node2D* _this_Node2D;
 	void* _sub_class;
-	int _allocated_text_length;
 
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);

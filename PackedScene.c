@@ -90,7 +90,7 @@ static Node* pksc_instanciate(const PackedScene* this_PackedScene)
 	const char* t = this_PackedScene->type;
 	const SortedDictionary* fcties = &(iCluige.iNode.node_factories);
 	Checked_Variant got = iCluige.iSortedDictionary.get(fcties, t);
-	CLUIGE_ASSERT(got.valid, "PackedScene::instanciate() : type found in PackedScene in unknown by cluige");
+	CLUIGE_ASSERT(got.valid, "PackedScene::instanciate() : type found in PackedScene is unknown by cluige");
 	const NodeFactory* fcty = (const NodeFactory*)(got.v.ptr);
 	Node* new_node = fcty->instanciate(&(this_PackedScene->dico_node));
 

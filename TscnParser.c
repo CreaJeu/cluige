@@ -188,6 +188,7 @@ static bool tsnp_param(TscnParser* this_TscnParser)
 //[node name="unLabelFourbe" type="Label" parent="."]
 //
 //[node name="XXX" type="YYY" parent="ZZZ" WWW]
+//[node name="cello" parent="cellist" instance=ExtResource("1_2rkvl")]
 static bool tsnp_node(TscnParser* this_TscnParser)
 {
 	FileLineReader* fr = &(this_TscnParser->_file_reader);
@@ -243,10 +244,18 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 	{
 		from += tmp_len;//1_hl8su")
 		tmp_len = strcspn(from, "\"");
+		char tmp_id_str[60] = "";
+		CLUIGE_ASSERT(tmp_len < 60, "TscnParser::node() : cluige bug, tmp_id_str is too small");
+		strncpy(tmp_id_str, from, tmp_len);
+		tmp_id_str[tmp_len] = '\0';
+		SortedDictionary* dic = &(this_TscnParser->_dico_id_to_path);
+		Checked_Variant cv = iCluige.iSortedDictionary.get(dic, tmp_id_str);
+		CLUIGE_ASSERT(cv.valid, "TscnParser::node() : ExtResource id was not registered in _dico_id_to_path");
+		char* path = (char*)(cv.v.ptr);
+		tmp_len = strlen(path);
 		char* tmp_inst = iCluige.checked_malloc((tmp_len +  1) * sizeof(char));
-		strncpy(tmp_inst, from, tmp_len);
-		tmp_inst[tmp_len] = '\0';
-		ps->instance_res = tmp_inst;
+		strcpy(tmp_inst, path);
+		ps->instance_path = tmp_inst;
 		type_xor_inst++;
 	}
 
@@ -326,7 +335,7 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 			bool ok = utils_id_str_from_ExtResource_parsed(&svg_id, keeped_val);
 			CLUIGE_ASSERT(ok, "TscnParser::node() : texture id could not be read");
 
-			SortedDictionary* dico_ids = &(this_TscnParser->_dico_ids);
+			SortedDictionary* dico_ids = &(this_TscnParser->_dico_id_to_path);
 			cv = iCluige.iSortedDictionary.get(dico_ids, svg_id);
 			//CLUIGE_ASSERT(cv.valid || 0=="id of texture not found in tscn_parser dico", "TscnParser::() : ");
 			if(cv.valid)
@@ -377,6 +386,7 @@ static bool tsnp_is_starting_node(TscnParser* this_TscnParser)
 //examples:
 //[ext_resource type="Texture2D" uid="uid://8j50qrs1q30l" path="res://loupe.svg" id="1_kwa0e"]
 //[ext_resource type="Script" path="res://player.gd" id="2_pseyi"]
+//[ext_resource type="PackedScene" uid="uid://dqk05t62v3vgm" path="res://cello.tscn" id="1_2rkvl"]
 //(or empty line)
 //advances in file stream if returns true
 static bool tsnp_ext_res(TscnParser* this_TscnParser)
@@ -397,8 +407,12 @@ static bool tsnp_ext_res(TscnParser* this_TscnParser)
 	}
 	const char* from = curr_line + tmp_len;//Texture2D" uid="uid://8j50qrs1q30l" path="res://loupe.svg" id="1_kwa0e"]
 	tmp_len = strcspn(from, "\"");
-	//SVG
-	if(strncmp(from, "Texture2D\"", tmp_len+1) == 0)
+	//SVG, Script, PackedScene : same parsing
+	if(
+		(strncmp(from, "Texture2D\"", tmp_len+1) == 0) ||
+		(strncmp(from, "Script\"", tmp_len+1) == 0) ||
+		(strncmp(from, "PackedScene\"", tmp_len+1) == 0)
+	)
 	{
 		from = strstr(curr_line, "\" id=\"");
 		CLUIGE_ASSERT(from != NULL,
@@ -420,25 +434,22 @@ static bool tsnp_ext_res(TscnParser* this_TscnParser)
 		strncpy(keeped_val, from, tmp_len);//loupe.svg
 		keeped_val[tmp_len] = '\0';
 
-		bool is_svg = (keeped_val[tmp_len - 4] == '.');
-		is_svg = is_svg && ( (keeped_val[tmp_len - 3] == 's') || (keeped_val[tmp_len - 3] == 'S') );
-		is_svg = is_svg && ( (keeped_val[tmp_len - 2] == 'v') || (keeped_val[tmp_len - 2] == 'V') );
-		is_svg = is_svg && ( (keeped_val[tmp_len - 1] == 'g') || (keeped_val[tmp_len - 1] == 'G') );
-		if(is_svg)
-		{
-			SortedDictionary* dico = &(this_TscnParser->_dico_ids);
+//		bool is_svg = (keeped_val[tmp_len - 4] == '.');
+//		is_svg = is_svg && ( (keeped_val[tmp_len - 3] == 's') || (keeped_val[tmp_len - 3] == 'S') );
+//		is_svg = is_svg && ( (keeped_val[tmp_len - 2] == 'v') || (keeped_val[tmp_len - 2] == 'V') );
+//		is_svg = is_svg && ( (keeped_val[tmp_len - 1] == 'g') || (keeped_val[tmp_len - 1] == 'G') );
+//		if(is_svg)
+//		{
+			SortedDictionary* dico = &(this_TscnParser->_dico_id_to_path);
 			Checked_Variant cv = iCluige.iSortedDictionary.insert(dico, keeped_key, keeped_val);
 			utils_breakpoint_trick(dico, cv.valid);//key/val overwriten
-		}
-		else
-		{
-			free(keeped_key);
-			free(keeped_val);
-		}
+//		}
+//		else
+//		{
+//			free(keeped_key);
+//			free(keeped_val);
+//		}
 	}
-	//else Script
-		//TODO
-
 	this_TscnParser->_current_line++;
 	return true;
 }
@@ -483,6 +494,14 @@ static bool tsnp_parse_scene(TscnParser* this_TscnParser)
 			nb_nodes++;
 		}
 	}
+	SortedDictionary* path_to_ps = &(iCluige.iPackedScene.dico_path_to_packed);
+	int k_len = strlen(fr->_file_path);
+	char* k = iCluige.checked_malloc((1 + k_len) * sizeof(char));
+	strcpy(k, fr->_file_path);
+	PackedScene* v = this_TscnParser->scene_root;
+	Checked_Variant cv = iCluige.iSortedDictionary.insert(path_to_ps, k, v);
+	CLUIGE_ASSERT(!(cv.valid),
+			"TscnParser::parse_scene() : another parsed scene was already registered at this path");
 	return nb_nodes > 0;
 }
 
@@ -518,7 +537,7 @@ static void tsnp_tscn_parser_alloc(struct _TscnParser* this_TscnParser, const ch
 //	this_TscnParser->read_line = tsnp_read_line;
 	this_TscnParser->is_ending_quote = tsnp_is_ending_quote;
 
-	SortedDictionary* dico = &(this_TscnParser->_dico_ids);
+	SortedDictionary* dico = &(this_TscnParser->_dico_id_to_path);
 	iCluige.iSortedDictionary.sorted_dictionary_alloc(dico, VT_POINTER, VT_POINTER, 7);
 	iCluige.iSortedDictionary.set_compare_keys_func(dico, iCluige.iDeque.default_compare_string_func);
 }
@@ -530,7 +549,7 @@ static void tsnp_pre_delete_TscnParser(TscnParser* this_TscnParser)
 	iCluige.iFileLineReader.close_file(fr);
 	iCluige.iFileLineReader.pre_delete_FileLineReader(fr);
 
-	SortedDictionary* dico = &(this_TscnParser->_dico_ids);
+	SortedDictionary* dico = &(this_TscnParser->_dico_id_to_path);
 	iCluige.iSortedDictionary.pre_delete_SortedDictionary(dico);
 	// ? scene_root - including _current_packed_scene
 
@@ -563,7 +582,7 @@ fstat(fd, &buf);
 off_t size = buf.st_size;
 
 https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
-stat gives you both numbers. st_size is the real length, with byte granularity. st_blocks is the number of 512-byte disk blocks used by the file (including extra blocks for metadata, attributes, and even block-lists or extent-lists for large files where the list of blocks or extents doesn't fit in the inode itself.) Whether the FS actually allocates in 512B blocks or not, that's the unit stat uses. (man7.org/linux/man-pages/man2/lstat.2.html). For most filesystems, st_size is accurate, but not on Linux /proc and /sys –
+stat gives you both numbers. st_size is the real length, with byte granularity. st_blocks is the number of 512-byte disk blocks used by the file (including extra blocks for metadata, attributes, and even block-lists or extent-lists for large files where the list of blocks or extents doesn't fit in the inode itself.) Whether the FS actually allocates in 512B blocks or not, that's the unit stat uses. (man7.org/linux/man-pages/man2/lstat.2.html). For most filesystems, st_size is accurate, but not on Linux /proc and /sys â€“
 Peter Cordes
  CommentedNov 25, 2021
 */
@@ -726,7 +745,7 @@ static bool _svp_parse_point(struct _SVGParser* this_SVGParser, FILE* file, char
 
 void _svp_parse_path(struct _SVGParser* this_SVGParser, FILE* file, char* buffer)
 {
-	//  <path ¤ ... d="..."
+	//  <path Â¤ ... d="..."
 	iCluige.iDeque.clear(&(this_SVGParser->coordinates_sequence));
 	last_command = 'M';
 	bool finished = false;
@@ -744,7 +763,7 @@ void _svp_parse_path(struct _SVGParser* this_SVGParser, FILE* file, char* buffer
 			finished = true;
 		}
 	}
-	//  <path ... d= ¤ "[M|m] -5.7154991,-26.450343 ..."
+	//  <path ... d= Â¤ "[M|m] -5.7154991,-26.450343 ..."
 	fscanf(file, "%1s", buffer);
 	if(strcmp(buffer, "\"") != 0)
 	{
@@ -752,7 +771,7 @@ void _svp_parse_path(struct _SVGParser* this_SVGParser, FILE* file, char* buffer
 		return;
 	}
 
-	//  <path ... d=" ¤ [M|m] -5.7154991,-26.450343 ..."
+	//  <path ... d=" Â¤ [M|m] -5.7154991,-26.450343 ..."
 	while(_svp_parse_point(this_SVGParser, file, buffer)) //sequence of points and commands
 		;
 }

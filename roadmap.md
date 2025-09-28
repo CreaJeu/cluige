@@ -19,11 +19,11 @@
 (process/main loop : still DFS, better game loop order)
 (enter_tree(), ready(), exit_tree())
 (more godot scene import : camera (not clock, no such node in godot, so, never found in .tscn))
+(bug erase SpriteText when text changes)
 
 
 **tâches actuelles**
 
-- bug erase SpriteText when text changes
 - more godot scene import : per-scene-dico id>uid, global-dico uid>PackedScene, project.godot parsing, script attachment, global dico script-name>script-constructor + system to auto register scripts into it, inputs, other deserialize()
 
 
@@ -82,5 +82,8 @@
 
 **bugs**
 
-- erase sometimes skipped when keyboard autorepeat, even if code in erase() is commented to erase everything each frame
-- spriteText not correctly erased when text changes
+
+
+**fixed bugs**
+(spriteText not correctly erased when text changes)
+(erase sometimes skipped when keyboard autorepeat, even if code in erase() is commented to erase everything each frame)

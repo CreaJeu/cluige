@@ -143,6 +143,20 @@ static void sd_insert_last(SortedDictionary* this_SortedDictionary, ...)
     iCluige.iDeque.push_back(_pairs, new_pair);
 }
 
+static void sd_merge(SortedDictionary* this_SortedDictionary, const SortedDictionary* other, bool overwrite)
+{
+	int other_size = iCluige.iSortedDictionary.size(other);
+	for(int i=0; i<other_size; i++)
+	{
+		Pair p_i = iCluige.iSortedDictionary.at(other, i);
+		if(overwrite
+			|| !iCluige.iSortedDictionary.get(this_SortedDictionary, p_i).valid)
+		{
+			iCluige.iSortedDictionary.insert(this_SortedDictionary, p_i.first, p_i.second);
+		}
+	}
+}
+
 //variadic for easier use than Variant
 //inserts or automatically replaces if key already present
 //returns a copy of replaced value (what was its value before replacement),
@@ -250,6 +264,26 @@ static void sd_clear(SortedDictionary* this_SortedDictionary)
     iCluige.iDeque.clear(_pairs);
 }
 
+//creates a malloced clone but without deep copy
+static SortedDictionary* sd_light_clone(const SortedDictionary* this_SortedDictionary, int extra_capacity)
+{
+	SortedDictionary* res = iCluige.checked_malloc(sizeof(SortedDictionary));
+	iCluige.iSortedDictionary.sorted_dictionary_alloc(
+			res,
+			this_SortedDictionary->_keys_type,
+			this_SortedDictionary->_values_type,
+			this_SortedDictionary->_pairs._capacity + extra_capacity);
+	res->_pairs._compare_func = this_SortedDictionary->_pairs._compare_func;
+	res->_pairs._compare_sub_func = this_SortedDictionary->_pairs._compare_sub_func;
+	int size = iCluige.iSortedDictionary.size(this_SortedDictionary);
+	for(int i=0; i<size; i++)
+	{
+		Pair p_i = iCluige.iSortedDictionary.at(this_SortedDictionary, i);
+		iCluige.iSortedDictionary.insert(res, p_i.first, p_i.second);
+	}
+	return res;
+}
+
 //only for Dico<char*, char*>
 //returned char* is malloced, up to the user to delete it
 static char* sd_debug_str_str(SortedDictionary* this_SortedDictionary)
@@ -295,8 +329,10 @@ void iiSortedDictionary_init()
     iCluige.iSortedDictionary.insert = sd_insert;
     iCluige.iSortedDictionary.insert_first = sd_insert_first;
     iCluige.iSortedDictionary.insert_last = sd_insert_last;
+    iCluige.iSortedDictionary.merge = sd_merge;
     iCluige.iSortedDictionary.erase = sd_erase;
     iCluige.iSortedDictionary.clear = sd_clear;
+    iCluige.iSortedDictionary.light_clone = sd_light_clone;
     iCluige.iSortedDictionary.debug_str_str = sd_debug_str_str;
 }
 

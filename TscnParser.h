@@ -27,7 +27,7 @@ struct _TscnParser //"mother class", Godot 4 by default
 	int _current_param_len;
 	const char* _current_value;
 	int _current_value_len;
-	SortedDictionary _dico_ids;
+	SortedDictionary _dico_id_to_path;
 
 	bool (*parse_scene)(TscnParser* this_TscnParser);
 	bool (*ext_res)(TscnParser* this_TscnParser);

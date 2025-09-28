@@ -56,6 +56,7 @@ struct iiSortedDictionary
     //inserts without any existence check
     void (*insert_last)(SortedDictionary* this_SortedDictionary, ...);
 
+    void (*merge)(SortedDictionary* this_SortedDictionary, const SortedDictionary* other, bool overwrite);
 
     //deletion
 
@@ -74,6 +75,10 @@ struct iiSortedDictionary
 
 
 	//other
+
+	//TODO test
+	//creates a malloced clone but without deep copy
+	SortedDictionary* (*light_clone)(const SortedDictionary* this_SortedDictionary, int extra_capacity);
 
 	//only for Dico<char*, char*>
 	//returned char* is malloced, up to the user to delete it

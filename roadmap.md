@@ -19,32 +19,43 @@
 (process/main loop : still DFS, better game loop order)
 (enter_tree(), ready(), exit_tree())
 (more godot scene import : camera (not clock, no such node in godot, so, never found in .tscn))
-(bug erase SpriteText when text changes)
+(more godot import)
+	per-scene-dico id>uid, global-dico uid>PackedScene
+	test [pre]delete tscnparser/packedscene => no, maybe one day
+	test with .tscn spread in sub-sub-dirs => ok godot always use absolute path from /res for ext_resource descriptors
+	test import tscn with a label at arbitrary position
+	update test_node_against_ps to include instance->instance->... => tant pis, complexité de test disproportionnée
+(bugs : see below)
 
 
 **tâches actuelles**
 
-- more godot scene import : per-scene-dico id>uid, global-dico uid>PackedScene, project.godot parsing, script attachment, global dico script-name>script-constructor + system to auto register scripts into it, inputs, other deserialize()
+
+- more godot scene import :
+	-- scripts : script attachment, global dico script-name>script-constructor + system to auto register scripts into it
+	-- project.godot parsing
+		--- inputs
+	-- (other deserialize()?)
 
 
 **Futures tâches**
 
-- replace all space-indent with tab-indent
-- wanted_frame_seconds rename as wanted_seconds_per_frame or like godot
+- replace all space-indent with tab-indent + check EOL?
+- fatal error => end loop + printf
 - sprite svg (no anim) : file parsing fix discontinued paths
 - sprite svg : choose rastering algo from thickness
 - sprite svg : optim big segments out of screen (cf. futurs chantiers)
-- node2D (et autre?) : meilleur test ~instanceof / _className static par classe
-- fatal error => end loop + printf
-- Deque::sort()
-- reallocate in Deque::grow()
 - more-like-godot-todos
+    - wanted_frame_seconds rename as wanted_seconds_per_frame or like godot
     - refactor utils to iCluige.iGlobals, match contents whith godot Globals, move check_malloc() in there
     - godotify move_local(vec2) : move_local_x/y(dx/dy) + translate(Vec2) + global_translate(Vec2)
     - rename SpriteText to Label ?
     - rename Path2D to SvgPath2D (confusion with godot Node2D subclass Path2D)
     - inherited_visibility (car parent invisible => branche invisible), màj dans bake()
     - process_mode (disabled, pausable, etc. : enum in godot instead of just a 'active' bool field)
+- Deque::sort()
+- reallocate in Deque::grow()
+- node2D (et autre?) : meilleur test instanceof / class_name static par classe
 
 
 
@@ -53,6 +64,7 @@
 - signals
 - collision rectangle
 - Node2D scale, with consequences on SpriteText/Label and SpriteSVG, no more scale in SpriteSVG
+- linux
 - optim draw/erase sprites (faire Node2D::scale d'abord)
     Node2D::bake() : benefit from DFS, tmp_global_pos of parent already up to date (nearest Node2D ancestor)
     spriteText
@@ -87,3 +99,4 @@
 **fixed bugs**
 (spriteText not correctly erased when text changes)
 (erase sometimes skipped when keyboard autorepeat, even if code in erase() is commented to erase everything each frame)
+(bug camera-test no more showing instructions)

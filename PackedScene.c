@@ -36,10 +36,11 @@ static PackedScene* pksc_new_PackedScene()
     return new_PackedScene;
 }
 
+//maybe one day, think carefully, remove from dico? are pointed strings used elsewhere? ...
 //static void pksc_pre_delete_PackedScene(PackedScene* this_PackedScene)
 //{
 //	free(this_PackedScene->instance_res);
-//	//TODO really not name, type, parent???
+//	// really not name, type, parent???
 //
 //    SortedDictionary* dico_node = &(this_PackedScene->dico_node);
 //    iCluige.iSortedDictionary.free_all_keys_pointers(dico_node);

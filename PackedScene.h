@@ -37,7 +37,7 @@ struct iiPackedScene
 	void (*packed_scene_alloc)(PackedScene* this_PackedScene);
 	PackedScene* (*new_PackedScene)();
 
-//	void (*pre_delete_PackedScene)(PackedScene* this_PackedScene);
+//	void (*pre_delete_PackedScene)(PackedScene* this_PackedScene);// maybe one day
 
 	PackedScene* (*get_packed_node)(PackedScene* root, const char* path);
 

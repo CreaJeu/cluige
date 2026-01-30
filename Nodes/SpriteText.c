@@ -318,7 +318,9 @@ static Node* sprtx_instanciate(const SortedDictionary* params)
     //text = "un autre label
     //sans param modifié
     //à part texte et pos"
-    utils_vector2_from_parsed(&(res_SpriteText->_new_baked.offset), params, "offset");
+    //utils_vector2_from_parsed(&(res_SpriteText->_new_baked.offset), params, "offset");
+    utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.x), params, "offset_left");
+    utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.y), params, "offset_top");
     CLUIGE_ASSERT(res_SpriteText->_new_baked.text == NULL, "SpriteText::instanciate() : trying to instanciate() into non empty object");
     utils_str_from_parsed(&(res_SpriteText->_new_baked.text), params, "text");
     CLUIGE_ASSERT(res_SpriteText->_new_baked.text != NULL, "SpriteText::instanciate() : text not instanciated, missing 'text' field?");

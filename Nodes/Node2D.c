@@ -82,6 +82,12 @@ static void n2d_bake(Node* this_Node)
     this_Node2D->_new_baked.visible = this_Node2D->visible;
 }
 
+static void n2d_draw(Node* this_Node)
+{
+    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+    this_Node2D->_position_changed = false;
+}
+
 //static void n2d_enter_tree_Node2D(Node* this_Node)
 //{
 //    struct _Node2D* this_Node2D = (struct _Node2D*)(this_Node->_sub_class);
@@ -125,7 +131,7 @@ static Node2D* n2d_new_Node2D_from_Node(Node* new_node)
 
     free(new_node->_class_name); //TODO static value to avoid free
     StringBuilder sb;
-    new_node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, strlen("NodeNode2D"));
+    new_node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, 1 + strlen("NodeNode2D"));
     iCluige.iStringBuilder.append(&sb, "NodeNode2D");
     new_node->_sub_class = new_node2D;
 
@@ -133,6 +139,7 @@ static Node2D* n2d_new_Node2D_from_Node(Node* new_node)
 //    new_node->erase = n2d_erase;
     new_node->bake = n2d_bake;
 //    new_node->on_loop_starting = n2d_on_loop_starting_Node2D;
+    new_node->draw = n2d_draw;
 
     return new_node2D;
 }

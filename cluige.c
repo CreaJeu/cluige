@@ -19,14 +19,15 @@ static void* clg_checked_malloc(size_t s)//TODO : move to Utils, add a checked_r
 
 static Vector2 clg_get_screen_size()
 {
-    int w, h;
+//    int w, h;
     //TODO : make it work !
-    if(is_termresized())
-    {
-        resize_term(0, 0);
-    }
-    getmaxyx(stdscr, h, w);
-    return (Vector2){ w, h };
+//    if(is_termresized())
+//    {
+//        resize_term(0, 0);
+//    }
+//    getmaxyx(stdscr, h, w);
+//    return (Vector2){ w, h };
+    return (Vector2){ 0, 0 };
 }
 
 

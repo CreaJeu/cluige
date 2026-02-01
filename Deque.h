@@ -31,6 +31,9 @@ struct _Deque
     VariantType _elems_type;
     bool _sorted;
 
+    //for custom use, see example in SortedDictionary
+    Variant meta_data;
+
     int (*_compare_func)(const Deque* this_Deque, Variant va, Variant vb);
     //for use by custom _compare_func if needed (see example in SortedDictionary)
     int (*_compare_sub_func)(const Deque* this_Deque, Variant sub_va, Variant sub_vb);
@@ -81,6 +84,7 @@ struct iiDeque
 
     int (*default_compare_func)(const Deque* this_Deque, Variant va, Variant vb);
     int (*default_compare_pair_key_func)(const Deque* this_Deque, Variant va, Variant vb);
+    int (*default_compare_sub_pair_key_func)(const Deque* this_Deque, Variant va, Variant vb);
     int (*default_compare_string_func)(const Deque* this_Deque, Variant va, Variant vb);//for convenience
 
     int (*bsearch)(const Deque* this_Deque, ...);

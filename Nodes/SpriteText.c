@@ -149,6 +149,7 @@ static void sprtx_draw(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
     SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
+	this_SpriteText->_draw_super(this_Node);
     //call super()
 //    this_SpriteText->_post_process_super(this_Node);//no, just pre_draw in Node2D, not overridden here
 
@@ -265,13 +266,14 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
     free(new_Node->_class_name); //TODO static value to avoid free
     StringBuilder sb;
     new_Node->_class_name = iCluige.iStringBuilder.string_alloc(
-            &sb, strlen("NodeNode2DSpriteText"));
+            &sb, 1 + strlen("NodeNode2DSpriteText"));
     iCluige.iStringBuilder.append(&sb, "NodeNode2DSpriteText");
     new_Node2D->_sub_class = new_SpriteText;
 
     new_Node->delete_Node = sprtx_delete_SpriteText;
 //    new_Node->enter_tree = sprtx_enter_tree_SpriteText;
     new_Node->erase = sprtx_erase;
+    new_SpriteText->_draw_super = new_Node->draw;
     new_Node->draw = sprtx_draw;
 
     return new_SpriteText;

@@ -1,6 +1,11 @@
 #ifndef CLUIGE_H_INCLUDED
 #define CLUIGE_H_INCLUDED
 
+//some undef because ncurses defines those as macros leading
+//to conflicts with Deque.clear/erase
+//(maybe one day : find another solution)
+#undef clear
+#undef erase
 
 #include <stdbool.h> //for bool, true, false (standard since C99)
 #include <stddef.h> //for NULL

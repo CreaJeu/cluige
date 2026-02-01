@@ -49,7 +49,7 @@ static struct _Clock* clk_new_Clock()
 
     free(new_node->_class_name); //TODO static value to avoid free
     StringBuilder sb;
-    new_node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, strlen("NodeClock"));
+    new_node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, 1 + strlen("NodeClock"));
     iCluige.iStringBuilder.append(&sb, "NodeClock");
 
     new_node->delete_Node = clk_delete_Clock;

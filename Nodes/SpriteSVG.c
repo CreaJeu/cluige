@@ -182,11 +182,12 @@ static void ssvg_erase(Node* this_Node)
 static void ssvg_draw(Node* this_Node)
 {
     Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+    SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
+	this_SpriteSVG->_draw_super(this_Node);
     if(!(this_Node2D->visible))
     {
         return;
     }
-    SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
     //call super()
     //this_SpriteSVG->_post_process_super(this_Node);//no, just pre_draw in Node2D, not overridden here
 
@@ -312,12 +313,13 @@ static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
     free(new_Node->_class_name); //TODO static value to avoid free
     StringBuilder sb;
     new_Node->_class_name = iCluige.iStringBuilder.string_alloc(
-            &sb, strlen("NodeNode2DSpriteSVG"));
+            &sb, 1 + strlen("NodeNode2DSpriteSVG"));
     iCluige.iStringBuilder.append(&sb, "NodeNode2DSpriteSVG");
     new_Node2D->_sub_class = new_SpriteSVG;
 
     new_Node->delete_Node = ssvg_delete_SpriteSVG;
     new_Node->erase = ssvg_erase;
+    new_SpriteSVG->_draw_super = new_Node->draw;
     new_Node->draw = ssvg_draw;
 
     return new_SpriteSVG;

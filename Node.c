@@ -115,7 +115,7 @@ static Node* nde_new_Node()
     node->process_priority = 0;
 
     StringBuilder sb;
-    node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, 4);
+    node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, 1 + strlen("Node"));
     iCluige.iStringBuilder.append(&sb, "Node");
 
 //    node->_state_changes.parent = node->parent;

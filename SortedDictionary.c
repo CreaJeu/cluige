@@ -16,8 +16,10 @@ static void sd_sorted_dictionary_alloc(SortedDictionary* this_SortedDictionary, 
     iCluige.iDeque.deque_alloc(&(this_SortedDictionary->_pairs), VT_POINTER, capacity);
     this_SortedDictionary->_pairs._sorted = true;
     this_SortedDictionary->_pairs._compare_func = iCluige.iDeque.default_compare_pair_key_func;
+    this_SortedDictionary->_pairs._compare_sub_func = iCluige.iDeque.default_compare_sub_pair_key_func;
     this_SortedDictionary->_keys_type = keys_type;
     this_SortedDictionary->_values_type = values_type;
+    this_SortedDictionary->_pairs.meta_data.i32 = keys_type;
 //    this_SortedDictionary->compare_keys_func = sd__deque_compare_func;
 }
 
@@ -71,11 +73,11 @@ static Checked_Variant sd_get(const SortedDictionary* this_SortedDictionary, ...
     struct _Structed_va_list s_args_elem_value;
     va_start(s_args_elem_value.args, this_SortedDictionary);
     Variant key = iCluige.iVariant.from_s_args(
-                _pairs->_elems_type, &s_args_elem_value);
+                this_SortedDictionary->_keys_type, &s_args_elem_value);
     va_end(s_args_elem_value.args);
 
     Pair new_pair = { key, iCluige.iVariant.NULL_VARIANT };
-    int i = iCluige.iDeque.bsearch(_pairs, new_pair);
+    int i = iCluige.iDeque.bsearch(_pairs, &new_pair);
     if(i == -1)
     {
         res.valid = false;

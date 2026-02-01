@@ -338,7 +338,7 @@ static Camera2D* c2d_new_Camera2D_from_Node2D(Node2D* new_Node2D)
     free(new_Node->_class_name); //TODO static value to avoid free
     StringBuilder sb;
     new_Node->_class_name = iCluige.iStringBuilder.string_alloc(
-            &sb, strlen("NodeNode2DCamera2D"));
+            &sb, 1 + strlen("NodeNode2DCamera2D"));
     iCluige.iStringBuilder.append(&sb, "NodeNode2DCamera2D");
 
 //    Camera2D* current_camera = iCluige.iCamera2D.current_camera;

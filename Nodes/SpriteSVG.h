@@ -30,6 +30,7 @@ struct _SpriteSVG
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
 //	void (*_erase_super)(Node*);
+	void (*_draw_super)(Node*);
 
 	//virtual methods in .c :
 	//void erase_Node(Node*);

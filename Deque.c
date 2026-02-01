@@ -335,6 +335,12 @@ static int dq_default_compare_pair_key_func(const Deque* this_Deque, Variant va,
     return this_Deque->_compare_sub_func(this_Deque, key_a, key_b);
 }
 
+static int dq_default_compare_sub_pair_key_func(const Deque* this_Deque, Variant va, Variant vb)
+{
+	VariantType t = (VariantType)(this_Deque->meta_data.i32);
+    return iCluige.iVariant.compare(t, va, vb);
+}
+
 static void dq_bsearch_rec(const Deque* this_Deque, Variant searched_elem, struct _BSearchData* bsd)
 {
     //assert(bsd->_i_min <= bsd->_i_max);
@@ -450,6 +456,7 @@ void iiDeque_init()
 
     iCluige.iDeque.default_compare_func = dq_default_compare_func;
     iCluige.iDeque.default_compare_pair_key_func = dq_default_compare_pair_key_func;
+    iCluige.iDeque.default_compare_sub_pair_key_func = dq_default_compare_sub_pair_key_func;
     iCluige.iDeque.default_compare_string_func = dq_default_compare_string_func;
     iCluige.iDeque.bsearch = dq_bsearch;
     iCluige.iDeque.bsearch_rec = dq_bsearch_rec;

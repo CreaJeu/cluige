@@ -1,9 +1,9 @@
 
-#include "../cluige.h"
-#include "Input.h"
-
 #include <string.h> //TODO static instead of malloc'ed class name
 #include <curses.h> //TODO separate from cluige core via 'server'
+
+#include "../cluige.h"
+#include "Input.h"
 
 ////////////////////////////////// _Input /////////
 
@@ -120,7 +120,7 @@ static struct _Input* inp_new_Input()
 
     free(new_node->_class_name); //TODO static value to avoid free
     StringBuilder sb;
-    new_node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, strlen("NodeInput"));
+    new_node->_class_name = iCluige.iStringBuilder.string_alloc(&sb, 1 + strlen("NodeInput"));
     iCluige.iStringBuilder.append(&sb, "NodeInput");
 
 	//virtual methods - private copies of mother class pointers

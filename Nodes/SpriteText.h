@@ -31,6 +31,7 @@ struct _SpriteText
 //	void (*_enter_tree_super)(Node*);
 //	void (*_erase_super)(Node*);
 //	void (*_post_process_super)(Node*);
+	void (*_draw_super)(Node*);
 
 	//virtual methods in .c :
 	//void erase(Node*);

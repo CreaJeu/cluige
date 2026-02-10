@@ -25,6 +25,7 @@
 	test with .tscn spread in sub-sub-dirs => ok godot always use absolute path from /res for ext_resource descriptors
 	test import tscn with a label at arbitrary position
 	update test_node_against_ps to include instance->instance->... => tant pis, complexité de test disproportionnée
+(linux)
 (bugs : see below)
 
 
@@ -64,7 +65,6 @@
 - signals
 - collision rectangle
 - Node2D scale, with consequences on SpriteText/Label and SpriteSVG, no more scale in SpriteSVG
-- linux
 - optim draw/erase sprites (faire Node2D::scale d'abord)
     Node2D::bake() : benefit from DFS, tmp_global_pos of parent already up to date (nearest Node2D ancestor)
     spriteText

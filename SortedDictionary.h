@@ -60,9 +60,10 @@ struct iiSortedDictionary
 
     //deletion
 
-    //no auto free/delete, don't forget to do it yourself before, if needed
-    //returns erased value (inside a Variant), or NULL_VARIANT if not found
-    Variant (*erase)(SortedDictionary* this_SortedDictionary, ...);
+    //no auto free/delete, don't forget to do it yourself, if needed
+    //returns erased key/value (inside a Pair), or
+    // Pair{NULL_VARIANT, NULL_VARIANT} if not found
+    Pair (*erase)(SortedDictionary* this_SortedDictionary, ...);
 
     //no auto free/delete, don't forget to do it yourself before, if needed
     void (*clear)(SortedDictionary* this_SortedDictionary);

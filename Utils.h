@@ -6,7 +6,9 @@
 
 
 #ifdef CLUIGE_DEBUG
-	#define CLUIGE_ASSERT(right, msg) _cluige_assert((right), (msg))
+//	#define CLUIGE_ASSERT(right, msg) _cluige_assert((right), (msg))
+	//can be used like printf ("... %d, %s", ...)
+	#define CLUIGE_ASSERT(right, ...) _cluige_assert((right), __VA_ARGS__)
 #else
 	#define CLUIGE_ASSERT(right, msg)
 #endif // CLUIGE_DEBUG
@@ -14,6 +16,10 @@
 typedef struct _SortedDictionary SortedDictionary;
 typedef struct _Vector2 Vector2;
 
+//first argument is ignored but lets your calling code
+// use a variable only to store a value to see in debugger
+// and pass it to this function to prevent
+// warning about unused variable
 void utils_breakpoint_trick(const void* anything, bool breakpoint);
 
 //TODO good error logging for game designer instead of assert
@@ -42,6 +48,7 @@ bool utils_id_str_from_ExtResource_parsed(char** out, const char* parsed_value);
 
 //private, cluige users should use the macro CLUIGE_ASSERT(right, msg) instead
 //macro->function to be able to breakpoint and view call stack
-void _cluige_assert(bool right, const char* msg);
+//can be used like printf ("... %d, %s", ...)
+void _cluige_assert(bool right, const char* msg, ...);
 
 #endif // CLUIGE_UTILS_H_INCLUDED

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <assert.h>
 #include <math.h>
+#include <stdarg.h>
 
 //for sscanf
 #include <stdio.h>
@@ -188,11 +189,17 @@ bool utils_id_str_from_ExtResource_parsed(char** out, const char* parsed_value)
 	return true;
 }
 
-void _cluige_assert(bool right, const char* msg)
+void _cluige_assert(bool right, const char* msg, ...)
 {
 	if(!right)
 	{
-		printf("ASSERT FAILED %s\n", msg);// TODO see utils_cluige_printf() in .h
+//		printf("ASSERT FAILED %s\n", msg);
+		printf("ASSERT FAILED ");
+		va_list args;
+		va_start(args, msg);
+		vprintf(msg, args);// TODO see utils_cluige_printf() in .h
+		va_end(args);
+		printf("\n");
 		utils_breakpoint_trick(msg, true);
 		assert(right);
 	}

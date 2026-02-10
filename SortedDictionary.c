@@ -214,13 +214,13 @@ static Checked_Variant sd_insert(SortedDictionary* this_SortedDictionary, ...)
 //deletion
 
 //no auto free/delete
-static Variant sd_erase(SortedDictionary* this_SortedDictionary, ...)
+static Pair sd_erase(SortedDictionary* this_SortedDictionary, ...)
 {
     Deque* _pairs = &(this_SortedDictionary->_pairs);
     int this_size = iCluige.iDeque.size(_pairs);
     if(this_size == 0)
     {
-        return iCluige.iVariant.NULL_VARIANT;
+        return (Pair){iCluige.iVariant.NULL_VARIANT, iCluige.iVariant.NULL_VARIANT};
     }
     struct _Structed_va_list s_args_key;
     va_start(s_args_key.args, this_SortedDictionary);
@@ -240,14 +240,14 @@ static Variant sd_erase(SortedDictionary* this_SortedDictionary, ...)
         Pair* found = (Pair*)((iCluige.iDeque.at(_pairs, bsd._found_deque_index)).ptr);
 //        int64_t dbg_k = found->first.i64;
 //        char* dbg_val = (char*)(found->second.ptr);
-        Variant replaced_value = found->second;//copy
+        Pair found_copied = *found;//copy
         iCluige.iDeque.remove(_pairs, bsd._found_deque_index);
         free(found);//TODO memory pool for pairs (maybe thread-safe ready?)
-        return replaced_value;
+        return found_copied;
     }
     else
     {
-        return iCluige.iVariant.NULL_VARIANT;
+        return (Pair){iCluige.iVariant.NULL_VARIANT, iCluige.iVariant.NULL_VARIANT};
     }
 }
 

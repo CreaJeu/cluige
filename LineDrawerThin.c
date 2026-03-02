@@ -113,8 +113,8 @@ void ldt_next(struct _LineDrawerThin* drawer)
     {
         drawer->current_position = diagonal_point;
         drawer->curr_dist = distance_diagonal;
-        float incr_x_sign = copysignf(1.0, drawer->_diagonal_incr.x);
-        float incr_y_sign = copysignf(1.0, drawer->_diagonal_incr.y);
+        int incr_x_sign = (int)copysignf(1.0, drawer->_diagonal_incr.x);
+        int incr_y_sign = (int)copysignf(1.0, drawer->_diagonal_incr.y);
         if(incr_x_sign == incr_y_sign)
         {
             drawer->_glyph_index = 3;

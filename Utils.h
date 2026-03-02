@@ -10,7 +10,7 @@
 	//can be used like printf ("... %d, %s", ...)
 	#define CLUIGE_ASSERT(right, ...) _cluige_assert((right), __VA_ARGS__)
 #else
-	#define CLUIGE_ASSERT(right, msg)
+	#define CLUIGE_ASSERT(right, ...)
 #endif // CLUIGE_DEBUG
 
 typedef struct _SortedDictionary SortedDictionary;

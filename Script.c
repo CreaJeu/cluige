@@ -55,6 +55,7 @@ static void scpt_register_ScriptFactory(const char* full_path, ScriptFactory* fa
 		"Script::register_ScriptFactory() : script path '%s' too short", full_path);
     char* fcty_key = iCluige.checked_malloc((key_len_term + 1) * sizeof(char));
     strncpy(fcty_key, full_path, key_len_term);
+    fcty_key[key_len_term] = '\0';
     Checked_Variant found = iCluige.iSortedDictionary.insert(fcties, fcty_key, factory);
     CLUIGE_ASSERT(!(found.valid),
 		"Node::register_ScriptFactory() : trying to register a script with the already used key '%s'",

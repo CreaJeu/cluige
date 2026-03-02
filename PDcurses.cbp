@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="PDCurses" />
+		<Option makefile="cf_build_options_make_commands" />
+		<Option makefile_is_custom="1" />
+		<Option execution_dir="cf_build_options_make_commands" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="DebugLinux">
+				<Option output="PDcurses.so" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="cf_build_options_make_commands" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<ExtraCommands>
+					<Add before='if  [ ! -e ../PDCurses/x11/MakefileDebug ]; then (echo &quot;inside PDCurses/x11...&quot; &amp;&amp; echo &quot;  pre-build step : need to run ./configure -disable-widec -enable-force-utf8 -enable-debug&quot; &amp;&amp; cd ../PDCurses/x11/ &amp;&amp; if [ -e Makefile ]; then ( echo &quot;keeping existing Makefile by renaming it Makefile.bak&quot; &amp;&amp; mv Makefile Makefile.bak ) fi &amp;&amp; ./configure -disable-widec -enable-force-utf8 -enable-debug &amp;&amp; echo &quot;renaming produced Makefile as MakefileDebug&quot; &amp;&amp; mv Makefile MakefileDebug) fi' />
+				</ExtraCommands>
+				<MakeCommands>
+					<Build command="cd ../PDCurses/x11 &amp;&amp; $make -f MakefileDebug all" />
+					<CompileFile command="cd ../PDCurses/x11 &amp;&amp; $make -f MakefileDebug $file" />
+					<Clean command="cd ../PDCurses/x11 &amp;&amp; $make -f MakefileDebug clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="cd ../PDCurses/x11 &amp;&amp; $make -f MakefileDebug -q" />
+					<SilentBuild command="cd ../PDCurses/x11 &amp;&amp; $make -f MakefileDebug all &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="DebugWindows">
+				<Option output="PDcurses.so" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="cf_build_options_make_commands" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<MakeCommands>
+					<Build command="cd ../PDCurses/wincon &amp;&amp; $make all DEBUG=Y DLL=Y" />
+					<CompileFile command="cd ../PDCurses/wincon &amp;&amp; $make $file DEBUG=Y DLL=Y" />
+					<Clean command="cd ../PDCurses/wincon &amp;&amp; $make clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="cd ../PDCurses/wincon &amp;&amp; $make -q" />
+					<SilentBuild command="cd ../PDCurses/wincon &amp;&amp; $make all DEBUG=Y DLL=Y &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="ReleaseLinux">
+				<Option output="PDcurses.so" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="cf_build_options_make_commands" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<ExtraCommands>
+					<Add before='if  [ ! -e ../PDCurses/x11/MakefileRelease ]; then (echo &quot;inside PDCurses/x11...&quot; &amp;&amp; echo &quot;  pre-build step : need to run ./configure -disable-widec -enable-force-utf8&quot; &amp;&amp; cd ../PDCurses/x11/ &amp;&amp; if [ -e Makefile ]; then ( echo &quot;keeping existing Makefile by renaming it Makefile.bak&quot; &amp;&amp; mv Makefile Makefile.bak ) fi &amp;&amp; ./configure -disable-widec -enable-force-utf8 &amp;&amp; echo &quot;renaming produced Makefile as MakefileRelease&quot; &amp;&amp; mv Makefile MakefileRelease) fi' />
+				</ExtraCommands>
+				<MakeCommands>
+					<Build command="cd ../PDCurses/x11 &amp;&amp; $make -f MakefileRelease all" />
+					<CompileFile command="cd ../PDCurses/x11 &amp;&amp; $make -f MakefileRelease $file" />
+					<Clean command="cd ../PDCurses/x11 &amp;&amp; $make -f MakefileRelease clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="cd ../PDCurses/x11 &amp;&amp; $make -f MakefileRelease -q" />
+					<SilentBuild command="cd ../PDCurses/x11 &amp;&amp; $make -f MakefileRelease all &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>

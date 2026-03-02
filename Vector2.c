@@ -52,11 +52,19 @@ static float vct2_length_squared(const Vector2* v)
 static void vct2_normalize(Vector2* v)
 {
 	float l = v->x * v->x + v->y * v->y;
-	if(l != 0)
+//	CLUIGE_ASSERT(l > iCluige.EPSILON,
+//		"trying to normalize (nearly) null Vector2 (%f, %f)",
+//		v->x, v->y);//not an error in godot, return (0,0)
+	if(l > iCluige.EPSILON)
     {
 		l = sqrtf(l);
 		v->x /= l;
 		v->y /= l;
+	}
+	else
+    {
+		v->x = 0;
+		v->y = 0;
 	}
 }
 

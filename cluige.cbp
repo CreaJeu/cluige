@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/libcluige" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/cluige" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -19,11 +19,12 @@
 					<Add option="-DCLUIGE_DEBUG" />
 				</Compiler>
 				<Linker>
-					<Add library="../pdcurses_debug/pdcurses_debug/bin/Debug/libpdcurses_debug.a" />
+					<Add library="bin/Debug/pdcurses/pdcurses.dll" />
+					<Add directory="bin/Debug/pdcurses" />
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/libcluige" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/cluige" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -36,8 +37,133 @@
 					<Add option="-s" />
 				</Linker>
 			</Target>
+			<Target title="DebugLinux">
+				<Option output="bin/Debug/cluige" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option additional_output="../PDCurses/x11/libXCurses.so;" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-fPIC" />
+					<Add option="-lm" />
+					<Add option="-O0" />
+					<Add option="-ggdb3" />
+					<Add option="-DCLUIGE_DEBUG" />
+				</Compiler>
+				<Linker>
+					<Add library="../PDCurses/x11/libXCurses.so" />
+					<Add library="m" />
+					<Add library="Xaw" />
+					<Add library="Xmu" />
+					<Add library="Xt" />
+					<Add library="X11" />
+					<Add library="Xpm" />
+					<Add library="SM" />
+					<Add library="ICE" />
+					<Add library="Xext" />
+					<Add library="c" />
+					<Add directory="/usr/lib/x86_64-linux-gnu" />
+				</Linker>
+			</Target>
+			<Target title="DebugLinuxNcurses">
+				<Option output="bin/Debug/cluige" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-fPIC" />
+					<Add option="-lm" />
+					<Add option="-O0" />
+					<Add option="-ggdb3" />
+					<Add option="-DCLUIGE_DEBUG" />
+				</Compiler>
+				<Linker>
+					<Add library="curses" />
+					<Add library="m" />
+					<Add directory="$CURSES_LIB_PATH" />
+				</Linker>
+				<ExtraCommands>
+					<Add before='#[[ print(_T(&quot;azertyuiopoiuytreza&quot;)); ]]' />
+					<Add before='echo [[ print(       _T(&quot;avant&quot;)       ); ]]' />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#echo [[ GetLibDirs(); ]]" />
+					<Add before="echo [[ GetLinkLibs(); ]]" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before='echo [[ print(       _T(&quot;après&quot;)       ); ]]' />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before='#[[ LogError(_T(&quot;qsdfghjkmlkjhgfdsq&quot;)); ]]' />
+					<Add before="sh zz-prebuildchecks.sh libcurses.so" />
+					<Add before="sh zz-prebuildchecks.sh libm.so" />
+					<Add before="#export CURSES_LIB_PATH=/usr/lib/x86_64-linux-gnu" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before='#echo &quot;$(PLATFORM)&quot;' />
+					<Add before='#`LogError(&quot;azert&quot;)`' />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before="#" />
+					<Add before='#echo `LogError(&quot;azert&quot;)`' />
+					<Add before="#LogError($(PLATFORM))" />
+					<Add before="#$(PLATFORM)" />
+					<Add before="#echo $(PLATFORM)" />
+					<Add before='#_T(&quot;azerty&quot;)' />
+					<Add before="#IO.GetCwd()" />
+				</ExtraCommands>
+			</Target>
+			<Target title="ReleaseLinux">
+				<Option output="bin/Release/cluige" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option additional_output="../PDCurses/x11/libXCurses.so;" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-fPIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="../PDCurses/x11/libXCurses.so" />
+					<Add library="m" />
+					<Add library="Xaw" />
+					<Add library="Xmu" />
+					<Add library="Xt" />
+					<Add library="X11" />
+					<Add library="Xpm" />
+					<Add library="SM" />
+					<Add library="ICE" />
+					<Add library="Xext" />
+					<Add library="c" />
+					<Add directory="/usr/lib/x86_64-linux-gnu" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-Wredundant-decls" />
+			<Add option="-Wfloat-equal" />
+			<Add option="-Wmissing-include-dirs" />
 			<Add option="-Wall" />
 			<Add option="-std=c11" />
 			<Add directory="../PDCurses" />

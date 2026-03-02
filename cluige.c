@@ -233,6 +233,12 @@ void cluige_run()
 		//queue_free_early
         iCluige.iNode._do_all_queue_free_early_step();
 
+        //curses handling of "screen" resize
+		if(is_termresized())
+		{
+			resize_term(0,0);
+		}
+
         //DRAW
         process_tree(iCluige._private_root_2D, DRAW_PASS);
 

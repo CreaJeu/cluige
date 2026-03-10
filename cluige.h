@@ -61,6 +61,10 @@ struct iiCluige
 	//for target FPS, 15 fps by default
 	float wanted_frame_seconds;//TODO rename wanted_seconds_per_frame
 
+	char* window_title;
+	int window_initial_size_cols;
+	int window_initial_size_lines;
+
 	//to quit a game
 	bool quit_asked;
 

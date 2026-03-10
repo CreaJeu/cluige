@@ -3,6 +3,7 @@
 #include <curses.h>
 #include "cluige.h"
 #include "Nodes/Clock.h"
+#include "init_non_portable.h"
 
 ////////////////////////////////// iiCluige /////////
 
@@ -41,6 +42,10 @@ void cluige_init()
     iCluige.checked_malloc = clg_checked_malloc;
     iCluige.get_screen_size = clg_get_screen_size;
     iCluige.wanted_frame_seconds = .0666;//15 fps by default
+
+	iCluige.window_title = "Cluige";
+	iCluige.window_initial_size_cols = 110;
+	iCluige.window_initial_size_lines = 50;
     iCluige.EPSILON = 0.00001;
     iCluige.quit_asked = false;
 
@@ -191,7 +196,7 @@ static void process_tree(Node* root, enum ProcessPass pass)
 void cluige_run()
 {
     //curses  //TODO separate from core cluige via 'display server'
-    initscr();
+    _cluige_initscr();
     nodelay(stdscr, true);
     cbreak();
     //nl();//?

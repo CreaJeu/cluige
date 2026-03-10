@@ -51,6 +51,7 @@
 					<Add option="-O0" />
 					<Add option="-ggdb3" />
 					<Add option="-DCLUIGE_DEBUG" />
+					<Add option="-DCLUIGE_X11" />
 					<Add option="-DXCURSES" />
 				</Compiler>
 				<Linker>
@@ -148,6 +149,8 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-fPIC" />
+					<Add option="-DCLUIGE_X11" />
+					<Add option="-DXCURSES" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -263,6 +266,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="cluige.h" />
+		<Unit filename="init_non_portable.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="init_non_portable.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

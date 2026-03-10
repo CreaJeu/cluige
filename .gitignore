@@ -1,5 +1,6 @@
-/cluige.layout
+/*.layout
 /bin
 /obj
 /*.depend
 /*.bak
+/.cluige_dep_dir

@@ -51,9 +51,11 @@
 					<Add option="-O0" />
 					<Add option="-ggdb3" />
 					<Add option="-DCLUIGE_DEBUG" />
+					<Add option="-DXCURSES" />
 				</Compiler>
 				<Linker>
-					<Add library="../PDCurses/x11/libXCurses.so" />
+					<Add option="-Wl,-rpath,&apos;\\$$$$ORIGIN&apos;" />
+					<Add library="XCurses" />
 					<Add library="m" />
 					<Add library="Xaw" />
 					<Add library="Xmu" />
@@ -64,8 +66,12 @@
 					<Add library="ICE" />
 					<Add library="Xext" />
 					<Add library="c" />
-					<Add directory="/usr/lib/x86_64-linux-gnu" />
+					<Add directory="../PDCurses/x11" />
+					<Add directory="`cat .cluige_dep_dir`" />
 				</Linker>
+				<ExtraCommands>
+					<Add before='test ! -e .cluige_dep_dir &amp;&amp;  grep -o &quot; -L[^ $]* -l&quot; ../PDCurses/x11/MakefileDebug | sed -n &quot;s/^ -L\\([^ ]*\\) -l.*$/\\1/p; q&quot; &gt; .cluige_dep_dir || echo .cluige_dep_dir ok' />
+				</ExtraCommands>
 			</Target>
 			<Target title="DebugLinuxNcurses">
 				<Option output="bin/Debug/cluige" prefix_auto="1" extension_auto="1" />
@@ -145,7 +151,8 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="../PDCurses/x11/libXCurses.so" />
+					<Add option="-Wl,-rpath,&apos;\\$$$$ORIGIN&apos;" />
+					<Add library="XCurses" />
 					<Add library="m" />
 					<Add library="Xaw" />
 					<Add library="Xmu" />
@@ -156,8 +163,12 @@
 					<Add library="ICE" />
 					<Add library="Xext" />
 					<Add library="c" />
-					<Add directory="/usr/lib/x86_64-linux-gnu" />
+					<Add directory="../PDCurses/x11" />
+					<Add directory="`cat .cluige_dep_dir`" />
 				</Linker>
+				<ExtraCommands>
+					<Add before='test ! -e .cluige_dep_dir &amp;&amp;  grep -o &quot; -L[^ $]* -l&quot; ../PDCurses/x11/MakefileRelease | sed -n &quot;s/^ -L\\([^ ]*\\) -l.*$/\\1/p; q&quot; &gt; .cluige_dep_dir || echo .cluige_dep_dir ok' />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>

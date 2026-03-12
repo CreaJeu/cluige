@@ -32,12 +32,6 @@ static Script* scpt_new_Script()
     return this_Script;
 }
 
-static void scpt_attach(Script* this_Script, Node* n)
-{
-	this_Script->node = n;
-	n->script = this_Script;
-}
-
 static void scpt_register_ScriptFactory(const char* full_path, ScriptFactory* factory)
 {
     CLUIGE_ASSERT(factory,
@@ -58,8 +52,43 @@ static void scpt_register_ScriptFactory(const char* full_path, ScriptFactory* fa
     fcty_key[key_len_term] = '\0';
     Checked_Variant found = iCluige.iSortedDictionary.insert(fcties, fcty_key, factory);
     CLUIGE_ASSERT(!(found.valid),
-		"Node::register_ScriptFactory() : trying to register a script with the already used key '%s'",
+		"Script::register_ScriptFactory() : trying to register a script with the already used key '%s'",
 		fcty_key);
+}
+
+
+//script_file_path must include res:// and extension (like .gd or .c) which is ignored
+static Script* scpt_instantiate_from_factories_with_ext(const char* script_file_path, const SortedDictionary* parsed_params)
+{
+    const char* last_dot = strrchr(script_file_path, '.');
+    CLUIGE_ASSERT(last_dot,
+		"Script::instantiate_from_factories_with_ext() : expected extension in script file name (usually '.gd') not found (%s)",
+		script_file_path);
+    CLUIGE_ASSERT(strstr(script_file_path, "res://"),
+		"Script::instantiate_from_factories_with_ext() : expected leading 'res://' in script file path not found (%s)",
+		script_file_path);
+    int key_len_term = last_dot - script_file_path;
+    CLUIGE_ASSERT(key_len_term > 6,
+		"Script::instantiate_from_factories_with_ext() : script path '%s' too short", script_file_path);
+	char fcty_key[key_len_term + 1];//444];
+    strncpy(fcty_key, script_file_path, key_len_term);
+    fcty_key[key_len_term] = '\0';
+    return iCluige.iScript.instantiate_from_factories_no_ext(fcty_key, parsed_params);
+}
+
+//script_file_path must include res:// but no extension (like .gd or .c)
+static Script* scpt_instantiate_from_factories_no_ext(const char* script_file_path, const SortedDictionary* parsed_params)
+{
+    SortedDictionary* fcties = &(iCluige.iScript.script_factories);
+    Checked_Variant found = iCluige.iSortedDictionary.get(fcties, script_file_path);
+    CLUIGE_ASSERT(found.valid,
+		"Script::instantiate_from_factories_no_ext() : trying to instantiate unknown script '%s'",
+		script_file_path);
+	ScriptFactory* factory = (ScriptFactory*)(found.v.ptr);
+    CLUIGE_ASSERT(factory,
+		"Script::instantiate_from_factories_no_ext() : factory registered for script '%s' is NULL",
+		script_file_path);
+	return factory->instantiate(parsed_params);
 }
 
 /////////////////////////////////// iScript //////////
@@ -67,7 +96,6 @@ static void scpt_register_ScriptFactory(const char* full_path, ScriptFactory* fa
 void iiScript_init()
 {
     iCluige.iScript.new_Script = scpt_new_Script;
-    iCluige.iScript.attach = scpt_attach;
 
     SortedDictionary* fcties = &(iCluige.iScript.script_factories);
     iCluige.iSortedDictionary.sorted_dictionary_alloc(
@@ -76,5 +104,7 @@ void iiScript_init()
 		fcties, iCluige.iDeque.default_compare_string_func);
 
     iCluige.iScript.register_ScriptFactory = scpt_register_ScriptFactory;
+    iCluige.iScript.instantiate_from_factories_with_ext = scpt_instantiate_from_factories_with_ext;
+    iCluige.iScript.instantiate_from_factories_no_ext = scpt_instantiate_from_factories_no_ext;
 }
 

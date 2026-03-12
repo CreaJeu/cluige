@@ -37,7 +37,7 @@ static Vector2 clg_get_screen_size()
 //redeclaration because of extern (like static members in c++)
 struct iiCluige iCluige;
 
-void cluige_init()
+void cluige_init(void (*register_user_scripts)())
 {
     iCluige.checked_malloc = clg_checked_malloc;
     iCluige.get_screen_size = clg_get_screen_size;
@@ -99,6 +99,12 @@ void cluige_init()
 	iCluige.iSortedDictionary.sorted_dictionary_alloc(
 		&(iCluige._prioritized_nodes_to_process),
 		VT_INT64, VT_POINTER, 7);
+
+	CLUIGE_ASSERT(register_user_scripts != NULL,
+			"\
+cluige_init(register_user_scripts) : param register_user_scripts must be non null. \
+Don't forget to register user scripts in the pointed function.");
+	register_user_scripts();
 }
 
 enum ProcessPass

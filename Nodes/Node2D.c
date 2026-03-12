@@ -176,10 +176,10 @@ static void n2d_set_local_position(Node2D* this_Node2D, Vector2 new_pos)
     this_Node2D->_position_changed = true;
 }
 
-static Node* n2d_instanciate(const SortedDictionary* params)
+static Node* n2d_instantiate(const SortedDictionary* params)
 {
     //mother class
-    Node* res_node = iCluige.iNode._Node_factory.instanciate(params);
+    Node* res_node = iCluige.iNode._Node_factory.instantiate(params);
     Node2D* res_node2D = n2d_new_Node2D_from_Node(res_node);
 
     utils_bool_from_parsed(&(res_node2D->visible), params, "visible");
@@ -200,7 +200,7 @@ void iiNode2D_init()
     iCluige.iNode2D.move_local = n2d_move_local;
     iCluige.iNode2D.set_local_position = n2d_set_local_position;
 
-    iCluige.iNode2D._Node2D_factory.instanciate = n2d_instanciate;
+    iCluige.iNode2D._Node2D_factory.instantiate = n2d_instantiate;
     iCluige.iNode.register_NodeFactory("Node2D", &(iCluige.iNode2D._Node2D_factory));
 }
 

@@ -645,11 +645,11 @@ static void nde__do_all_queue_free_late_step()
     iCluige.iDeque.clear(&_queue_freed_nodes);
 }
 
-static Node* nde_instanciate(const SortedDictionary* parsed_params)
+static Node* nde_instantiate(const SortedDictionary* parsed_params)
 {
     Node* res = nde_new_Node();
     bool ok = utils_str_from_parsed(&(res->name), parsed_params, "name");
-    CLUIGE_ASSERT(ok, "Node::instanciate() : missing 'name' field");
+    CLUIGE_ASSERT(ok, "Node::instantiate() : missing 'name' field");
     //optional
     utils_int_from_parsed(&(res->process_priority), parsed_params, "process_priority");
     // TODO ? from godot process mode? // utils_bool_from_parsed(&(res->active), params, "active");
@@ -664,6 +664,23 @@ static void nde_register_NodeFactory(const char* key, NodeFactory* factory)
     strncpy(fcty_key, key, key_len_term);
     Checked_Variant found = iCluige.iSortedDictionary.insert(fcties, fcty_key, factory);
     CLUIGE_ASSERT(!(found.valid), "Node::register_NodeFactory() : trying to register a factory with an already used key");
+}
+
+
+//detaches previous script if any, up to the user to store or free it
+// s can be NULL to just detach previous script if any
+static void nde_set_script(Node* this_node, Script* s)
+{
+	Script* old_s = this_node->script;
+	if(old_s)
+	{
+		old_s->node = NULL;
+	}
+	this_node->script = s;
+	if(s)
+	{
+		s->node = this_node;
+	}
 }
 
 /////////////////////////////////// Node //////////
@@ -699,8 +716,9 @@ void iiNode_init()
     iCluige.iSortedDictionary.sorted_dictionary_alloc(fcties, VT_POINTER, VT_POINTER, 20);
     iCluige.iSortedDictionary.set_compare_keys_func(fcties, iCluige.iDeque.default_compare_string_func);
     iCluige.iNode.register_NodeFactory = nde_register_NodeFactory;
+    iCluige.iNode.set_script = nde_set_script;
 
-    iCluige.iNode._Node_factory.instanciate = nde_instanciate;
+    iCluige.iNode._Node_factory.instantiate = nde_instantiate;
     iCluige.iNode.register_NodeFactory("Node", &(iCluige.iNode._Node_factory));
 }
 

@@ -368,10 +368,10 @@ static void ssvg_parse_file(SpriteSVG* this_SpriteSVG, char* file_path)
     iCluige.iSpriteSVG.iSVGParser.end_parsing(&_svg_parser);
 }
 
-static Node* ssvg_instanciate(const SortedDictionary* params)
+static Node* ssvg_instantiate(const SortedDictionary* params)
 {
     //mother class
-    Node* res_node = iCluige.iNode2D._Node2D_factory.instanciate(params);
+    Node* res_node = iCluige.iNode2D._Node2D_factory.instantiate(params);
     Node2D* res_node2D = (Node2D*)(res_node->_sub_class);
     SpriteSVG* res_SpriteSVG = ssvg_new_SpriteSVG_from_Node2D(res_node2D);
 
@@ -380,13 +380,13 @@ static Node* ssvg_instanciate(const SortedDictionary* params)
     //svg_file_path = "../some/where"
     utils_vector2_from_parsed(&(res_SpriteSVG->offset), params, "offset");
     utils_vector2_from_parsed(&(res_SpriteSVG->scale), params, "scale");//TODO scale in Node2D instead
-    CLUIGE_ASSERT(iCluige.iDeque.empty(&(res_SpriteSVG->paths)), "SpriteSVG::instanciate() : trying to instanciate() into non empty object");
+    CLUIGE_ASSERT(iCluige.iDeque.empty(&(res_SpriteSVG->paths)), "SpriteSVG::instantiate() : trying to instantiate() into non empty object");
     char* svg_file_path;
     //'texture'=>'path/to/file.svg' see TscnParser::node()
     bool ok = utils_nonquoted_str_from_parsed(&svg_file_path, params, "svg_file_path");
 //	char* dbg = iCluige.iSortedDictionary.debug_str_str(params);
 //	utils_breakpoint_trick(dbg, !ok);
-    CLUIGE_ASSERT(ok, "SpriteSVG::instanciate() : missing 'texture' field");
+    CLUIGE_ASSERT(ok, "SpriteSVG::instantiate() : missing 'texture' field");
     ssvg_parse_file(res_SpriteSVG, svg_file_path);
     //free(svg_file_path);no need with utils_nonquoted_str_from_parsed()
     return res_node;
@@ -403,7 +403,7 @@ void iiSpriteSVG_init()
     iCluige.iSpriteSVG.add_path_from_parsed_deque = ssvg_add_path_from_parsed_deque;
     iCluige.iSpriteSVG.parse_file = ssvg_parse_file;
 
-    iCluige.iSpriteSVG._SpriteSVG_factory.instanciate = ssvg_instanciate;
+    iCluige.iSpriteSVG._SpriteSVG_factory.instantiate = ssvg_instantiate;
     iCluige.iNode.register_NodeFactory("Sprite2D", &(iCluige.iSpriteSVG._SpriteSVG_factory));
 
     iiSVGParser_init(&(iCluige.iSpriteSVG.iSVGParser));

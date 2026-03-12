@@ -10,7 +10,7 @@ typedef struct _ScriptFactory ScriptFactory;
 
 struct _ScriptFactory
 {
-    Script* (*instanciate)(const SortedDictionary* parsed_params);
+    Script* (*instantiate)(const SortedDictionary* parsed_params);
 };
 
 struct _Script
@@ -35,9 +35,6 @@ struct iiScript
 	//Script* new_Script()
 	Script* (*new_Script)();
 
-//	void attach(Node*)
-	void (*attach)(Script* this_Script, Node* n);
-
 	//Dico<String, ScriptFactory*>
 	// path -> factory*
 	//path : absolute from res:// (including res://),
@@ -47,6 +44,11 @@ struct iiScript
 	//path : absolute from res:// (including res://),
 	// with extension like .c or .gd
 	void (*register_ScriptFactory)(const char* full_path, ScriptFactory* factory);
+
+	//script_file_path must include res:// and extension (like .gd or .c) which is ignored
+	Script* (*instantiate_from_factories_with_ext)(const char* script_file_path, const SortedDictionary* parsed_params);
+	//script_file_path must include res:// but no extension (like .gd or .c)
+	Script* (*instantiate_from_factories_no_ext)(const char* script_file_path, const SortedDictionary* parsed_params);
 };
 //iScript : in iiCluige
 

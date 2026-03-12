@@ -13,7 +13,7 @@ typedef struct _NodeFactory NodeFactory;
 
 struct _NodeFactory
 {
-    Node* (*instanciate)(const SortedDictionary* parsed_params);
+    Node* (*instantiate)(const SortedDictionary* parsed_params);
 };
 
 struct _Node
@@ -57,15 +57,15 @@ struct _Node
 	void* _sub_class;
 
 	//virtual methods
-	void (*delete_Node)(Node*);
-	void (*enter_tree)(Node*);//called at each tree entering
-	void (*ready)(Node*);//called after enter_tree, but only on the 1st entering ever
-	void (*exit_tree)(Node*);//called just before remove_child logic
-//	void (*on_loop_starting)(Node*);
-	void (*erase)(Node*);//abstract (null)
-	void (*process)(Node*);
-	void (*bake)(Node*);//abstract (null)
-	void (*draw)(Node*);//abstract (null)
+	void (*delete_Node)(Node* this_node);
+	void (*enter_tree)(Node* this_node);//called at each tree entering
+	void (*ready)(Node* this_node);//called after enter_tree, but only on the 1st entering ever
+	void (*exit_tree)(Node* this_node);//called just before remove_child logic
+//	void (*on_loop_starting)(Node* this_node);
+	void (*erase)(Node* this_node);//abstract (null)
+	void (*process)(Node* this_node);
+	void (*bake)(Node* this_node);//abstract (null)
+	void (*draw)(Node* this_node);//abstract (null)
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
@@ -92,55 +92,60 @@ struct iiNode
 
 	// read
 
-	//int get_index(Node*)
-	int (*get_index)(const Node*);
+	//int get_index()
+	int (*get_index)(const Node* this_node);
 
-	//int get_depth(Node*)
-	int (*get_depth)(const Node*);
+	//int get_depth()
+	int (*get_depth)(const Node* this_node);
 
 	//get the child at idx
-	Node* (*get_child)(const Node* ths_node, int idx);
+	Node* (*get_child)(const Node* this_node, int idx);
 
 	//get the number of children of the current node
-	int (*get_child_count)(const Node* ths_node);
+	int (*get_child_count)(const Node* this_node);
 
 	//get a node based on the relative or absolute path
 	//examples: /root/child_test1/
 	//          test1/child_test1/
 	//          test1/child_test1
 	//          ../sibling3
-	Node* (*get_node)(Node* ths_node, const char* node_path);
+	Node* (*get_node)(Node* this_node, const char* node_path);
 
-	bool (*is_ancestor_of)(Node* ths_node, Node* potential_ancestor);
-	bool (*is_higher_than)(Node* ths_node, Node* node);
+	bool (*is_ancestor_of)(Node* this_node, Node* potential_ancestor);
+	bool (*is_higher_than)(Node* this_node, Node* node);
 
 	//the returned string is malloced, up to the user to free it later
-	char* (*get_path_mallocing)(const Node* node);
+	char* (*get_path_mallocing)(const Node* this_node);
 
-	//void print_tree_pretty(Node*)
-	void (*print_tree_pretty)(const Node*);
+	//void print_tree_pretty()
+	void (*print_tree_pretty)(const Node* this_node);
 
 	// write
 
 	//user must call this function like instead of n->name = "bob"
 	//previous name is automatically freed
-	//void set_name(Node*, char* new_name)
-	void (*set_name)(Node*, const char* new_name);
+	//void set_name(char* new_name)
+	void (*set_name)(Node* this_node, const char* new_name);
 
 	//asserts that wanted child doesn't have already a parent
 	//void add_child(Node* p, Node* c)
 	void (*add_child)(Node* p, Node* c);
 
 	//The user have to save or free the Node manually
-	void (*remove_child)(Node* ths_node, Node* child);
+	void (*remove_child)(Node* this_node, Node* child);
 
-	void (*queue_free)(Node* node);
+	void (*queue_free)(Node* this_node);
 
 	//Only for cluige internal logic
 	void (*_do_all_queue_free_early_step)();//remove from tree
 	void (*_do_all_queue_free_late_step)();//free, separated to be called between refresh() and sleep()
 
 	void (*register_NodeFactory)(const char* key, NodeFactory* factory);
+
+	//void set_script(Script* s);
+	//detaches previous script if any, up to the user to store or free it
+	// s can be NULL to just detach previous script if any
+	void (*set_script)(Node* this_node, Script* s);
 };
 //iNode : in iiCluige
 

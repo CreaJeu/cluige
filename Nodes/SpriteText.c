@@ -309,10 +309,10 @@ static void sprtx_set_text(SpriteText* this_SpriteText, const char* new_text)
     this_SpriteText->_text_changed = true;
 }
 
-static Node* sprtx_instanciate(const SortedDictionary* params)
+static Node* sprtx_instantiate(const SortedDictionary* params)
 {
     //mother class
-    Node* res_node = iCluige.iNode2D._Node2D_factory.instanciate(params);
+    Node* res_node = iCluige.iNode2D._Node2D_factory.instantiate(params);
     Node2D* res_node2D = (Node2D*)(res_node->_sub_class);
     SpriteText* res_SpriteText = sprtx_new_SpriteText_from_Node2D(res_node2D);
 
@@ -323,9 +323,9 @@ static Node* sprtx_instanciate(const SortedDictionary* params)
     //utils_vector2_from_parsed(&(res_SpriteText->_new_baked.offset), params, "offset");
     utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.x), params, "offset_left");
     utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.y), params, "offset_top");
-    CLUIGE_ASSERT(res_SpriteText->_new_baked.text == NULL, "SpriteText::instanciate() : trying to instanciate() into non empty object");
+    CLUIGE_ASSERT(res_SpriteText->_new_baked.text == NULL, "SpriteText::instantiate() : trying to instantiate() into non empty object");
     utils_str_from_parsed(&(res_SpriteText->_new_baked.text), params, "text");
-    CLUIGE_ASSERT(res_SpriteText->_new_baked.text != NULL, "SpriteText::instanciate() : text not instanciated, missing 'text' field?");
+    CLUIGE_ASSERT(res_SpriteText->_new_baked.text != NULL, "SpriteText::instantiate() : text not instantiated, missing 'text' field?");
     res_SpriteText->_new_baked.allocated_text_length = strlen(res_SpriteText->_new_baked.text);
     sprtx__bake_text(res_SpriteText);
     return res_node;
@@ -339,7 +339,7 @@ void iiSpriteText_init()
     iCluige.iSpriteText.new_SpriteText_from_Node2D = sprtx_new_SpriteText_from_Node2D;
     iCluige.iSpriteText.set_text = sprtx_set_text;
 
-    iCluige.iSpriteText._SpriteText_factory.instanciate = sprtx_instanciate;
+    iCluige.iSpriteText._SpriteText_factory.instantiate = sprtx_instantiate;
     iCluige.iNode.register_NodeFactory("Label", &(iCluige.iSpriteText._SpriteText_factory));
 }
 

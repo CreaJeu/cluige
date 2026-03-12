@@ -123,5 +123,13 @@ void iiVector2_init()
     iCluige.iVector2.distance_squared_to = vct2_distance_squared_to;
     iCluige.iVector2.is_zero_approx = vct2_is_zero_approx;
     iCluige.iVector2.is_equal_approx = vct2_is_equal_approx;
+
+    iCluige.iVector2.ZERO = (Vector2){0, 0};
+    iCluige.iVector2.ONE = (Vector2){1, 1};
+    iCluige.iVector2.INF = (Vector2){FLT_MAX, FLT_MAX};
+    iCluige.iVector2.LEFT = (Vector2){-1, 0};
+    iCluige.iVector2.RIGHT = (Vector2){1, 0};
+    iCluige.iVector2.UP = (Vector2){0, -1};
+    iCluige.iVector2.DOWN = (Vector2){0, 1};
 }
 

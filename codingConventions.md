@@ -12,8 +12,14 @@ In .c
 
 
 function pointers :
-	virtual/inheritance : in _Struct
-	non virtual/inheritance : in _iiStruct
+	virtual/inheritance : in `_Struct`
+	non virtual/inheritance : in `_iiStruct`
+
+
+methods :
+	name equivalent of "this" `this_MyClass`
+		void my_method(MyClass* this_MyClass)
+		void my_method_2(const MyClass* this_MyClass, int arg_1, int arg_2)
 
 
 General :

@@ -336,5 +336,7 @@ void iiSortedDictionary_init()
     iCluige.iSortedDictionary.clear = sd_clear;
     iCluige.iSortedDictionary.light_clone = sd_light_clone;
     iCluige.iSortedDictionary.debug_str_str = sd_debug_str_str;
+    iCluige.iSortedDictionary.sorted_dictionary_alloc(
+            &(iCluige.iSortedDictionary.EMPTY), VT_POINTER, VT_POINTER, 0);
 }
 

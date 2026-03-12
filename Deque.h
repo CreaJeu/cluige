@@ -41,8 +41,9 @@ struct _Deque
 
 struct iiDeque
 {
-    //constructor/destructor (don't forget to use them)
+    Deque EMPTY;
 
+    //constructor/destructor (don't forget to use them)
     void (*deque_alloc)(Deque* this_Deque, VariantType elems_type, int capacity);
     void (*pre_delete_Deque)(Deque* this_Deque);
 

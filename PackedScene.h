@@ -41,9 +41,9 @@ struct iiPackedScene
 
 	PackedScene* (*get_packed_node)(PackedScene* root, const char* path);
 
-	Node* (*instanciate)(const PackedScene* this_PackedScene);
+	Node* (*instantiate)(const PackedScene* this_PackedScene);
 
-	void (*prepare_ext_instanciate)(PackedScene* this_PackedScene, const PackedScene* ext_other, const PackedScene* local_other);
+	void (*prepare_ext_instantiate)(PackedScene* this_PackedScene, const PackedScene* ext_other, const PackedScene* local_other);
 
 	//returned char* is malloced, up to the user to delete it
 	char* (*debug)(const PackedScene* this_PackedScene);

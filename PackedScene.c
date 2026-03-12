@@ -88,7 +88,7 @@ static PackedScene* pksc_get_packed_node(PackedScene* root, const char* path)
 	return NULL;
 }
 
-static Node* pksc_instanciate(const PackedScene* this_PackedScene)
+static Node* pksc_instantiate(const PackedScene* this_PackedScene)
 {
 	//type XOR instance_res
 	const char* t = this_PackedScene->type;
@@ -97,29 +97,29 @@ static Node* pksc_instanciate(const PackedScene* this_PackedScene)
 	{
 		const SortedDictionary* fcties = &(iCluige.iNode.node_factories);
 		Checked_Variant got = iCluige.iSortedDictionary.get(fcties, t);
-		CLUIGE_ASSERT(got.valid, "PackedScene::instanciate() : type found in PackedScene is unknown by cluige");
+		CLUIGE_ASSERT(got.valid, "PackedScene::instantiate() : type found in PackedScene is unknown by cluige");
 		const NodeFactory* fcty = (const NodeFactory*)(got.v.ptr);
-		new_node = fcty->instanciate(&(this_PackedScene->dico_node));
+		new_node = fcty->instantiate(&(this_PackedScene->dico_node));
 	}
 	else //instance_res => instance from other scene
 	{
 		CLUIGE_ASSERT(this_PackedScene->instance_path != NULL,
-				"PackedScene::instanciate() : neither instance path nor type found in PackedScene");
+				"PackedScene::instantiate() : neither instance path nor type found in PackedScene");
 		//prepare a temporary (on stack) copy of wanted PackedScene
 		SortedDictionary* glob = &(iCluige.iPackedScene.dico_path_to_packed);
 		Checked_Variant cv = iCluige.iSortedDictionary.get(glob, this_PackedScene->instance_path);
 		CLUIGE_ASSERT(cv.valid,
-				"PackedScene::instanciate() : packed scene path not found in global dico");
+				"PackedScene::instantiate() : packed scene path not found in global dico");
 		PackedScene* glob_ps = (PackedScene*)(cv.v.ptr);
 		PackedScene tmp_ps;
 		//copy with global params + local params
-		iCluige.iPackedScene.prepare_ext_instanciate(&tmp_ps, glob_ps, this_PackedScene);
+		iCluige.iPackedScene.prepare_ext_instantiate(&tmp_ps, glob_ps, this_PackedScene);
 //		char* tmp_dbg = iCluige.iPackedScene.debug(&tmp_ps);
 
-		//do instanciate
-		new_node = iCluige.iPackedScene.instanciate(&tmp_ps);
+		//do instantiate
+		new_node = iCluige.iPackedScene.instantiate(&tmp_ps);
 
-		//clear temporary malloced data from prepare_ext_instanciate()
+		//clear temporary malloced data from prepare_ext_instantiate()
 		iCluige.iSortedDictionary.pre_delete_SortedDictionary(&(tmp_ps.dico_node));
 	}
 
@@ -130,13 +130,13 @@ static Node* pksc_instanciate(const PackedScene* this_PackedScene)
 	{
 		const PackedScene* child_ps =
 			(const PackedScene*)(iCluige.iDeque.at(&(this_PackedScene->children), c).ptr);
-		Node* child_nde = pksc_instanciate(child_ps);
+		Node* child_nde = pksc_instantiate(child_ps);
 		iCluige.iNode.add_child(new_node, child_nde);
 	}
 	return new_node;
 }
 
-static void pksc_prepare_ext_instanciate(PackedScene* this_PackedScene, const PackedScene* ext_other, const PackedScene* local_other)
+static void pksc_prepare_ext_instantiate(PackedScene* this_PackedScene, const PackedScene* ext_other, const PackedScene* local_other)
 {
 	this_PackedScene->name = ext_other->name;
 	this_PackedScene->type = ext_other->type;
@@ -276,8 +276,8 @@ void iiPackedScene_init()
 //    iCluige.iPackedScene.pre_delete_PackedScene = pksc_pre_delete_PackedScene;
     iCluige.iPackedScene.new_PackedScene = pksc_new_PackedScene;
     iCluige.iPackedScene.get_packed_node = pksc_get_packed_node;
-    iCluige.iPackedScene.instanciate = pksc_instanciate;
-    iCluige.iPackedScene.prepare_ext_instanciate = pksc_prepare_ext_instanciate;
+    iCluige.iPackedScene.instantiate = pksc_instantiate;
+    iCluige.iPackedScene.prepare_ext_instantiate = pksc_prepare_ext_instantiate;
     iCluige.iPackedScene.debug = pksc_debug;
     iCluige.iPackedScene.debug_recrusive = pksc_debug_recrusive;
 

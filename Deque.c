@@ -461,5 +461,7 @@ void iiDeque_init()
     iCluige.iDeque.bsearch = dq_bsearch;
     iCluige.iDeque.bsearch_rec = dq_bsearch_rec;
 //    iCluige.iDeque.find = dq_find;
+
+    iCluige.iDeque.deque_alloc(&(iCluige.iDeque.EMPTY), VT_POINTER, 0);
 }
 

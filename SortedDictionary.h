@@ -20,6 +20,8 @@ struct _SortedDictionary
 
 struct iiSortedDictionary
 {
+    SortedDictionary EMPTY;
+
     //constructor/destructor (don't forget to use them)
     void (*sorted_dictionary_alloc)(SortedDictionary* this_SortedDictionary, VariantType keys_type, VariantType values_type, int capacity);
     void (*pre_delete_SortedDictionary)(SortedDictionary* this_SortedDictionary);

@@ -369,10 +369,10 @@ static struct _Camera2D* c2d_new_Camera2D()
     return c2d_new_Camera2D_from_Node2D(new_Node2D);
 }
 
-static Node* c2d_instanciate(const SortedDictionary* params)
+static Node* c2d_instantiate(const SortedDictionary* params)
 {
     //mother class
-    Node* res_node = iCluige.iNode2D._Node2D_factory.instanciate(params);
+    Node* res_node = iCluige.iNode2D._Node2D_factory.instantiate(params);
     Node2D* res_node2D = (Node2D*)(res_node->_sub_class);
     Camera2D* res_Camera2D = c2d_new_Camera2D_from_Node2D(res_node2D);
 
@@ -414,6 +414,6 @@ void iiCamera2D_init()
     iCluige.iCamera2D.set_rotation_degrees = c2d_set_rotation_degrees;
     iCluige.iCamera2D.get_rotation_degrees = c2d_get_rotation_degrees;
 
-    iCluige.iCamera2D._Camera2D_factory.instanciate = c2d_instanciate;
+    iCluige.iCamera2D._Camera2D_factory.instantiate = c2d_instantiate;
     iCluige.iNode.register_NodeFactory("Camera2D", &(iCluige.iCamera2D._Camera2D_factory));
 }

@@ -88,7 +88,7 @@ struct iiCluige
 };
 extern struct iiCluige iCluige;
 
-void cluige_init();
+void cluige_init(void (*register_user_scripts)());
 
 void cluige_run();
 

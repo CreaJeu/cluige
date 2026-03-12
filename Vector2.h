@@ -11,6 +11,14 @@ struct _Vector2
 
 struct iiVector2
 {
+    Vector2 ZERO;
+    Vector2 ONE;
+    Vector2 INF;
+    Vector2 LEFT;
+    Vector2 RIGHT;
+    Vector2 UP;
+    Vector2 DOWN;
+
     void (*set)(Vector2* v, float x, float y);
     void (*add)(const Vector2* v1, const Vector2* v2, Vector2 *result);
     void (*substract)(const Vector2* v1, const Vector2* v2, Vector2 *res);

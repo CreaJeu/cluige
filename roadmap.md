@@ -41,7 +41,7 @@
 
 **Futures tâches**
 
-- replace all space-indent with tab-indent + check EOL?
+- replace all space-indent with tab-indent + check EOL? + (Node.c +?) ths_Node => this_Node
 - fatal error => end loop + printf
 - sprite svg (no anim) : file parsing fix discontinued paths
 - sprite svg : choose rastering algo from thickness

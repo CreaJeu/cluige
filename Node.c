@@ -652,6 +652,14 @@ static Node* nde_instantiate(const SortedDictionary* parsed_params)
     CLUIGE_ASSERT(ok, "Node::instantiate() : missing 'name' field");
     //optional
     utils_int_from_parsed(&(res->process_priority), parsed_params, "process_priority");
+    char* script_path;
+    ok = utils_nonquoted_str_from_parsed(&script_path, parsed_params, "script");
+    if(ok)
+    {
+        Script* s = iCluige.iScript.instantiate_from_factories_no_ext(script_path, parsed_params);
+        iCluige.iNode.set_script(res, s);
+        //free(script_path);//not with utils_nonquoted_str_from_parsed()
+    }
     // TODO ? from godot process mode? // utils_bool_from_parsed(&(res->active), params, "active");
     return res;
 }

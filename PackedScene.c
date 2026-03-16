@@ -20,7 +20,6 @@ static void pksc_packed_scene_alloc(PackedScene* this_PackedScene)
 //    iCluige.iSortedDictionary.sorted_dictionary_alloc(dico_svg_paths, VT_POINTER, VT_POINTER, 7);
 //    iCluige.iSortedDictionary.set_compare_keys_func(dico_svg_paths, iCluige.iDeque.default_compare_string_func);
 
-    //later : script
     //later : signals
 
     Deque* children = &(this_PackedScene->children);
@@ -46,7 +45,7 @@ static PackedScene* pksc_new_PackedScene()
 //    iCluige.iSortedDictionary.free_all_keys_pointers(dico_node);
 //    iCluige.iSortedDictionary.free_all_values_pointers(dico_node);
 //    iCluige.iSortedDictionary.pre_delete_SortedDictionary(dico_node);
-//    //later : script
+//    // ? script
 //    //later : signals
 //    Deque* children = &(this_PackedScene->children);
 //    iCluige.iDeque.free_all_elems_pointers(children);//TODO whaaat??

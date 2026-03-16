@@ -26,6 +26,8 @@ void utils_breakpoint_trick(const void* anything, bool breakpoint);
 //void utils_cluige_printf(int x, int y, const char* msg);
 
 bool is_equal_approx(float a, float b);
+int min_int(int a, int b);
+int max_int(int a, int b);
 int clamp_int(int x, int min, int max);
 float clamp_float(float x, float min, float max);
 

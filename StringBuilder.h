@@ -25,6 +25,10 @@ struct iiStringBuilder
 	//void append(StringBuilder* sb, const char* formatted_tail, ...)
 	void (*append)(StringBuilder* sb, const char* formatted_tail, ...);
 
+	//void nappend(StringBuilder* sb, int n, const char* tail)
+	//appends not more than n characters
+	void (*nappend)(StringBuilder* sb, int n, const char* tail);
+
 	//void replace(StringBuilder* sb, const char* formatted_tail, ...)
 	void (*replace)(StringBuilder* sb, const char* formatted_tail, ...);
 

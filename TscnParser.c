@@ -351,7 +351,38 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 			}
 			free(svg_id);
 		}
-		//else script TODO
+		else if(str_equals(keeped_key, "script"))
+		{
+			//keeped_val is like 'ExtResource("2_efpur")\0'
+			//we must extract the id, then find filepath from it
+			char* script_id;
+			bool ok = utils_id_str_from_ExtResource_parsed(&script_id, keeped_val);
+			CLUIGE_ASSERT(ok, "TscnParser::node() : script id could not be read");
+
+			SortedDictionary* dico_ids = &(this_TscnParser->_dico_id_to_path);
+			cv = iCluige.iSortedDictionary.get(dico_ids, script_id);
+			CLUIGE_ASSERT(cv.valid, "TscnParser::node() : id of script '%s' not found in '%s' tscn_parser dico", keeped_val, ps->name);
+			if(cv.valid)
+			{
+				char* file_path_ext = (char*)(cv.v.ptr);//"res://path/to/gg.gd"
+				const char* last_dot = strrchr(file_path_ext, '.');
+				int no_ext_len = last_dot - file_path_ext;
+//				StringBuilder sb;
+//				iCluige.iStringBuilder.string_alloc(&sb, no_ext_len + 2);
+//				char* file_path_no_ext = sb.built_string;
+//				iCluige.iStringBuilder.append(&sb, "\"");
+//				iCluige.iStringBuilder.nappend(&sb, no_ext_len, file_path_ext);
+//				iCluige.iStringBuilder.append(&sb, "\"");
+				char* file_path_no_ext = iCluige.checked_malloc(no_ext_len + 1);
+				snprintf(file_path_no_ext, no_ext_len + 1, file_path_ext);
+				file_path_no_ext[no_ext_len] = '\0';//"res://path/to/gg"
+				free(keeped_val);//'ExtResource("2_efpur")\0'
+				keeped_val = file_path_no_ext;
+				//char* dbg = iCluige.iSortedDictionary.debug_str_str(dic);
+				//utils_breakpoint_trick(dbg, true);
+			}
+			free(script_id);
+		}
 
 		cv = iCluige.iSortedDictionary.insert(dic,
 				keeped_key,
@@ -359,7 +390,7 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 		//dbg_dic = iCluige.iSortedDictionary.debug_str_str(dic);
 		bool overwritten = (cv.valid);
 		CLUIGE_ASSERT(!overwritten,
-			"TscnParser::node() : parsed param-value would overwrite another param-value");
+			"TscnParser::node() : parsed param '%s' would overwrite another param-value", keeped_key);
 
 		parse_ok = this_TscnParser->param(this_TscnParser);
 	}
@@ -505,8 +536,6 @@ static bool tsnp_parse_scene(TscnParser* this_TscnParser)
 	return nb_nodes > 0;
 }
 
-//later : script
-
 
 ////////////////////////////////// iiTscnParser /////////
 
@@ -568,263 +597,3 @@ void iiTscnParser_init()
 	iCluige.iTscnParser.pre_delete_TscnParser = tsnp_pre_delete_TscnParser;
 }
 
-
-
-
-/*
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-// fd = fileno(f); //if you have a stream (e.g. from fopen), not a file descriptor.
-struct stat buf;
-fstat(fd, &buf);
-off_t size = buf.st_size;
-
-https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
-stat gives you both numbers. st_size is the real length, with byte granularity. st_blocks is the number of 512-byte disk blocks used by the file (including extra blocks for metadata, attributes, and even block-lists or extent-lists for large files where the list of blocks or extents doesn't fit in the inode itself.) Whether the FS actually allocates in 512B blocks or not, that's the unit stat uses. (man7.org/linux/man-pages/man2/lstat.2.html). For most filesystems, st_size is accurate, but not on Linux /proc and /sys –
-Peter Cordes
- CommentedNov 25, 2021
-*/
-
-
-/*
-
-static bool _svp_parse_point(struct _SVGParser* this_SVGParser, FILE* file, char* buffer)
-{
-	//commands
-	// m x y : move to x y
-	// L x y line to x y
-	// h dx horiz line
-	// V y vertic line
-	// C x1 y1, x2 y2, x y bezier (cubic) to x y
-	// c dx1 dy1, dx2 dy2, dx dy
-	// S x2 y2, x y bezier cubic with symetric slopes
-	// Q x1 y1, x y bezier quadratic
-	// T x y bezier quadratic infered from previous segment
-	// A rx ry x-axis-rot large-arc-flag sweep-flag x y : arc to x y
-	// z|Z close path
-
-	char read_command_char;
-	//char read_command_cZZZZ;read_command_cZZZZ='y';read_command_cZZZZ++;
-	char command;
-	float first_float;
-	Vector2 parsed_point;
-	float ignored;
-
-	int n;
-	do
-	{
-		//n = fscanf(file, "%1s", command);
-//		n = fscanf(file, "%c", &read_command_char);
-		n = fscanf(file, "%c", &read_command_char);
-	}while((n == 0) ||
-		   (read_command_char == ' ') ||
-		   (read_command_char == '\n') ||
-		   (read_command_char == '\t'));
-
-	if(strchr("MLHVCSQTAZ", read_command_char) != 00)
-	{
-		absolute = true;
-		command = read_command_char;
-		last_command = read_command_char;
-		fscanf(file, "%f", &first_float);
-	}
-	else if(strchr("mlhvcsqtaz", read_command_char) != 00)
-	{
-		absolute = false;
-		command = read_command_char;
-		last_command = read_command_char;
-		fscanf(file, "%f", &first_float);
-	}
-	else if(read_command_char == '\"')
-	{
-		absolute = true;
-		//printf("\n");
-		return false;
-	}
-	else
-	{
-		command = last_command;
-		// ~ put back first digit into buffer
-		char first_float_str[19];
-		first_float_str[0] = read_command_char;
-		first_float_str[1] = (char)0; //special case, "%17[^,]," with "0,..."
-		fscanf(file, "%17[^,\" ]", first_float_str+1);
-		sscanf(first_float_str, "%f", &first_float);
-	}
-
-	switch(command)
-	{
-	case 'M':
-	case 'm':
-	case 'L':
-	case 'l':
-	case 'T':
-	case 't':
-		// L/l : TO TEST
-		parsed_point.x = first_float;
-		fscanf(file, ",%f", &(parsed_point.y));
-		break;
-	case 'H':
-		parsed_point.x = first_float;
-		parsed_point.y = svg_cursor.y; //TO TEST
-		break;
-	case 'h':
-		parsed_point.x = first_float;
-		parsed_point.y = 0; //TO TEST
-		break;
-	case 'V':
-		parsed_point.x = svg_cursor.x; //TO TEST
-		parsed_point.y = first_float;
-		break;
-	case 'v':
-		parsed_point.x = 0; //TO TEST
-		parsed_point.y = first_float;
-		break;
-	case 'C':
-	case 'c':
-//		first_float ignored
-		fscanf(file, ",%f %f,%f %f,%f",
-			   &ignored,&ignored,&ignored,
-			   &(parsed_point.x), &(parsed_point.y));
-		break;
-	case 'S':
-	case 's':
-	case 'Q':
-	case 'q':
-//		first_float ignored
-		fscanf(file, ",%f %f,%f",
-			   &ignored,
-			   &(parsed_point.x), &(parsed_point.y));//TO TEST
-		break;
-	case 'A':
-	case 'a':
-//		first_float ignored
-		fscanf(file, ",%f %f,%f %f %f,%f",
-			   &ignored,&ignored,&ignored,&ignored,
-			   &(parsed_point.x), &(parsed_point.y));//TO TEST
-		break;
-	case 'Z':
-	case 'z':
-		absolute = true; // easier for z
-		parsed_point.x = iCluige.iDeque.at(&(this_SVGParser->coordinates_sequence), 0).f;
-		parsed_point.y = iCluige.iDeque.at(&(this_SVGParser->coordinates_sequence), 1).f;
-		break;
-	default:
-		CLUIGE_ASSERT(false && "wrong svg path command in file", "TscnParser::() : ");
-	}
-
-	if(absolute ||
-	   //special case : first point is never relative
-	   iCluige.iDeque.size(&(this_SVGParser->coordinates_sequence)) == 0)
-	{
-		svg_cursor = parsed_point;
-	}
-	else
-	{
-		iCluige.iVector2.add(&svg_cursor, &parsed_point, &svg_cursor);
-	}
-	//printf("%f,%f ", parsed_point.x, parsed_point.y);
-	iCluige.iDeque.push_back(&(this_SVGParser->coordinates_sequence), svg_cursor.x);
-	iCluige.iDeque.push_back(&(this_SVGParser->coordinates_sequence), svg_cursor.y);
-
-//	int nbCoord = iCluige.iDeque.size(&(this_SVGParser->coordinates_sequence));
-//	char* dbg = "																																																																																							";
-//	StringBuilder sb;
-//	iCluige.iStringBuilder.connect_existing_string(&sb, dbg);
-//	for(int i=0; i < nbCoord; i++)
-//	{
-//		iCluige.iStringBuilder.append(&sb,"%f ", iCluige.iDeque.at(&(this_SVGParser->coordinates_sequence), i).f);
-//		if((i % 2) == 0)
-//			iCluige.iStringBuilder.append(&sb,"  ");;
-//	}
-
-	return true;
-}
-
-void _svp_parse_path(struct _SVGParser* this_SVGParser, FILE* file, char* buffer)
-{
-	//  <path ¤ ... d="..."
-	iCluige.iDeque.clear(&(this_SVGParser->coordinates_sequence));
-	last_command = 'M';
-	bool finished = false;
-	while(!finished)
-	{
-		fscanf(file, "%2s", buffer);
-		if(strcmp(buffer, "/>") == 0)
-		{
-			//no point in path
-			return;
-		}
-		else if(strcmp(buffer, "d=") == 0)
-		{
-			//printf("	%s\n", buffer);
-			finished = true;
-		}
-	}
-	//  <path ... d= ¤ "[M|m] -5.7154991,-26.450343 ..."
-	fscanf(file, "%1s", buffer);
-	if(strcmp(buffer, "\"") != 0)
-	{
-		//no point in path
-		return;
-	}
-
-	//  <path ... d=" ¤ [M|m] -5.7154991,-26.450343 ..."
-	while(_svp_parse_point(this_SVGParser, file, buffer)) //sequence of points and commands
-		;
-}
-
-////////////////////////////////// iistruct _SVGParser /////////
-
-static void svp_SVGParser_alloc(struct _SVGParser* this_SVGParser)
-{
-	iCluige.iDeque.deque_alloc(
-		&(this_SVGParser->coordinates_sequence), VT_FLOAT, 2 * 50);
-}
-
-static bool svp_prepare_parsing(struct _SVGParser* this_SVGParser, char* file_path)
-{
-	file = fopen(file_path, "r");
-	if(file == 00)
-	{
-		printf("\n\n  ERROR : cannot read file %s\n\n", file_path);
-		CLUIGE_ASSERT((file != 00) && "cannot read file");// && file_path, "TscnParser::() : ");
-		return false;
-	}
-
-//	fscanf : all whitespaces are ignored even if not specified in the format param
-	svg_cursor = (Vector2){ 0.f, 0.f};
-	last_command = 'M';
-	//this_SVGParser->file_finished = false;
-	return true;
-}
-
-static bool svp_parse_path(struct _SVGParser* this_SVGParser)
-{
-	iCluige.iDeque.clear(&(this_SVGParser->coordinates_sequence));
-
-	char buffer_tag[19];
-	fscanf(file, "%1s", buffer_tag);
-	//for unknown reason, "<" cannot be used with fscanf()
-	if(buffer_tag[0] == '<')
-	{
-		fscanf(file, "%18s", buffer_tag);
-		if(strcmp(buffer_tag, "path") == 0)
-		{
-			//printf("%s\n", buffer_tag);
-			_svp_parse_path(this_SVGParser, file, buffer_tag);
-		}
-	}
-	return !feof(file);
-	//this_SVGParser->file_finished = feof(file);
-}
-static void svp_end_parsing(struct _SVGParser* this_SVGParser)
-{
-	fclose(file);
-}
-
-
-
-*/

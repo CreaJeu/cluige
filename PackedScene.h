@@ -19,7 +19,6 @@ struct _PackedScene
 	SortedDictionary dico_node;
 
 	//SortedDictionary dico_svg_paths;//not used! see TscnParser
-	//later : dico_script;
 
 	//later : connected signals
 

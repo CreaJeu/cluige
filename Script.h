@@ -37,17 +37,27 @@ struct iiScript
 
 	//Dico<String, ScriptFactory*>
 	// path -> factory*
-	//path : absolute from res:// (including res://),
+	//path : absolute from res:// (excluding res://),
 	// without extension like .c or .gd
 	SortedDictionary script_factories;
 
-	//path : absolute from res:// (including res://),
+	//path : absolute from res:// (excluding res://),
 	// with extension like .c or .gd
-	void (*register_ScriptFactory)(const char* full_path, ScriptFactory* factory);
+	// "path/to/aa.gd"
+	// "path/to/aa.c"
+	// "path/to/aa.zzz"
+	void (*register_ScriptFactory_with_ext)(const char* full_path, ScriptFactory* factory);
 
-	//script_file_path must include res:// and extension (like .gd or .c) which is ignored
+	//path : absolute from res:// (excluding res://),
+	// but no extension (like .gd or .c)
+	// "path/to/aa"
+	void (*register_ScriptFactory_no_ext)(const char* full_path, ScriptFactory* factory);
+
+	//script_file_path must exclude res:// and include extension (like .gd or .c) which is ignored
+	// "path/to/aa.gd"
 	Script* (*instantiate_from_factories_with_ext)(const char* script_file_path, const SortedDictionary* parsed_params);
-	//script_file_path must include res:// but no extension (like .gd or .c)
+	//script_file_path must exclude res:// but no extension (like .gd or .c)
+	// "path/to/aa"
 	Script* (*instantiate_from_factories_no_ext)(const char* script_file_path, const SortedDictionary* parsed_params);
 };
 //iScript : in iiCluige

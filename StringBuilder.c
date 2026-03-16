@@ -27,7 +27,7 @@ static void sbr_connect_existing_string(StringBuilder* sb, char* dest)
 
 static void sbr__append_from_args(StringBuilder* sb, const char* formatted_tail, va_list args)
 {
-    int written = vsnprintf(sb->next_char, sb->remaining_size, formatted_tail, args);
+    int written = vsnprintf(sb->next_char, sb->remaining_size +  1, formatted_tail, args);
     sb->remaining_size -= written;
     sb->next_char += written;
     *(sb->next_char) = '\0';
@@ -39,6 +39,18 @@ static void sbr_append(StringBuilder* sb, const char* formatted_tail, ...)
     va_start(args, formatted_tail);
     sbr__append_from_args(sb, formatted_tail, args);
     va_end(args);
+}
+
+//appends not more than n characters
+void sbr_nappend(StringBuilder* sb, int n, const char* tail)
+{
+	int res_n = min_int(n, strlen(tail));
+	CLUIGE_ASSERT(sb->remaining_size > res_n,
+			"StringBuilder::nappend() : built string to small to append wanted n (%d) and tail (%s)", n, tail);
+	strncat(sb->built_string, tail, n);
+	sb->remaining_size -= res_n;
+	sb->next_char += res_n;
+	//*(sb->next_char) = '\0';//already done by strncat()
 }
 
 static void sbr_replace(StringBuilder* sb, const char* formatted_tail, ...)
@@ -133,6 +145,7 @@ void iiStringBuilder_init()
     iCluige.iStringBuilder.string_alloc = sbr_string_alloc;
     iCluige.iStringBuilder.connect_existing_string = sbr_connect_existing_string;
     iCluige.iStringBuilder.append = sbr_append;
+    iCluige.iStringBuilder.nappend = sbr_nappend;
     iCluige.iStringBuilder.replace = sbr_replace;
     iCluige.iStringBuilder.clone = sbr_clone;
     iCluige.iStringBuilder.clone_formatted = sbr_clone_formatted;

@@ -32,6 +32,30 @@ bool is_equal_approx(float a, float b)
 	return fabs(a - b) < iCluige.EPSILON;
 }
 
+int min_int(int a, int b)
+{
+	if(a < b)
+	{
+		return a;
+	}
+	else
+	{
+		return b;
+	}
+}
+
+int max_int(int a, int b)
+{
+	if(a > b)
+	{
+		return a;
+	}
+	else
+	{
+		return b;
+	}
+}
+
 int clamp_int(int x, int min, int max)
 {
     if(x < min)

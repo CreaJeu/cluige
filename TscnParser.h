@@ -10,7 +10,7 @@
 //(for future versions, "sub-classes" will have to be provided)
 
 typedef struct _TscnParser TscnParser;
-typedef struct _PackedScene PackedScene;
+//typedef struct _PackedScene PackedScene;
 
 struct _TscnParser //"mother class", Godot 4 by default
 {
@@ -23,9 +23,10 @@ struct _TscnParser //"mother class", Godot 4 by default
 	FileLineReader _file_reader;
 	PackedScene* _current_packed_scene;
 	int _current_line;//first line of file is # 0
-	const char* _current_param;
+	int _current_param_line_i;
 	int _current_param_len;
-	const char* _current_value;
+	int _current_value_line_i;
+	int _current_value_first_i;
 	int _current_value_len;
 	char _tscn_format[16];
 	char* _tmp_uid;
@@ -45,7 +46,7 @@ struct _TscnParser //"mother class", Godot 4 by default
 //~namespace to call like : iCluige.iNode.f(myNode, param)
 struct iiTscnParser
 {
-	void (*tscn_parser_alloc)(TscnParser* this_TscnParser, const char* file_path);
+	void (*tscn_parser_alloc)(TscnParser* this_TscnParser, const char* file_path, int buffer_capacity);
 
 	void (*pre_delete_TscnParser)(TscnParser* this_TscnParser);
 };

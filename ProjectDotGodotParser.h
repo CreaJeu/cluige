@@ -8,7 +8,7 @@
 //(for future versions, "sub-classes" will have to be provided)
 
 typedef struct _ProjectDotGodotParser ProjectDotGodotParser;
-typedef struct _FileLineReader FileLineReader;
+//typedef struct _FileLineReader FileLineReader;
 
 struct _ProjectDotGodotParser //"mother class", Godot 4 by default
 {

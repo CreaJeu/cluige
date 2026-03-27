@@ -113,12 +113,13 @@ static bool tsnp_value(TscnParser* this_TscnParser)
 		return false;
 	}
 	const char* current_token = curr_line + before_value_len;
+	this_TscnParser->_current_value_line_i = curr_line_i;
+	this_TscnParser->_current_value_first_i = before_value_len;
 
 	//case with (potentially multiline) brackets { ... }
 	//for example AnimationPlayer libraries
 	if(current_token[0] == '{')
 	{
-		this_TscnParser->_current_value = current_token;
 		this_TscnParser->_current_value_len = 1;
 		current_token++;
 		int nb_opened = 1;
@@ -168,7 +169,6 @@ static bool tsnp_value(TscnParser* this_TscnParser)
 			token_len += line_len;
 		}
 
-		this_TscnParser->_current_value = current_token;
 		if(curr_line[line_len - 1] == '\n')
 		{
 			token_len--;
@@ -180,8 +180,7 @@ static bool tsnp_value(TscnParser* this_TscnParser)
 
 	else //easy case : no delimiter, just read until end of line
 	{
-		this_TscnParser->_current_value = current_token;
-		if(this_TscnParser->_current_value[token_len - 1] == '\n')
+		if(curr_line[token_len + before_value_len - 1] == '\n')
 		{
 			token_len--;
 		}
@@ -204,7 +203,7 @@ static bool tsnp_param(TscnParser* this_TscnParser)
 	}
 	int param_len = 0;
 	int ok = sscanf(curr_line, "%*s%n = ", &param_len);
-	if(param_len <= 0)
+	if(param_len <= 0 || param_len >= (strlen(curr_line) - 1) )
 	{
 		return false;
 	}
@@ -213,7 +212,7 @@ static bool tsnp_param(TscnParser* this_TscnParser)
 	{
 		return false;
 	}
-	this_TscnParser->_current_param = curr_line;
+	this_TscnParser->_current_param_line_i = curr_line_i;
 	this_TscnParser->_current_param_len = param_len;
 
 //int fscanf(FILE * restrict stream, const char * restrict format, ...)
@@ -365,14 +364,22 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 	{
 		tmp_len = this_TscnParser->_current_param_len;
 		keeped_key = iCluige.checked_malloc((tmp_len +  1) * sizeof(char));
-		strncpy(keeped_key, this_TscnParser->_current_param, tmp_len);
+//		strncpy(keeped_key, this_TscnParser->_current_param, tmp_len);
+		const char* param_line = iCluige.iFileLineReader.get_line(fr,
+				this_TscnParser->_current_param_line_i);
+		strncpy(keeped_key, param_line,
+				this_TscnParser->_current_param_len);
 		keeped_key[tmp_len] = '\0';
 
 		//strcpy() value, but can be multiline and file_reader buffer contains '\0' between lines
 		tmp_len = this_TscnParser->_current_value_len;
 		keeped_val = iCluige.checked_malloc((tmp_len +  1) * sizeof(char));
 		int nb_copied = 0;
-		const char* tmp_value_line = this_TscnParser->_current_value;
+//		const char* tmp_value_line = this_TscnParser->_current_value;
+		const char* tmp_value_line =
+				iCluige.iFileLineReader.get_line(fr,
+						this_TscnParser->_current_value_line_i)
+				+ this_TscnParser->_current_value_first_i;
 		char* tmp_append_here = keeped_val;
 		while(nb_copied < tmp_len)
 		{
@@ -613,7 +620,7 @@ static bool tsnp_parse_scene(TscnParser* this_TscnParser)
 
 ////////////////////////////////// iiTscnParser /////////
 
-static void tsnp_tscn_parser_alloc(struct _TscnParser* this_TscnParser, const char* file_path)
+static void tsnp_tscn_parser_alloc(struct _TscnParser* this_TscnParser, const char* file_path, int buffer_capacity)
 {
 	CLUIGE_ASSERT(file_path != NULL, "TscnParser::tscn_parser_alloc() : file_path is null");
 	//public
@@ -624,7 +631,7 @@ static void tsnp_tscn_parser_alloc(struct _TscnParser* this_TscnParser, const ch
 	//private
 	this_TscnParser->_current_packed_scene = NULL;
 	FileLineReader* fr = &(this_TscnParser->_file_reader);
-	iCluige.iFileLineReader.fileLineReader_alloc(fr, 2000);
+	iCluige.iFileLineReader.fileLineReader_alloc(fr, buffer_capacity);
 	bool ok = iCluige.iFileLineReader.open_file_start_reader(fr, file_path);
 	if(!ok)
 	{

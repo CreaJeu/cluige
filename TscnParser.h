@@ -27,9 +27,12 @@ struct _TscnParser //"mother class", Godot 4 by default
 	int _current_param_len;
 	const char* _current_value;
 	int _current_value_len;
+	char _tscn_format[16];
+	char* _tmp_uid;
 	SortedDictionary _dico_id_to_path;
 
 	bool (*parse_scene)(TscnParser* this_TscnParser);
+	bool (*header)(TscnParser* this_TscnParser);
 	bool (*ext_res)(TscnParser* this_TscnParser);
 	bool (*node)(TscnParser* this_TscnParser);
 	bool (*param)(TscnParser* this_TscnParser);
@@ -48,7 +51,7 @@ struct iiTscnParser
 };
 //iTscnParser : in iiSpriteGodotScene
 
-//to be called only by SpriteGodotScene_init() to set functions pointers
+//to be called only by cluige_init() to set functions pointers
 void iiTscnParser_init();
 
 

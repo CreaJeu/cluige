@@ -99,6 +99,10 @@ struct iiDeque
 
     //TODO void (*sort)(Deque* this_Deque);
     //TODO void (*sort_custom)(Deque* this_Deque, int (*compare_func)(Variant, Variant));
+
+	//only for Deque<char*>
+	//in_out must be previously malloced
+	void (*debug_str)(const Deque* this_Deque, char* in_out);
 };
 
 void iiDeque_init();

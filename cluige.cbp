@@ -230,6 +230,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Path2D.h" />
+		<Unit filename="ProjectDotGodotParser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ProjectDotGodotParser.h" />
 		<Unit filename="SVGParser.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -212,13 +212,30 @@ static void svp_SVGParser_alloc(struct _SVGParser* this_SVGParser)
 
 static bool svp_prepare_parsing(struct _SVGParser* this_SVGParser, char* file_path)
 {
-    file = fopen(file_path, "r");
+	int res_path_len = strlen(iCluige.resource_path);
+	char* full_file_path = file_path;
+//	iCluige.resource_path has no final / or \ thanks to set_resrouce_path()
+	if(res_path_len != 0)
+	{
+		int new_path_len = res_path_len + 1 + strlen(file_path);
+		full_file_path = iCluige.iStringBuilder.clone_formatted(
+			new_path_len, "%s/%s", iCluige.resource_path, file_path);
+			// " cluige.res_path / file_path "
+	}
+
+	file = fopen(full_file_path, "r");
     if(file == 00)
     {
-        printf("\n\n  ERROR : cannot read file %s\n\n", file_path);
-        CLUIGE_ASSERT(file != 00, "SVGParser::prepare_parsing() : cannot read file");
+//		printf("\n\n  ERROR : cannot read file %s\n\n", full_file_path);
+		CLUIGE_ASSERT(file != 00, "SVGParser::prepare_parsing() : cannot read file %s", full_file_path);
+		if(res_path_len != 0)
+			free(full_file_path);
         return false;
     }
+	if(res_path_len != 0)
+	{
+		free(full_file_path);
+	}
 
 //    fscanf : all whitespaces are ignored even if not specified in the format param
     svg_cursor = (Vector2){ 0.f, 0.f};

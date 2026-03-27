@@ -315,6 +315,30 @@ static char* sd_debug_str_str(SortedDictionary* this_SortedDictionary)
 	return sb.built_string;
 }
 
+//only for Dico<char*, char*>
+//in_out must be previously malloced
+static void sd_debug_str_str_around(SortedDictionary* this_SortedDictionary, char* key, char* in_out)
+{
+	int n = iCluige.iDeque.size(&(this_SortedDictionary->_pairs));
+	Variant key_v;
+	key_v.ptr = key;
+	Pair new_pair = { key_v, iCluige.iVariant.NULL_VARIANT };
+	int key_i = iCluige.iDeque.bsearch(&(this_SortedDictionary->_pairs), &new_pair);
+	CLUIGE_ASSERT(key_i != -1, "SortedDictionary::%s : key '%' not found", __FUNCTION__, key);
+	int start_i = max_int(0, key_i - 2);
+	int end_i = min_int(n - 1, key_i + 2);
+	for(int i=start_i; i <= end_i; i++)
+	{
+		Pair* p = (Pair*)(iCluige.iDeque.at(&(this_SortedDictionary->_pairs), i).ptr);
+		char* k_i = (char*)(p->first.ptr);
+		char* v_i = (char*)(p->second.ptr);
+		strcat(in_out, k_i);
+		strcat(in_out, ":");
+		strcat(in_out, v_i);
+		strcat(in_out, "   ");
+	}
+}
+
 ////////////////////////////////// iSortedDictionary /////////
 
 void iiSortedDictionary_init()
@@ -336,6 +360,7 @@ void iiSortedDictionary_init()
     iCluige.iSortedDictionary.clear = sd_clear;
     iCluige.iSortedDictionary.light_clone = sd_light_clone;
     iCluige.iSortedDictionary.debug_str_str = sd_debug_str_str;
+    iCluige.iSortedDictionary.debug_str_str_around = sd_debug_str_str_around;
     iCluige.iSortedDictionary.sorted_dictionary_alloc(
             &(iCluige.iSortedDictionary.EMPTY), VT_POINTER, VT_POINTER, 0);
 }

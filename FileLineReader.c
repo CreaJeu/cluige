@@ -25,14 +25,28 @@ static void flr_fileLineReader_alloc(FileLineReader* this_FileLineReader, int ca
 static bool flr_open_file_start_reader(FileLineReader* this_FileLineReader, const char* path)
 {
 	//deep copy to prevent pointing to the stack
-	int new_path_len = strlen(path) + 1;
 	if(this_FileLineReader->_file_path != NULL)
 	{
 		free(this_FileLineReader->_file_path);
 	}
-	this_FileLineReader->_file_path = iCluige.checked_malloc(new_path_len * sizeof(char));
-	strcpy(this_FileLineReader->_file_path, path);
-	this_FileLineReader->_file = fopen(path, "r");
+//	int new_path_len = strlen(path) + 1;
+//	this_FileLineReader->_file_path = iCluige.checked_malloc(new_path_len * sizeof(char));
+//	strcpy(this_FileLineReader->_file_path, path);
+	int res_path_len = strlen(iCluige.resource_path);
+//	iCluige.resource_path has no final / or \ thanks to set_resrouce_path()
+	if(res_path_len == 0)
+	{
+		this_FileLineReader->_file_path = iCluige.iStringBuilder.clone(path);
+	}
+	else
+	{
+		int new_path_len = res_path_len + 1 + strlen(path);
+		this_FileLineReader->_file_path = iCluige.iStringBuilder.clone_formatted(
+			new_path_len, "%s/%s", iCluige.resource_path, path);
+			// " cluige.res_path / path "
+	}
+
+	this_FileLineReader->_file = fopen(this_FileLineReader->_file_path, "r");
 	if(this_FileLineReader->_file == 00)
 	{
 		return false;
@@ -64,6 +78,7 @@ static const char* flr_get_line(FileLineReader* this_FileLineReader, int i)
 	CLUIGE_ASSERT(this_FileLineReader->_oldest_line <= i, "FileLineReader::get_line() : asked line is too old, already forgotten; try calling forget_lines_before() less often");
 	if(i > this_FileLineReader->_eof_line)
 	{
+		CLUIGE_ASSERT(false, "FileLineReader::get_line() : asked line '%d' is farther than EOF", i);
 		return NULL;
 	}
 
@@ -88,7 +103,7 @@ static const char* flr_get_line(FileLineReader* this_FileLineReader, int i)
 			return NULL;
 		}
 		int new_line_nb_read = strlen(append_here);
-		this_FileLineReader->_nb_chars += new_line_nb_read + 1;//final \0 allways added by fgets()
+		this_FileLineReader->_nb_chars += new_line_nb_read + 1;//final \0 always added by fgets()
 		int nb_read = this_FileLineReader->_nb_chars;
 		char last_char_read = append_here[new_line_nb_read - 1];
 		int max_len = this_FileLineReader->_capacity;
@@ -127,7 +142,7 @@ static const char* flr_get_line(FileLineReader* this_FileLineReader, int i)
 				{
 					return NULL;
 				}
-				this_FileLineReader->_nb_chars += strlen(append_here);// + 1;//final \0 allways added by fgets()
+				this_FileLineReader->_nb_chars += strlen(append_here);// + 1;//final \0 always added by fgets()
 				nb_read = this_FileLineReader->_nb_chars;
 			}
 			last_char_read = this_FileLineReader->_buffer[nb_read - 2];

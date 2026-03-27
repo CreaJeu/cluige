@@ -11,6 +11,13 @@
 
 static void pksc_packed_scene_alloc(PackedScene* this_PackedScene)
 {
+	this_PackedScene->name = NULL;
+	this_PackedScene->type = NULL;
+	this_PackedScene->instance_path = NULL;
+	this_PackedScene->parent = NULL;
+	this_PackedScene->uid = NULL;
+	this_PackedScene->tscn_format = NULL;
+
     SortedDictionary* dico_node = &(this_PackedScene->dico_node);
     iCluige.iSortedDictionary.sorted_dictionary_alloc(dico_node, VT_POINTER, VT_POINTER, 7);
     iCluige.iSortedDictionary.set_compare_keys_func(dico_node, iCluige.iDeque.default_compare_string_func);
@@ -39,7 +46,7 @@ static PackedScene* pksc_new_PackedScene()
 //static void pksc_pre_delete_PackedScene(PackedScene* this_PackedScene)
 //{
 //	free(this_PackedScene->instance_res);
-//	// really not name, type, parent???
+//	// really not name, type, parent, uid, tscn_format???
 //
 //    SortedDictionary* dico_node = &(this_PackedScene->dico_node);
 //    iCluige.iSortedDictionary.free_all_keys_pointers(dico_node);
@@ -87,6 +94,23 @@ static PackedScene* pksc_get_packed_node(PackedScene* root, const char* path)
 	return NULL;
 }
 
+//returns NULL if not found
+static PackedScene* pksc_packed_scene_from_uid(const char* uid)
+{
+	SortedDictionary* dic_ps = &(iCluige.iPackedScene.dico_path_to_packed);
+	int dic_ps_n = iCluige.iSortedDictionary.size(dic_ps);
+	for(int i=0; i<dic_ps_n; i++)
+	{
+		Pair p = iCluige.iSortedDictionary.at(dic_ps, i);
+		PackedScene* ps = (PackedScene*)(p.second.ptr);
+		if(str_equals(ps->uid, uid))
+		{
+			return ps;
+		}
+	}
+	return NULL;
+}
+
 static Node* pksc_instantiate(const PackedScene* this_PackedScene)
 {
 	//type XOR instance_res
@@ -96,9 +120,17 @@ static Node* pksc_instantiate(const PackedScene* this_PackedScene)
 	{
 		const SortedDictionary* fcties = &(iCluige.iNode.node_factories);
 		Checked_Variant got = iCluige.iSortedDictionary.get(fcties, t);
-		CLUIGE_ASSERT(got.valid, "PackedScene::instantiate() : type found in PackedScene is unknown by cluige");
-		const NodeFactory* fcty = (const NodeFactory*)(got.v.ptr);
-		new_node = fcty->instantiate(&(this_PackedScene->dico_node));
+		//CLUIGE_ASSERT(got.valid, "PackedScene::instantiate() : type found in PackedScene is unknown by cluige");
+		if(got.valid)
+		{
+			const NodeFactory* fcty = (const NodeFactory*)(got.v.ptr);
+			new_node = fcty->instantiate(&(this_PackedScene->dico_node));
+		}
+		else
+		{
+			//Node not implemented in cluige
+			return NULL;
+		}
 	}
 	else //instance_res => instance from other scene
 	{
@@ -108,7 +140,7 @@ static Node* pksc_instantiate(const PackedScene* this_PackedScene)
 		SortedDictionary* glob = &(iCluige.iPackedScene.dico_path_to_packed);
 		Checked_Variant cv = iCluige.iSortedDictionary.get(glob, this_PackedScene->instance_path);
 		CLUIGE_ASSERT(cv.valid,
-				"PackedScene::instantiate() : packed scene path not found in global dico");
+				"PackedScene::instantiate() : packed scene path '%s' not found in global dico", this_PackedScene->instance_path);
 		PackedScene* glob_ps = (PackedScene*)(cv.v.ptr);
 		PackedScene tmp_ps;
 		//copy with global params + local params
@@ -130,7 +162,11 @@ static Node* pksc_instantiate(const PackedScene* this_PackedScene)
 		const PackedScene* child_ps =
 			(const PackedScene*)(iCluige.iDeque.at(&(this_PackedScene->children), c).ptr);
 		Node* child_nde = pksc_instantiate(child_ps);
-		iCluige.iNode.add_child(new_node, child_nde);
+		if(child_nde != NULL)
+		{
+			iCluige.iNode.add_child(new_node, child_nde);
+		}
+		//else Node not implemented in cluige
 	}
 	return new_node;
 }
@@ -275,6 +311,7 @@ void iiPackedScene_init()
 //    iCluige.iPackedScene.pre_delete_PackedScene = pksc_pre_delete_PackedScene;
     iCluige.iPackedScene.new_PackedScene = pksc_new_PackedScene;
     iCluige.iPackedScene.get_packed_node = pksc_get_packed_node;
+    iCluige.iPackedScene.packed_scene_from_uid = pksc_packed_scene_from_uid;
     iCluige.iPackedScene.instantiate = pksc_instantiate;
     iCluige.iPackedScene.prepare_ext_instantiate = pksc_prepare_ext_instantiate;
     iCluige.iPackedScene.debug = pksc_debug;

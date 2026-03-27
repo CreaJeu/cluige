@@ -7,6 +7,64 @@
 
 ////////////////////////////////// _TscnParser /////////
 
+//[gd_scene load_steps=7 format=3 uid="uid://b75aarxsf6n0o"]
+static bool tsnp_header(TscnParser* this_TscnParser)
+{
+	FileLineReader* fr = &(this_TscnParser->_file_reader);
+	int curr_line_i = this_TscnParser->_current_line;
+	const char* curr_line = iCluige.iFileLineReader.get_line(fr, curr_line_i);
+	if(curr_line == NULL)
+	{
+		return false;
+	}
+	char* delim = strstr(curr_line, " format=");
+	if(delim == NULL)
+	{
+		return false;
+	}
+	//[gd_scene load_steps=7 format=3 uid="uid://b75aarxsf6n0o"]
+	//                      ^
+	delim += strlen(" format=");
+	//[gd_scene load_steps=7 format=3 uid="uid://b75aarxsf6n0o"]
+	//                              ^
+	char tmp_str[200] = "";
+	sscanf(delim, "%s", tmp_str);
+	CLUIGE_ASSERT(strlen(tmp_str) < sizeof(this_TscnParser->_tscn_format),
+			"TscnParser::%s : _tscn_format too little, fix by increasing its size in .h",
+			__FUNCTION__);
+	strcpy(this_TscnParser->_tscn_format, tmp_str);
+	if(!str_equals(tmp_str, "3"))
+	{
+		return false;
+	}
+
+	delim = strstr(curr_line, " uid=\"");
+	if(delim == NULL)
+	{
+		return false;
+	}
+	//[gd_scene load_steps=7 format=3 uid="uid://b75aarxsf6n0o"]
+	//                               ^
+	delim += strlen(" uid=\"");
+	//[gd_scene load_steps=7 format=3 uid="uid://b75aarxsf6n0o"]
+	//                                     ^
+	tmp_str[0] = '\0';
+	char* uid_end = strchr(delim, '\"');
+	if(uid_end == NULL)
+	{
+		return false;
+	}
+	int uid_len = strlen(delim) - strlen(uid_end);
+	//[gd_scene load_steps=7 format=3 uid="uid://b75aarxsf6n0o"]
+	//                                     ^                  ^
+	CLUIGE_ASSERT(uid_len < sizeof(tmp_str),
+			"TscnParser::%s : tmp_str too little, fix by increasing its size in this function",
+			__FUNCTION__);
+	strncpy(tmp_str, delim, uid_len);
+	tmp_str[uid_len] = '\0';
+	this_TscnParser->_tmp_uid = iCluige.iStringBuilder.clone(tmp_str);
+	return true;
+}
 
 static bool tsnp_is_ending_quote(TscnParser* this_TscnParser)
 {
@@ -271,7 +329,7 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 	tmp_len = strlen("\" parent=\"");
 	if(from == NULL)//ok != 0)
 	{
-		CLUIGE_ASSERT(this_TscnParser->scene_root == NULL, "TscnParser::node() : scene_root is null");
+		CLUIGE_ASSERT(this_TscnParser->scene_root == NULL, "TscnParser::node() : scene_root is not null");
 		ps->parent = NULL;
 		this_TscnParser->scene_root = ps;
 	}
@@ -492,7 +550,12 @@ static bool tsnp_parse_scene(TscnParser* this_TscnParser)
 	bool more_ext_res = true;
 	bool more_node = true;
 	FileLineReader* fr = &(this_TscnParser->_file_reader);
-	this_TscnParser->_current_line = 1;
+	this_TscnParser->_current_line = 0;
+	if(!(this_TscnParser->header(this_TscnParser)))
+	{
+		return false;
+	}
+	this_TscnParser->_current_line++;
 	while(!iCluige.iFileLineReader.feof(fr, this_TscnParser->_current_line))
 	{
 		more_ext_res = this_TscnParser->ext_res(this_TscnParser);//auto-consumes empty lines
@@ -526,13 +589,24 @@ static bool tsnp_parse_scene(TscnParser* this_TscnParser)
 		}
 	}
 	SortedDictionary* path_to_ps = &(iCluige.iPackedScene.dico_path_to_packed);
-	int k_len = strlen(fr->_file_path);
-	char* k = iCluige.checked_malloc((1 + k_len) * sizeof(char));
-	strcpy(k, fr->_file_path);
+//	int k_len = strlen(fr->_file_path);
+//	char* k = iCluige.checked_malloc((1 + k_len) * sizeof(char));
+//	strcpy(k, fr->_file_path);
+	char* k = NULL;
+	int res_path_len = strlen(iCluige.resource_path);
+	if(res_path_len == 0)
+	{
+		k = iCluige.iStringBuilder.clone(fr->_file_path);
+	}
+	else
+	{
+		k = iCluige.iStringBuilder.clone(fr->_file_path + res_path_len + 1);
+	}
 	PackedScene* v = this_TscnParser->scene_root;
 	Checked_Variant cv = iCluige.iSortedDictionary.insert(path_to_ps, k, v);
 	CLUIGE_ASSERT(!(cv.valid),
 			"TscnParser::parse_scene() : another parsed scene was already registered at this path");
+	this_TscnParser->scene_root->uid = this_TscnParser->_tmp_uid;
 	return nb_nodes > 0;
 }
 
@@ -544,11 +618,13 @@ static void tsnp_tscn_parser_alloc(struct _TscnParser* this_TscnParser, const ch
 	CLUIGE_ASSERT(file_path != NULL, "TscnParser::tscn_parser_alloc() : file_path is null");
 	//public
 	this_TscnParser->scene_root = NULL;
+	this_TscnParser->_tscn_format[0] = '\0';
+	this_TscnParser->_tmp_uid = NULL;
 
 	//private
 	this_TscnParser->_current_packed_scene = NULL;
 	FileLineReader* fr = &(this_TscnParser->_file_reader);
-	iCluige.iFileLineReader.fileLineReader_alloc(fr, 1000);
+	iCluige.iFileLineReader.fileLineReader_alloc(fr, 2000);
 	bool ok = iCluige.iFileLineReader.open_file_start_reader(fr, file_path);
 	if(!ok)
 	{
@@ -558,6 +634,7 @@ static void tsnp_tscn_parser_alloc(struct _TscnParser* this_TscnParser, const ch
 	this_TscnParser->_current_line = -1;//first line of file is # 0
 
 	this_TscnParser->parse_scene = tsnp_parse_scene;
+	this_TscnParser->header = tsnp_header;
 	this_TscnParser->is_starting_node = tsnp_is_starting_node;
 	this_TscnParser->ext_res = tsnp_ext_res;
 	this_TscnParser->node = tsnp_node;

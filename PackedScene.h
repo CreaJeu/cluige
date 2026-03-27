@@ -12,6 +12,8 @@ struct _PackedScene
 	const char* type;
 	const char* instance_path;
 	const char* parent;
+	const char* uid;
+	const char* tscn_format;
 	//SortedDictionary<String, string>
 	//   param_name -> param_value
 	//warning : in this dico, 'class' names are from godot :
@@ -39,6 +41,9 @@ struct iiPackedScene
 //	void (*pre_delete_PackedScene)(PackedScene* this_PackedScene);// maybe one day
 
 	PackedScene* (*get_packed_node)(PackedScene* root, const char* path);
+
+	//returns NULL if not found
+	PackedScene* (*packed_scene_from_uid)(const char* uid);
 
 	Node* (*instantiate)(const PackedScene* this_PackedScene);
 

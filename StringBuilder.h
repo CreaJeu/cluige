@@ -19,8 +19,8 @@ struct iiStringBuilder
     //char* string_alloc(StringBuilder* sb, size_t max_size)
 	char* (*string_alloc)(StringBuilder* sb, size_t max_size);
 
-	//void connect_existing_string(StringBuilder* sb, char* dest)
-	void (*connect_existing_string)(StringBuilder* sb, char* dest);
+	//void connect_existing_string(StringBuilder* sb, char* dest, int capacity)
+	void (*connect_existing_string)(StringBuilder* sb, char* dest, int capacity);
 
 	//void append(StringBuilder* sb, const char* formatted_tail, ...)
 	void (*append)(StringBuilder* sb, const char* formatted_tail, ...);

@@ -1,12 +1,8 @@
 
+#include <stdarg.h>
 #include "cluige.h"
 #include "Deque.h"
 
-#include <stdarg.h>
-#include <stdlib.h>
-
-//for convenience compare function
-#include <string.h>
 
 //just forward declarations, see implentation below
 static void dq_bsearch_rec(const Deque* this_Deque, Variant searched_elem, struct _BSearchData* bsd);
@@ -62,7 +58,7 @@ static int dq__i_array(const Deque* this_Deque, int i_deque)
 static int dq__i_array_prev(const Deque* this_Deque, int i_deque)
 {
     //previous i_array (one-step closer to front) from i_deque
-    int i_prev_array = this_Deque->_front_i + i_deque - 1;
+    int i_prev_array = ((this_Deque->_front_i + i_deque) % this_Deque->_capacity) - 1;
     if(i_prev_array < 0)
     {
         //loop to other end of the array
@@ -96,7 +92,9 @@ static void dq__grow(Deque* this_Deque)
 
 static Variant dq_at(const Deque* this_Deque, int i)
 {
-    CLUIGE_ASSERT((0 <= i) && (i < this_Deque->_nb_elems), "Deque::at(i) : i is out of bounds");
+    CLUIGE_ASSERT((0 <= i) && (i < this_Deque->_nb_elems),
+			"Deque::at(i) : i=%d is out of bounds [%d; %d]",
+			i, 0, this_Deque->_nb_elems-1);
     int i_array = dq__i_array(this_Deque, i);
     return this_Deque->_elems[i_array];
 }
@@ -194,7 +192,9 @@ static void dq_append(Deque* this_Deque, ...)
 
 static void dq_insert(Deque* this_Deque, int i, ...)
 {
-    CLUIGE_ASSERT((0 <= i) && (i <= this_Deque->_nb_elems), "Deque::insert(i, ...) : i is out of bound");
+    CLUIGE_ASSERT((0 <= i) && (i <= this_Deque->_nb_elems),
+			"Deque::insert(i, ...) : i=%d is out of bounds [%d; %d]",
+			i, 0, this_Deque->_nb_elems);
     struct _Structed_va_list s_args_elem_value;
     va_start(s_args_elem_value.args, i);
     dq__insert_va_list(this_Deque, i, &s_args_elem_value);
@@ -202,7 +202,7 @@ static void dq_insert(Deque* this_Deque, int i, ...)
 }
 
 //returns a copy of replaced elem, for example if you need to do some free/delete
-//returns NULL_VARIANT if no elem was replaced
+//result.valid = false if no elem was replaced
 static Checked_Variant dq_insert_or_replace_sorted(Deque* this_Deque, bool replace, ...)
 {
     CLUIGE_ASSERT(this_Deque->_sorted, "Deque::insert_or_replace_sorted(...) : deque is not sorted");
@@ -266,7 +266,9 @@ static Variant dq_pop_front(Deque* this_Deque)
 
 static void dq_remove(Deque* this_Deque, int i)
 {
-    CLUIGE_ASSERT((0 <= i) && (i < this_Deque->_nb_elems), "Deque::remove(i, ...) : i is out of bound");
+    CLUIGE_ASSERT((0 <= i) && (i < this_Deque->_nb_elems),
+			"Deque::remove(i, ...) : i=%d is out of bounds [%d; %d]",
+			i, 0, this_Deque->_nb_elems-1);
     //shift to left or right
     if(i < (this_Deque->_nb_elems / 2))
     {
@@ -300,7 +302,9 @@ static void dq_clear(Deque* this_Deque)
 
 static void dq_replace(Deque* this_Deque, int i, Variant new_v)
 {
-    CLUIGE_ASSERT((0 <= i) && (i < this_Deque->_nb_elems), "Deque::replace(i, ...) : i is out of bound");
+    CLUIGE_ASSERT((0 <= i) && (i < this_Deque->_nb_elems),
+			"Deque::replace(i, ...) : i=%d is out of bounds [%d; %d]",
+			i, 0, this_Deque->_nb_elems-1);
     Variant* elem_ptr = dq__at_ptr(this_Deque, i);
     (*elem_ptr) = new_v;
 }
@@ -345,6 +349,13 @@ static void dq_bsearch_rec(const Deque* this_Deque, Variant searched_elem, struc
 {
     //assert(bsd->_i_min <= bsd->_i_max);
     CLUIGE_ASSERT(this_Deque->_nb_elems > 0, "Deque::bsearch_rec() : deque is empty");
+    CLUIGE_ASSERT(this_Deque->_sorted, "Deque::bsearch_rec() : deque is not sorted");
+    CLUIGE_ASSERT(0 <= bsd->_i_min,
+			"Deque::bsearch_rec(...) : bsd->_i_min=%d is out of bounds [%d; %d]",
+			bsd->_i_min, 0, this_Deque->_nb_elems-1);
+    CLUIGE_ASSERT(bsd->_i_max < this_Deque->_nb_elems,
+			"Deque::bsearch_rec(...) : bsd->_i_max=%d is out of bounds [%d; %d]",
+			bsd->_i_max, 0, this_Deque->_nb_elems-1);
     int comp;
 
     //end of recursivity
@@ -396,7 +407,6 @@ static void dq_bsearch_rec(const Deque* this_Deque, Variant searched_elem, struc
 
 static int dq_bsearch(const Deque* this_Deque, ...)
 {
-    CLUIGE_ASSERT(this_Deque->_sorted, "Deque::bsearch(...) : deque is not sorted");
     int this_size = iCluige.iDeque.size(this_Deque);
     if(this_size == 0)
     {
@@ -431,6 +441,22 @@ static int dq_bsearch(const Deque* this_Deque, ...)
 //
 //}
 
+//only for Deque<char*>
+//in_out must be previously malloced
+void dq_debug_str(const Deque* this_Deque, char* in_out)
+{
+	CLUIGE_ASSERT(in_out != NULL, "Deque::%s: param in_out should not be null", __FUNCTION__);
+	in_out[0] = '\0';
+	int s = iCluige.iDeque.size(this_Deque);
+	for(int i=0; i<s; i++)
+	{
+		const char* str_i =
+				(const char*)(iCluige.iDeque.at(this_Deque, i).ptr);
+		strcat(in_out, str_i);
+		strcat(in_out, "   ");
+	}
+}
+
 ////////////////////////////////// iDeque /////////
 
 void iiDeque_init()
@@ -461,6 +487,8 @@ void iiDeque_init()
     iCluige.iDeque.bsearch = dq_bsearch;
     iCluige.iDeque.bsearch_rec = dq_bsearch_rec;
 //    iCluige.iDeque.find = dq_find;
+
+    iCluige.iDeque.debug_str = dq_debug_str;
 
     iCluige.iDeque.deque_alloc(&(iCluige.iDeque.EMPTY), VT_POINTER, 0);
 }

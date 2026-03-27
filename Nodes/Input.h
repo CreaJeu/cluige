@@ -11,7 +11,7 @@
 
 struct _InputAction
 {
-    char* name;//usefull apart from debug?
+    char* name;
     int nb_pressed;
 //    bool just_pressed;//tmp lists instead
 //    bool just_released;
@@ -29,7 +29,7 @@ struct _InputKey
 struct _Input
 {
     Deque available_actions;//Deque<InputAction>
-    Deque bound_keys;//Deque<InputKey>
+    Deque bound_keys;//Deque<InputKey> //sorted
 
     Deque just_pressed_actions;//Deque<int32_t>
     Deque just_released_actions;//Deque<int32_t>
@@ -56,9 +56,15 @@ struct iiInput
 //	struct _InputKey* (*newKey)(int charVal);
 
     //action_name will be copied, can be freed afterward or stack allocated
-	int (*add_action)(char* action_name);
+	int (*add_action)(const char* action_name);
 
-	void (*bind_key)(int action_id, int keyCharVal);
+	int (*action_id_from_name)(const char* action_name, bool assert_exists);
+
+	void (*bind_key)(const char* action_name, int key_char_val);
+	void (*un_bind_key_one_action)(int action_id, int key_char_val);
+	void (*un_bind_key_all_actions)(int key_char_val);//also removes key from bound_keys
+	int (*_is_action_orphan)(int action_id);//whether exists at least 1 key bound to it
+	void (*remove_last_available_action)();//asserts that !_is_action_orphan()
 //	bool (*is_action_pressed)(int action_id);
 	bool (*is_action_just_pressed)(int action_id);
 //	bool (*is_key_pressed)(int charVal);

@@ -18,11 +18,11 @@ static char* sbr_string_alloc(StringBuilder* sb, size_t max_size)
     return sb->next_char;
 }
 
-static void sbr_connect_existing_string(StringBuilder* sb, char* dest)
+static void sbr_connect_existing_string(StringBuilder* sb, char* dest, int capacity)
 {
     sb->built_string = dest;
     sb->next_char = sb->built_string;
-    sb->remaining_size = strlen(dest);//TODO really strlen(dest) ?
+    sb->remaining_size = capacity - strlen(dest);
 }
 
 static void sbr__append_from_args(StringBuilder* sb, const char* formatted_tail, va_list args)

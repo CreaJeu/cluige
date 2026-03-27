@@ -86,6 +86,10 @@ struct iiSortedDictionary
 	//only for Dico<char*, char*>
 	//returned char* is malloced, up to the user to delete it
 	char* (*debug_str_str)(SortedDictionary* this_SortedDictionary);
+
+	//only for Dico<char*, char*>
+	//in_out must be previously malloced
+	void (*debug_str_str_around)(SortedDictionary* this_SortedDictionary, char* key, char* in_out);
 };
 
 void iiSortedDictionary_init();

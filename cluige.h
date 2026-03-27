@@ -1,11 +1,11 @@
 #ifndef CLUIGE_H_INCLUDED
 #define CLUIGE_H_INCLUDED
 
-//some undef because ncurses defines those as macros leading
-//to conflicts with Deque.clear/erase
-//(maybe one day : find another solution)
-#undef clear
-#undef erase
+////some undef because ncurses defines those as macros leading
+////to conflicts with Deque.clear/erase
+//(since 2026-03 cluige officially depends on PDCurses instead of ncurses)
+//#undef clear
+//#undef erase
 
 #include <stdbool.h> //for bool, true, false (standard since C99)
 #include <stddef.h> //for NULL
@@ -33,6 +33,7 @@
 #include "Nodes/SpriteSVG.h"
 #include "Nodes/Camera2D.h"
 #include "TscnParser.h"
+#include "ProjectDotGodotParser.h"
 
 //just a kind of namespace to prevent name collisions
 struct iiCluige
@@ -57,6 +58,7 @@ struct iiCluige
 	struct iiSpriteSVG iSpriteSVG;
 	struct iiCamera2D iCamera2D;
 	struct iiTscnParser iTscnParser;
+	struct iiProjectDotGodotParser iProjectDotGodotParser;
 
 	//for target FPS, 15 fps by default
 	float wanted_frame_seconds;//TODO rename wanted_seconds_per_frame
@@ -77,11 +79,18 @@ struct iiCluige
 
 	float EPSILON;
 
+	char* resource_path;
+
 	//private
 	SortedDictionary _prioritized_nodes_to_process;//maybe one day : the equivalent for z-index
 
 	//void* checked_malloc(size_t)
 	void* (*checked_malloc)(size_t);
+
+	//void set_window_title(const char*)
+	void (*set_window_title)(const char*);
+	//void set_resource_path(const char*)
+	void (*set_resource_path)(const char*);
 
 //	Vector2 get_screen_size();
 	Vector2 (*get_screen_size)();

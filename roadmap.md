@@ -26,22 +26,25 @@
 	test import tscn with a label at arbitrary position
 	update test_node_against_ps to include instance->instance->... => tant pis, complexité de test disproportionnée
 (linux)
+(more godot scene import : script attachment, script factory + system to force to register them)
+(project.godot parsing : first interesting params, inputs)
 (bugs : see below)
 
 
 **tâches actuelles**
 
-
-- more godot scene import :
-	-- scripts : script attachment, global dico script-name>script-constructor + system to auto register scripts into it
-	-- project.godot parsing
-		--- inputs
-	-- (other deserialize()?)
+- re-test windows
 
 
 **Futures tâches**
 
+- update Readme
 - replace all space-indent with tab-indent + check EOL? + (Node.c +?) ths_Node => this_Node
+- checked_malloc() : separate sizeof(...) as another arg (to help never forget)
+- macro CLUIGE_BREAKPOINT() => utils_breakpoint_trick()
+- hunt every
+	for(...; i < iCluige.iDeque.size( ...
+	printf()
 - fatal error => end loop + printf
 - sprite svg (no anim) : file parsing fix discontinued paths
 - sprite svg : choose rastering algo from thickness
@@ -55,15 +58,19 @@
     - inherited_visibility (car parent invisible => branche invisible), màj dans bake()
     - process_mode (disabled, pausable, etc. : enum in godot instead of just a 'active' bool field)
 - Deque::sort()
+- custom app icon
 - reallocate in Deque::grow()
 - node2D (et autre?) : meilleur test instanceof / class_name static par classe
+- add types in Variant (in union, VariantType, from_val(), compare()...) : char*, Pair*
 
 
 
 **FUTURS CHANTIERS**
 
 - signals
-- collision rectangle
+- collision rectangle + layers
+- all valgrind ok cluige and test_cluige
+- groups (Node functions + tscn import + instantiate)
 - Node2D scale, with consequences on SpriteText/Label and SpriteSVG, no more scale in SpriteSVG
 - optim draw/erase sprites (faire Node2D::scale d'abord)
     Node2D::bake() : benefit from DFS, tmp_global_pos of parent already up to date (nearest Node2D ancestor)
@@ -74,7 +81,11 @@
                 sreen_text_orig--->curr_char = col*v + lin*u
     clip drawing inside visible window (cf. futures tâches)
 - utf8 in SpriteText
-- input : just_released? => MVC pour inputs (input server, platform-specific)
+- input :
+	parse other than 'unicode' from project.godot + mouse + joystick
+	generate godot default even if absent from projetc.godot ?
+	just_released? => MVC for inputs (input server, platform-specific)
+- autoload
 - memory pools for pairs in dico
 - full transform2D?
 - audio?
@@ -93,7 +104,7 @@
 
 
 **bugs**
-
+things not well erased when running test_cluige quickly by keeping keys pressed to keep moving camera or sprite when also pressing 'N' for next phase
 
 
 **fixed bugs**

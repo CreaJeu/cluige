@@ -13,9 +13,38 @@ static void* clg_checked_malloc(size_t s)//TODO : move to Utils, add a checked_r
     if(res == NULL)
     {
         printf("\n\n\n    fatal memory alloc error !\n\n\n");
+        CLUIGE_ASSERT(false, "that day has come");//for breakpoint
         exit(EXIT_FAILURE);
     }
     return res;
+}
+
+static void clg_set_window_title(const char* new_title)
+{
+	CLUIGE_ASSERT(new_title != NULL, "iCluige.set_window_title() : new_title should not be null");
+	if(iCluige.window_title != NULL)
+	{
+		free(iCluige.window_title);
+	}
+	iCluige.window_title = iCluige.iStringBuilder.clone(new_title);
+}
+
+static void clg_set_resource_path(const char* new_path)
+{
+	CLUIGE_ASSERT(new_path != NULL, "iCluige.set_resource_path() : new_path should not be null");
+	if(iCluige.resource_path != NULL)
+	{
+		free(iCluige.resource_path);
+	}
+	iCluige.resource_path = iCluige.iStringBuilder.clone(new_path);
+
+	//remove final '/' or '\'
+	int last_char_i = strlen(new_path) - 1;
+	while(last_char_i >= 0 && (new_path[last_char_i] == '/' || new_path[last_char_i] == '\\'))
+	{
+		iCluige.resource_path[last_char_i] = '\0';
+		last_char_i--;
+	}
 }
 
 static Vector2 clg_get_screen_size()
@@ -40,10 +69,11 @@ struct iiCluige iCluige;
 void cluige_init(void (*register_user_scripts)())
 {
     iCluige.checked_malloc = clg_checked_malloc;
+    iCluige.set_window_title = clg_set_window_title;
+    iCluige.set_resource_path = clg_set_resource_path;
     iCluige.get_screen_size = clg_get_screen_size;
     iCluige.wanted_frame_seconds = .0666;//15 fps by default
 
-	iCluige.window_title = "Cluige";
 	iCluige.window_initial_size_cols = 110;
 	iCluige.window_initial_size_lines = 50;
     iCluige.EPSILON = 0.00001;
@@ -90,12 +120,18 @@ void cluige_init(void (*register_user_scripts)())
     iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.public_root_2D);
 
     iiTscnParser_init();
+    iiProjectDotGodotParser_init();
 
     //...
     //...
 
     //...
     //...
+	iCluige.window_title = NULL;
+	iCluige.set_window_title("Cluige");
+	iCluige.resource_path = NULL;
+	iCluige.set_resource_path("");
+
 	iCluige.iSortedDictionary.sorted_dictionary_alloc(
 		&(iCluige._prioritized_nodes_to_process),
 		VT_INT64, VT_POINTER, 7);
@@ -285,6 +321,18 @@ int cluige_finish()
     //free tmp locks
     //...
 
+#ifdef CLUIGE_DEBUG
+//in release mode : skip last free() calls because OS will free all app RAM at once
+//in debug mode : do those free() for valgrind check
+	if(iCluige.window_title != NULL)
+	{
+		free(iCluige.window_title);
+	}
+	if(iCluige.resource_path != NULL)
+	{
+		free(iCluige.resource_path);
+	}
+#endif // CLUIGE_DEBUG
 
 	curs_set(1);
 	endwin();

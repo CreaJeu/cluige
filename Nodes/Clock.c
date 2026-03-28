@@ -1,10 +1,9 @@
+
 //#include <stdlib.h> //already in cluige.h
 //#include <stddef.h> //already in cluige.h
 #include "../cluige.h"
-//#include "Node.h" //already in cluige.h
-#include "Clock.h"
+#include "clock_non_portable.h"
 
-#include <string.h> //TODO static instead of malloc'ed class name
 
 ////////////////////////////////// _Clock /////////
 
@@ -21,10 +20,9 @@ static void clk_delete_Clock(Node* this_Node)
 static void clk_process(Node* this_Node)
 {
     struct _Clock* this_Clock = (struct _Clock*)(this_Node->_sub_class);
-    clock_t new_tick = clock();
-    float d_sec = (float)(new_tick - this_Clock->_last_tick) / CLOCKS_PER_SEC;
+	float d_sec = clk__precise_unscaled_elapsed_seconds(this_Clock, true);
     this_Clock->elapsed_seconds = this_Clock->scale * d_sec;
-    this_Clock->_last_tick = new_tick;
+//    this_Clock->_last_tick = new_tick;//now in _precise_unscaled_elapsed_seconds(true)
 }
 
 
@@ -37,7 +35,9 @@ static struct _Clock* clk_new_Clock()
 
     new_clock->scale = 1.;
     new_clock->elapsed_seconds = 0.;
-    new_clock->_last_tick = clock();
+
+	iCluige.iClock._init_tick(new_clock);
+
     new_clock->_this_Node = new_node;
 
     //virtual methods - private copies of mother class pointers
@@ -63,6 +63,8 @@ static struct _Clock* clk_new_Clock()
 
 void iiClock_init()
 {
-    iCluige.iClock.new_Clock = clk_new_Clock;
+	iCluige.iClock.new_Clock = clk_new_Clock;
+	iCluige.iClock._init_tick = clk__init_tick;
+	iCluige.iClock._precise_unscaled_elapsed_seconds = clk__precise_unscaled_elapsed_seconds;
 }
 

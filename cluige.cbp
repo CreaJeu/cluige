@@ -222,6 +222,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Nodes/SpriteText.h" />
+		<Unit filename="Nodes/clock_non_portable.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Nodes/clock_non_portable.h" />
 		<Unit filename="PackedScene.c">
 			<Option compilerVar="CC" />
 		</Unit>

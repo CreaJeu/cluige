@@ -22,6 +22,10 @@ methods :
 		void my_method_2(const MyClass* this_MyClass, int arg_1, int arg_2)
 
 
+comments :
+	prefer `//` rather than `/* */`
+	put comments above concerned lines rather than below (trick to remember : think usual .h). Short comments at the end of short lines is acceptable.
+
 General :
 	indentation : tab (no space indent, any remaining space-indents will be fixed in near future) (in Code::Blocks, check the checkbox to force tab-indent)
 	use but don't abuse of new lines

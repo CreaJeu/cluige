@@ -298,12 +298,19 @@ void cluige_run()
 
         //curses sleep
         int sleep_frame_milliseconds = 1;
-        if(iCluige.clock->elapsed_seconds < iCluige.wanted_frame_seconds)
-        {
-            float sleep_frame_seconds = iCluige.wanted_frame_seconds - iCluige.clock->elapsed_seconds;
-            sleep_frame_milliseconds = (int)(sleep_frame_seconds * 1000);
-        }
-        napms(sleep_frame_milliseconds);//sleep to avoid 100% CPU
+		float pu_delta = iCluige.iClock._precise_unscaled_elapsed_seconds(iCluige.clock, false);
+		// '+.002' to be sure to sleep
+		// '*.972' to prefer small under-sleep than small over-sleep
+		if(pu_delta + .002 < iCluige.wanted_frame_seconds * .972)
+		{
+			// '*.972' to prefer small under-sleep than small over-sleep
+			sleep_frame_milliseconds = (int)(((iCluige.wanted_frame_seconds * .972) - pu_delta) * 1000.);
+		}
+			if(iCluige.clock->elapsed_seconds < .0647)
+				printf("%f\n", iCluige.clock->elapsed_seconds);
+			if(iCluige.clock->elapsed_seconds > .0662)
+				printf("\t%f\n", iCluige.clock->elapsed_seconds);
+		napms(sleep_frame_milliseconds);//sleep to avoid 100% CPU and approach wanted FPS
 
         //PROCESS
         process_tree(iCluige._private_root_2D, PROCESS_PASS);//just computes priorities

@@ -12,6 +12,13 @@ struct _SVGParser
     //Deque<float> [x y x y x y x y x y...]
     Deque coordinates_sequence;
 
+	//from
+	//  <svg width="30cm" height="30cm" ...>
+	//  or without nammed unit (meaning 'px' in inkscape) :
+	//  <svg width="30" height="30" ...>
+	float height;
+	float width;
+
     //TODO
     //bool _visible;
     //color, thickness...
@@ -24,6 +31,7 @@ struct iiSVGParser
 	//void (*pre_delete_SVGParser)(struct _SVGParser* this_SVGParser);
 
 	bool (*prepare_parsing)(struct _SVGParser* this_SVGParser, char* file_path);
+	bool (*parse_svg_tag)(struct _SVGParser* this_SVGParser);
     bool (*parse_path)(struct _SVGParser* this_SVGParser);
     void (*end_parsing)(struct _SVGParser* this_SVGParser);
 };

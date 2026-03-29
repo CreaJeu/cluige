@@ -45,6 +45,7 @@
 - hunt every
 	for(...; i < iCluige.iDeque.size( ...
 	printf()
+	todo
 - fatal error => end loop + printf
 - sprite svg (no anim) : file parsing fix discontinued paths
 - sprite svg : choose rastering algo from thickness

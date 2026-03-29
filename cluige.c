@@ -306,10 +306,10 @@ void cluige_run()
 			// '*.972' to prefer small under-sleep than small over-sleep
 			sleep_frame_milliseconds = (int)(((iCluige.wanted_frame_seconds * .972) - pu_delta) * 1000.);
 		}
-			if(iCluige.clock->elapsed_seconds < .0647)
-				printf("%f\n", iCluige.clock->elapsed_seconds);
-			if(iCluige.clock->elapsed_seconds > .0662)
-				printf("\t%f\n", iCluige.clock->elapsed_seconds);
+//			if(iCluige.clock->elapsed_seconds < .0647)
+//				printf("%f\n", iCluige.clock->elapsed_seconds);
+//			if(iCluige.clock->elapsed_seconds > .0662)
+//				printf("\t%f\n", iCluige.clock->elapsed_seconds);
 		napms(sleep_frame_milliseconds);//sleep to avoid 100% CPU and approach wanted FPS
 
         //PROCESS

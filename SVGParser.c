@@ -16,7 +16,7 @@ static char last_command;
 static bool absolute;
 static FILE* file;
 
-static bool _svp_parse_point(struct _SVGParser* this_SVGParser, FILE* file, char* buffer)
+static bool svp__parse_point(struct _SVGParser* this_SVGParser, FILE* file, char* buffer)
 {
     //commands
     // m x y : move to x y
@@ -169,7 +169,7 @@ static bool _svp_parse_point(struct _SVGParser* this_SVGParser, FILE* file, char
     return true;
 }
 
-void _svp_parse_path(struct _SVGParser* this_SVGParser, FILE* file, char* buffer)
+void svp__parse_path(struct _SVGParser* this_SVGParser, FILE* file, char* buffer)
 {
     //  <path ¤ ... d="..."
     iCluige.iDeque.clear(&(this_SVGParser->coordinates_sequence));
@@ -198,7 +198,7 @@ void _svp_parse_path(struct _SVGParser* this_SVGParser, FILE* file, char* buffer
     }
 
     //  <path ... d=" ¤ [M|m] -5.7154991,-26.450343 ..."
-    while(_svp_parse_point(this_SVGParser, file, buffer)) //sequence of points and commands
+    while(svp__parse_point(this_SVGParser, file, buffer)) //sequence of points and commands
         ;
 }
 
@@ -244,6 +244,123 @@ static bool svp_prepare_parsing(struct _SVGParser* this_SVGParser, char* file_pa
     return true;
 }
 
+static float svp__scale_by_unit(const char* unit, float x)
+{
+	if(str_equals(unit, "mm"))
+	{
+		return x * 3.78;
+	}
+	else if(str_equals(unit, "cm"))
+	{
+		return x * 37.8;
+	}
+	else if(str_equals(unit, "in"))
+	{
+		return x * 96;
+	}
+	else if(str_equals(unit, "pt"))
+	{
+		return x * 1.33333;
+	}
+	else if(str_equals(unit, "pc"))
+	{
+		return x * 16;
+	}
+	else //assume px => 1<=>1
+	{
+		return x;
+	}
+}
+
+static bool svp__parse_tag_attributes(struct _SVGParser* this_SVGParser)
+{
+	char buffer_tag[99];
+	char buffer_unit[9];
+	int nb_found = 0;
+	while(nb_found < 2 && !feof(file))
+	{
+		fscanf(file, "%*98[ \t\n]%[^<=]s", buffer_tag);
+		if(str_equals("height", buffer_tag))
+		{
+			float h = 0.;
+			fscanf(file, "%98s", buffer_tag);
+			int nbc = sscanf(buffer_tag, "=\"%f%8[^\"]s", &h, buffer_unit);
+			if(nbc < 1)
+			{
+				utils_breakpoint_trick("can't read height", true);
+				return false;
+			}
+			this_SVGParser->height = svp__scale_by_unit(buffer_unit, h);
+			nb_found++;
+		}
+		else if(str_equals("width", buffer_tag))
+		{
+			float w = 0.;
+			fscanf(file, "%98s", buffer_tag);
+			int nbc = sscanf(buffer_tag, "=\"%f%8[^\"]s", &w, buffer_unit);
+			if(nbc < 1)
+			{
+				utils_breakpoint_trick("can't read width", true);
+				return false;
+			}
+			this_SVGParser->width = svp__scale_by_unit(buffer_unit, w);
+			nb_found++;
+		}
+		else
+		{
+			fscanf(file, "%s", buffer_tag);
+		}
+	}
+	return !feof(file);
+}
+
+static bool svp_parse_svg_tag(struct _SVGParser* this_SVGParser)
+{
+	char buffer_tag[19];
+	//for unknown reason, "<" cannot be used with fscanf()
+	while(!feof(file))
+	{
+		fscanf(file, "%1s", buffer_tag);
+		if(feof(file))
+		{
+			return false;
+		}
+		while(buffer_tag[0] != '<')
+		{
+			fscanf(file, "%1s", buffer_tag);
+			if(feof(file))
+			{
+				return false;
+			}
+		}
+		//tag start
+		fscanf(file, "%18s", buffer_tag);
+		if(feof(file))
+		{
+			return false;
+		}
+		if(str_equals(buffer_tag, "svg"))
+		{
+			bool ok = svp__parse_tag_attributes(this_SVGParser);
+			if(!ok)
+			{
+				utils_breakpoint_trick("VGParser::_svp_parse_svg_tag() incorrect <svg> attributes", true);
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else if(buffer_tag[0] != '?' && buffer_tag[0] != '!')
+		{
+			//other than <?xml or <!--
+			return false;
+		}
+	}
+	return false;
+}
+
 static bool svp_parse_path(struct _SVGParser* this_SVGParser)
 {
     iCluige.iDeque.clear(&(this_SVGParser->coordinates_sequence));
@@ -257,7 +374,7 @@ static bool svp_parse_path(struct _SVGParser* this_SVGParser)
         if(strcmp(buffer_tag, "path") == 0)
         {
             //printf("%s\n", buffer_tag);
-            _svp_parse_path(this_SVGParser, file, buffer_tag);
+            svp__parse_path(this_SVGParser, file, buffer_tag);
         }
     }
     return !feof(file);
@@ -276,6 +393,7 @@ void iiSVGParser_init(struct iiSVGParser* this_iiSVGParser)
 	this_iiSVGParser->SVGParser_alloc = svp_SVGParser_alloc;
 	//this_iiSVGParser.pre_delete_SVGParser = svp_pre_delete_SVGParser;
 	this_iiSVGParser->prepare_parsing = svp_prepare_parsing;
+	this_iiSVGParser->parse_svg_tag = svp_parse_svg_tag;
     this_iiSVGParser->parse_path = svp_parse_path;
     this_iiSVGParser->end_parsing = svp_end_parsing;
 }

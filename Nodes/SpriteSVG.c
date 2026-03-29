@@ -93,6 +93,10 @@ static void ssvg_erase(Node* this_Node)
             &(this_Node2D->_old_baked.tmp_global_position),
             &(this_SpriteSVG->offset),
             &orig);
+    iCluige.iVector2.add(
+            &orig,
+            &(this_SpriteSVG->_centered_offest),
+            &orig);
 
     float x_camera = iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position.x;
     float y_camera = iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position.y;
@@ -199,6 +203,10 @@ static void ssvg_draw(Node* this_Node)
             &(this_Node2D->_new_baked.tmp_global_position),
             &(this_SpriteSVG->offset),
             &orig);
+    iCluige.iVector2.add(
+            &orig,
+            &(this_SpriteSVG->_centered_offest),
+            &orig);
 
     Camera2D* current_camera = iCluige.iCamera2D.current_camera;
     CLUIGE_ASSERT(current_camera != NULL, "SpriteSVG::draw() : current_camera is null");
@@ -292,6 +300,8 @@ static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
 	Node* new_Node = new_Node2D->_this_Node;
     SpriteSVG* new_SpriteSVG = iCluige.checked_malloc(sizeof(SpriteSVG));
 
+    new_SpriteSVG->centered = true;
+    new_SpriteSVG->_centered_offest = (Vector2) { 0., 0. };
     new_SpriteSVG->offset = (Vector2) { 0., 0. };
     new_SpriteSVG->scale = (Vector2) { 1., 1. };
     iCluige.iDeque.deque_alloc(&(new_SpriteSVG->paths), VT_POINTER, 3);
@@ -359,6 +369,13 @@ static void ssvg_parse_file(SpriteSVG* this_SpriteSVG, char* file_path)
 {
     iCluige.iSpriteSVG.iSVGParser.prepare_parsing(
             &_svg_parser, file_path);
+	bool ok = iCluige.iSpriteSVG.iSVGParser.parse_svg_tag(&_svg_parser);
+	if(!ok)
+	{
+		utils_breakpoint_trick("SpriteSVG::parse_file() incorrect <svg> attributes", true);
+	}
+	this_SpriteSVG->size_svg.x = _svg_parser.width;
+	this_SpriteSVG->size_svg.y = _svg_parser.height;
 
     while(iCluige.iSpriteSVG.iSVGParser.parse_path(&_svg_parser))
     {
@@ -366,6 +383,11 @@ static void ssvg_parse_file(SpriteSVG* this_SpriteSVG, char* file_path)
     }
 
     iCluige.iSpriteSVG.iSVGParser.end_parsing(&_svg_parser);
+
+	if(this_SpriteSVG->centered)
+	{
+		iCluige.iVector2.k_mul(&(this_SpriteSVG->size_svg), -.5, &(this_SpriteSVG->_centered_offest));
+	}
 }
 
 static Node* ssvg_instantiate(const SortedDictionary* params)
@@ -378,6 +400,7 @@ static Node* ssvg_instantiate(const SortedDictionary* params)
     //offset = Vector2(2.265, -3.2)
     //scale = Vector2(2.265, -3.2)
     //svg_file_path = "../some/where"
+	utils_bool_from_parsed(&(res_SpriteSVG->centered), params, "centered");
     utils_vector2_from_parsed(&(res_SpriteSVG->offset), params, "offset");
     utils_vector2_from_parsed(&(res_SpriteSVG->scale), params, "scale");//TODO scale in Node2D instead
     CLUIGE_ASSERT(iCluige.iDeque.empty(&(res_SpriteSVG->paths)), "SpriteSVG::instantiate() : trying to instantiate() into non empty object");

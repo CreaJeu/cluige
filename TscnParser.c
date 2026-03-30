@@ -159,17 +159,30 @@ static bool tsnp_value(TscnParser* this_TscnParser)
 	//case with (potentially multiline) quoted string
 	else if(current_token[0] == '\"')
 	{
-		int line_len = strlen(curr_line);
-		while(!(this_TscnParser->is_ending_quote(this_TscnParser)))
+		int line_len = 0;
+		bool more = true;
+		while(more)
 		{
-			this_TscnParser->_current_line++;
-			curr_line_i = this_TscnParser->_current_line;
-			curr_line = iCluige.iFileLineReader.get_line(fr, curr_line_i);
-			line_len = strlen(curr_line);
+			//despecialize \" or \\ (or other ?)
+			char* tmp = strchr(curr_line, '\\');// find first \"
+			while(tmp != NULL)
+			{
+				tmp += 2;
+				line_len--;
+				tmp = strchr(tmp, '\\');// find next \"
+			}
 			token_len += line_len;
+			more = !(this_TscnParser->is_ending_quote(this_TscnParser));
+			if(more)
+			{
+				this_TscnParser->_current_line++;
+				curr_line = iCluige.iFileLineReader.get_line(
+						fr, this_TscnParser->_current_line);
+				line_len = strlen(curr_line);
+			}
 		}
 
-		if(curr_line[line_len - 1] == '\n')
+		if(curr_line[strlen(curr_line) - 1] == '\n')
 		{
 			token_len--;
 		}
@@ -384,8 +397,22 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 		while(nb_copied < tmp_len)
 		{
 			int sub_len = strlen(tmp_value_line);
+//			strncpy(tmp_append_here, tmp_value_line, sub_len);
+			//despecialize \" or \\ (or other ?)
+			char* special = strchr(tmp_value_line, '\\');
+			while(special != NULL)
+			{
+				int sub_sub_len = (int) (special - tmp_value_line);
+				strncpy(tmp_append_here, tmp_value_line, sub_sub_len);
+				tmp_append_here[sub_sub_len] = tmp_value_line[sub_sub_len + 1];
+				sub_sub_len++;
+				tmp_append_here += sub_sub_len;
+				tmp_value_line += sub_sub_len + 1;
+				nb_copied += sub_sub_len;
+				special = strchr(tmp_value_line, '\\');
+				sub_len -= sub_sub_len + 1;
+			}
 			strncpy(tmp_append_here, tmp_value_line, sub_len);
-			//memcpy(tmp_append_here, tmp_value_line, sub_len);
 			tmp_append_here += sub_len;
 			tmp_value_line += sub_len + 1;
 			nb_copied += sub_len;

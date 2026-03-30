@@ -34,11 +34,11 @@
 **tâches actuelles**
 
 - re-test windows
+- update Readme
 
 
 **Futures tâches**
 
-- update Readme
 - replace all space-indent with tab-indent + check EOL? + (Node.c +?) ths_Node => this_Node
 - checked_malloc() : separate sizeof(...) as another arg (to help never forget)
 - macro CLUIGE_BREAKPOINT() => utils_breakpoint_trick()
@@ -72,7 +72,7 @@
 - collision rectangle + layers
 - all valgrind ok cluige and test_cluige
 - groups (Node functions + tscn import + instantiate)
-- Node2D scale, with consequences on SpriteText/Label and SpriteSVG, no more scale in SpriteSVG
+- Node2D scale (or full transform2D?), with consequences on SpriteText/Label and SpriteSVG, no more scale in SpriteSVG
 - optim draw/erase sprites (faire Node2D::scale d'abord)
     Node2D::bake() : benefit from DFS, tmp_global_pos of parent already up to date (nearest Node2D ancestor)
     spriteText

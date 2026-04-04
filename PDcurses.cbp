@@ -39,12 +39,12 @@
 					<Add option="-g" />
 				</Compiler>
 				<MakeCommands>
-					<Build command="cd ../PDCurses/wincon &amp;&amp; $make all DEBUG=Y DLL=Y" />
-					<CompileFile command="cd ../PDCurses/wincon &amp;&amp; $make $file DEBUG=Y DLL=Y" />
-					<Clean command="cd ../PDCurses/wincon &amp;&amp; $make clean" />
+					<Build command='cmd /V:ON /C &quot;cd ..\PDCurses\wincon\myDebug &amp;&amp; path $(TARGET_COMPILER_DIR)/bin/;%PATH% &amp;&amp; $make -f ..\Makefile DEBUG=Y DLL=Y PDCURSES_SRCDIR=../..&quot;' />
+					<CompileFile command='cmd /V:ON /C &quot;cd ..\PDCurses\wincon\myDebug &amp;&amp; path $(TARGET_COMPILER_DIR)/bin/;%PATH% &amp;&amp; $make -f ..\Makefile $file DEBUG=Y DLL=Y PDCURSES_SRCDIR=../..&quot;' />
+					<Clean command='cmd /V:ON /C &quot;(if not exist ..\PDCurses\wincon\myDebug\ mkdir ..\PDCurses\wincon\myDebug ) &amp;&amp; cd ..\PDCurses\wincon\myDebug &amp;&amp; $make -f ..\Makefile clean PDCURSES_SRCDIR=../..&quot;' />
 					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="cd ../PDCurses/wincon &amp;&amp; $make -q" />
-					<SilentBuild command="cd ../PDCurses/wincon &amp;&amp; $make all DEBUG=Y DLL=Y &gt; $(CMD_NULL)" />
+					<AskRebuildNeeded command='cmd /V:ON /C &quot;(if not exist ..\PDCurses\wincon\myDebug\ mkdir ..\PDCurses\wincon\myDebug ) &amp;&amp; cd ..\PDCurses\wincon\myDebug &amp;&amp; $make -f ..\Makefile -q PDCURSES_SRCDIR=../..&quot;' />
+					<SilentBuild command='cmd /V:ON /C &quot;cd ..\PDCurses\wincon\myDebug &amp;&amp; path $(TARGET_COMPILER_DIR)/bin/;%PATH% &amp;&amp; $make -f ..\Makefile DEBUG=Y DLL=Y PDCURSES_SRCDIR=../..&quot; &gt; $(CMD_NULL)' />
 				</MakeCommands>
 			</Target>
 			<Target title="ReleaseLinux">
@@ -63,6 +63,23 @@
 					<DistClean command="$make -f $makefile distclean$target" />
 					<AskRebuildNeeded command="cd ../PDCurses/x11 &amp;&amp; $make -f MakefileRelease -q" />
 					<SilentBuild command="cd ../PDCurses/x11 &amp;&amp; $make -f MakefileRelease all &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="ReleaseWindows">
+				<Option output="PDcurses.so" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="cf_build_options_make_commands" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<MakeCommands>
+					<Build command='cmd /V:ON /C &quot;cd ..\PDCurses\wincon\myRelease &amp;&amp; path $(TARGET_COMPILER_DIR)/bin/;%PATH% &amp;&amp; $make -f ..\Makefile DLL=Y PDCURSES_SRCDIR=../..&quot;' />
+					<CompileFile command='cmd /V:ON /C &quot;cd ..\PDCurses\wincon\myRelease &amp;&amp; path $(TARGET_COMPILER_DIR)/bin/;%PATH% &amp;&amp; $make -f ..\Makefile $file DLL=Y PDCURSES_SRCDIR=../..&quot;' />
+					<Clean command='cmd /V:ON /C &quot;(if not exist ..\PDCurses\wincon\myRelease\ mkdir ..\PDCurses\wincon\myRelease ) &amp;&amp; cd ..\PDCurses\wincon\myRelease &amp;&amp; $make -f ..\Makefile clean PDCURSES_SRCDIR=../..&quot;' />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command='cmd /V:ON /C &quot;(if not exist ..\PDCurses\wincon\myRelease\ mkdir ..\PDCurses\wincon\myRelease ) &amp;&amp; cd ..\PDCurses\wincon\myRelease &amp;&amp; $make -f ..\Makefile -q PDCURSES_SRCDIR=../..&quot;' />
+					<SilentBuild command='cmd /V:ON /C &quot;cd ..\PDCurses\wincon\myRelease &amp;&amp; path $(TARGET_COMPILER_DIR)/bin/;%PATH% &amp;&amp; $make -f ..\Makefile DLL=Y PDCURSES_SRCDIR=../..&quot; &gt; $(CMD_NULL)' />
 				</MakeCommands>
 			</Target>
 		</Build>

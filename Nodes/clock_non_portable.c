@@ -67,9 +67,11 @@ float clk__precise_unscaled_elapsed_seconds(struct _Clock* this_Clock, bool memo
 	if(memorize)
 	{
 		this_Clock->_last_tick.t = new_tick;
+		return res;
 	}
 
-	return res;
+	//+ empiric value to compensate sleep time imprecision
+	return res + 0.006;
 }
 
 #endif // CLUIGE_X11

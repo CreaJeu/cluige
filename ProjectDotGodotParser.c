@@ -238,12 +238,12 @@ static bool pdgp__input_event_unicode(ProjectDotGodotParser* this_ProjectDotGodo
 	delim += strlen("\"unicode\":");
 	//"events": [Object(InputEv...,"unicode":0,..."script":null)\n,
 	//                                       ^
-	uint64_t uni = 0;
+	long unsigned int uni = 0;
 	sscanf(delim, "%lu%*s", &uni);
 	if(uni != 0)
 	{
 		Deque* dq = this_ProjectDotGodotParser->_current_input_action_triggers;
-		iCluige.iDeque.push_back(dq, uni);
+		iCluige.iDeque.push_back(dq, (uint64_t)uni);
 		*input_str_ptr = strstr(delim, "\n") + 1;
 		//"events": [Object(InputEv...,"unicode":0,..."script":null)\n,
 		//                                                            ^

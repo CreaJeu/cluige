@@ -17,8 +17,9 @@ void _cluige_initscr()
 	char* tmp_argv[] = {iCluige.window_title, "-cols", cols, "-lines", lines, NULL};
     Xinitscr(5, tmp_argv);
 #else
-	//TODO windows : find how set initial screen size
 	initscr();
+	resize_term(iCluige.window_initial_size_lines, iCluige.window_initial_size_cols);
+	PDC_set_title(iCluige.window_title);
 #endif
 
 }

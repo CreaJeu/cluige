@@ -49,15 +49,12 @@ static void clg_set_resource_path(const char* new_path)
 
 static Vector2 clg_get_screen_size()
 {
-//    int w, h;
-    //TODO : make it work !
-//    if(is_termresized())
-//    {
-//        resize_term(0, 0);
-//    }
-//    getmaxyx(stdscr, h, w);
-//    return (Vector2){ w, h };
-    return (Vector2){ 0, 0 };
+	//ok on windows (once cluige_run() has started)
+	///TODO test on linux
+	int h;
+	int w;
+	getmaxyx(stdscr, h, w);
+	return (Vector2){ w, h };
 }
 
 

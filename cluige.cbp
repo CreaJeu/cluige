@@ -6,35 +6,23 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Debug">
+			<Target title="DebugWindows">
 				<Option output="bin/Debug/cluige" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
+				<Option additional_output="../PDCurses/wincon/myDebug/pdcurses.dll;" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-fPIC" />
-					<Add option="-g" />
+					<Add option="-O0" />
+					<Add option="-ggdb3" />
 					<Add option="-DCLUIGE_DEBUG" />
+					<Add option="-DPDC_DLL_BUILD" />
 				</Compiler>
 				<Linker>
-					<Add library="bin/Debug/pdcurses/pdcurses.dll" />
-					<Add directory="bin/Debug/pdcurses" />
-				</Linker>
-			</Target>
-			<Target title="Release">
-				<Option output="bin/Release/cluige" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Release/" />
-				<Option type="3" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
-				<Compiler>
-					<Add option="-O2" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
+					<Add library="../PDCurses/wincon/myDebug/pdcurses.a" />
 				</Linker>
 			</Target>
 			<Target title="DebugLinux">
@@ -74,7 +62,60 @@
 					<Add before='test ! -e .cluige_dep_dir &amp;&amp;  grep -o &quot; -L[^ $]* -l&quot; ../PDCurses/x11/MakefileDebug | sed -n &quot;s/^ -L\\([^ ]*\\) -l.*$/\\1/p; q&quot; &gt; .cluige_dep_dir || echo .cluige_dep_dir ok' />
 				</ExtraCommands>
 			</Target>
-			<Target title="DebugLinuxNcurses">
+			<Target title="ReleaseWindows">
+				<Option output="bin/Release/cluige" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option additional_output="../PDCurses/wincon/myRelease/pdcurses.dll;" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-fPIC" />
+					<Add option="-DPDC_DLL_BUILD" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="../PDCurses/wincon/myRelease/pdcurses.a" />
+				</Linker>
+			</Target>
+			<Target title="ReleaseLinux">
+				<Option output="bin/Release/cluige" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option additional_output="../PDCurses/x11/libXCurses.so;" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-fPIC" />
+					<Add option="-DCLUIGE_X11" />
+					<Add option="-DXCURSES" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-Wl,-rpath,&apos;\\$$$$ORIGIN&apos;" />
+					<Add library="XCurses" />
+					<Add library="m" />
+					<Add library="Xaw" />
+					<Add library="Xmu" />
+					<Add library="Xt" />
+					<Add library="X11" />
+					<Add library="Xpm" />
+					<Add library="SM" />
+					<Add library="ICE" />
+					<Add library="Xext" />
+					<Add library="c" />
+					<Add directory="../PDCurses/x11" />
+					<Add directory="`cat .cluige_dep_dir`" />
+				</Linker>
+				<ExtraCommands>
+					<Add before='test ! -e .cluige_dep_dir &amp;&amp;  grep -o &quot; -L[^ $]* -l&quot; ../PDCurses/x11/MakefileRelease | sed -n &quot;s/^ -L\\([^ ]*\\) -l.*$/\\1/p; q&quot; &gt; .cluige_dep_dir || echo .cluige_dep_dir ok' />
+				</ExtraCommands>
+			</Target>
+			<Target title="z_DebugLinuxNcurses">
 				<Option output="bin/Debug/cluige" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
@@ -136,41 +177,6 @@
 					<Add before="#echo $(PLATFORM)" />
 					<Add before='#_T(&quot;azerty&quot;)' />
 					<Add before="#IO.GetCwd()" />
-				</ExtraCommands>
-			</Target>
-			<Target title="ReleaseLinux">
-				<Option output="bin/Release/cluige" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Release/" />
-				<Option additional_output="../PDCurses/x11/libXCurses.so;" />
-				<Option type="3" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
-				<Compiler>
-					<Add option="-O2" />
-					<Add option="-fPIC" />
-					<Add option="-DCLUIGE_X11" />
-					<Add option="-DXCURSES" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-					<Add option="-Wl,-rpath,&apos;\\$$$$ORIGIN&apos;" />
-					<Add library="XCurses" />
-					<Add library="m" />
-					<Add library="Xaw" />
-					<Add library="Xmu" />
-					<Add library="Xt" />
-					<Add library="X11" />
-					<Add library="Xpm" />
-					<Add library="SM" />
-					<Add library="ICE" />
-					<Add library="Xext" />
-					<Add library="c" />
-					<Add directory="../PDCurses/x11" />
-					<Add directory="`cat .cluige_dep_dir`" />
-				</Linker>
-				<ExtraCommands>
-					<Add before='test ! -e .cluige_dep_dir &amp;&amp;  grep -o &quot; -L[^ $]* -l&quot; ../PDCurses/x11/MakefileRelease | sed -n &quot;s/^ -L\\([^ ]*\\) -l.*$/\\1/p; q&quot; &gt; .cluige_dep_dir || echo .cluige_dep_dir ok' />
 				</ExtraCommands>
 			</Target>
 		</Build>

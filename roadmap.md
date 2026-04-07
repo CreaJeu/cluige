@@ -1,45 +1,45 @@
 
 **fini récemment**
 
-(chantier : minimal usable Node/Script/main loop)
-(chantier sprite text (no anim))
-(Deque)
-(inputs without just_released)
-(tous les params char* : accepter ceux alloués sur pile, avec copie systématique)
-(suite textraster avec code Ulrich)
-(tous les identifiants en snake_case, types restent PascalCase)
-(sprite svg (no anim) : minimal file parsing)
-(SortedDictionary)
-(queue_free, remove child, get node by name/path, get_path)
-(`~auto` test project)
-(camera)
-(minimal godot scene import : tscn format parsing, packed scene generation)
-(more godot scene import : instanciate() ok for some node classes in their current state)
-(tscn import : move test functions from gamejam to test project)
-(process/main loop : still DFS, better game loop order)
-(enter_tree(), ready(), exit_tree())
-(more godot scene import : camera (not clock, no such node in godot, so, never found in .tscn))
-(more godot import)
-	per-scene-dico id>uid, global-dico uid>PackedScene
-	test [pre]delete tscnparser/packedscene => no, maybe one day
-	test with .tscn spread in sub-sub-dirs => ok godot always use absolute path from /res for ext_resource descriptors
-	test import tscn with a label at arbitrary position
-	update test_node_against_ps to include instance->instance->... => tant pis, complexité de test disproportionnée
-(linux)
-(more godot scene import : script attachment, script factory + system to force to register them)
-(project.godot parsing : first interesting params, inputs)
-(bugs : see below)
+- (chantier : minimal usable Node/Script/main loop)
+- (chantier sprite text (no anim))
+- (Deque)
+- (inputs without just_released)
+- (tous les params char* : accepter ceux alloués sur pile, avec copie systématique)
+- (suite textraster avec code Ulrich)
+- (tous les identifiants en snake_case, types restent PascalCase)
+- (sprite svg (no anim) : minimal file parsing)
+- (SortedDictionary)
+- (queue_free, remove child, get node by name/path, get_path)
+- ("auto" test project)
+- (camera)
+- (minimal godot scene import : tscn format parsing, packed scene generation)
+- (more godot scene import : instanciate() ok for some node classes in their current state)
+- (tscn import : move test functions from gamejam to test project)
+- (process/main loop : still DFS, better game loop order)
+- (enter_tree(), ready(), exit_tree())
+- (more godot scene import : camera (not clock, no such node in godot, so, never found in .tscn))
+- (more godot import)
+  - per-scene-dico id>uid, global-dico uid>PackedScene
+  - test [pre]delete tscnparser/packedscene => no, maybe one day
+  - test with .tscn spread in sub-sub-dirs => ok godot always use absolute path from /res for ext_resource descriptors
+  - test import tscn with a label at arbitrary position
+  - update test_node_against_ps to include instance->instance->... => tant pis, complexité de test disproportionnée
+- (linux)
+- (more godot scene import : script attachment, script factory + system to force to register them)
+- (project.godot parsing : first interesting params, inputs)
+- (re-test windows)
+- (update Readme)
+- (bugs : see below)
 
 
 **tâches actuelles**
 
-- re-test windows
-- update Readme
+- replace all space-indent with tab-indent + check EOL? + (Node.c +?) ths_Node => this_Node
 
 
 **Futures tâches**
 
-- replace all space-indent with tab-indent + check EOL? + (Node.c +?) ths_Node => this_Node
 - checked_malloc() : separate sizeof(...) as another arg (to help never forget)
 - macro CLUIGE_BREAKPOINT() => utils_breakpoint_trick()
 - hunt every
@@ -70,6 +70,7 @@
 
 - signals
 - collision rectangle + layers
+- cluige game templates
 - all valgrind ok cluige and test_cluige
 - groups (Node functions + tscn import + instantiate)
 - Node2D scale (or full transform2D?), with consequences on SpriteText/Label and SpriteSVG, no more scale in SpriteSVG
@@ -101,14 +102,15 @@
 - deque : option deep copy ?
 - other Node2D subclasses? see https://docs.godotengine.org/en/stable/classes/class_node2d.html e.g. Line2D, Marker2D, Polygon2D
 - add draw() function in scripts like in godot?
+- mods : design how to integrate them as easy as possible
 
 
 
 **bugs**
-things not well erased when running test_cluige quickly by keeping keys pressed to keep moving camera or sprite when also pressing 'N' for next phase
+- things not well erased when running test_cluige quickly by keeping keys pressed to keep moving camera or sprite when also pressing 'N' for next phase
 
 
 **fixed bugs**
-(spriteText not correctly erased when text changes)
-(erase sometimes skipped when keyboard autorepeat, even if code in erase() is commented to erase everything each frame)
-(bug camera-test no more showing instructions)
+- (spriteText not correctly erased when text changes)
+- (erase sometimes skipped when keyboard autorepeat, even if code in erase() is commented to erase everything each frame)
+- (bug camera-test no more showing instructions)

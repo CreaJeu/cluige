@@ -49,8 +49,9 @@ static void clg_set_resource_path(const char* new_path)
 
 static Vector2 clg_get_screen_size()
 {
-	//ok on windows (once cluige_run() has started)
-	///TODO test on linux
+	//ok on windows and linux
+	//(once cluige_run() has started, not fullscreen,
+	//even if window was resized by user)
 	int h;
 	int w;
 	getmaxyx(stdscr, h, w);

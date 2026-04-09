@@ -6,3 +6,4 @@
 void _cluige_initscr();
 
 #endif // INIT_NON_PORTABLE_H_INCLUDED
+

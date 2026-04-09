@@ -89,6 +89,7 @@ static char* sbr_clone_formatted(size_t max_size, const char* formatted_tail, ..
     return res;
 }
 
+//maybe one day, but now Deque can be used, see also strtok()
 //char** sbr_split(const char* text, const char* separator, int* outNbSegments)
 //{
 //    int totalLength = strlen(text);

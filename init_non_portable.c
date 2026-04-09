@@ -6,7 +6,7 @@
 
 void _cluige_initscr()
 {
-    //maybe one day : separate from core cluige via 'display server'
+	//maybe one day : separate from core cluige via 'display server'
 
 #ifdef CLUIGE_X11
 	char cols[8];
@@ -15,7 +15,7 @@ void _cluige_initscr()
 	sprintf(lines, "%d", iCluige.window_initial_size_lines);
 
 	char* tmp_argv[] = {iCluige.window_title, "-cols", cols, "-lines", lines, NULL};
-    Xinitscr(5, tmp_argv);
+	Xinitscr(5, tmp_argv);
 #else
 	initscr();
 	resize_term(iCluige.window_initial_size_lines, iCluige.window_initial_size_cols);

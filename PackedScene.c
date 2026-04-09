@@ -308,7 +308,7 @@ static char* pksc_debug_recrusive(const PackedScene* root, Deque* strings)
 void iiPackedScene_init()
 {
     iCluige.iPackedScene.packed_scene_alloc = pksc_packed_scene_alloc;
-//    iCluige.iPackedScene.pre_delete_PackedScene = pksc_pre_delete_PackedScene;
+    //iCluige.iPackedScene.pre_delete_PackedScene = pksc_pre_delete_PackedScene;
     iCluige.iPackedScene.new_PackedScene = pksc_new_PackedScene;
     iCluige.iPackedScene.get_packed_node = pksc_get_packed_node;
     iCluige.iPackedScene.packed_scene_from_uid = pksc_packed_scene_from_uid;

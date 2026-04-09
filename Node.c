@@ -111,7 +111,7 @@ static Node* nde_new_Node()
     node->children = NULL;
     node->script = NULL;
     node->name = NULL;
-//    node->active = true;
+    //node->active = true;
     node->process_priority = 0;
 
     StringBuilder sb;
@@ -433,7 +433,7 @@ static char* nde_get_path_mallocing(const Node* ths_node)
 
 
 
-////////// write (iiNode) /////////
+////////// iiNode /////////
 
 
 //private utility

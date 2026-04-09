@@ -341,6 +341,6 @@ int cluige_finish()
 
 	curs_set(1);
 	endwin();
-    return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
 

@@ -288,7 +288,7 @@ static SpriteText* sprtx_new_SpriteText()
 //private util
 static void sprtx__bake_text(SpriteText* this_SpriteText)
 {
-    this_SpriteText->_new_baked.nb_chars =
+	this_SpriteText->_new_baked.nb_chars =
 		strlen(this_SpriteText->_new_baked.text);
 }
 
@@ -318,8 +318,8 @@ static Node* sprtx_instantiate(const SortedDictionary* params)
 
     //offset = Vector2(2.265, -3.2)
     //text = "un autre label
-    //sans param modifié
-    //à part texte et pos"
+    //sans param modifiÃ©
+    //Ã  part texte et pos"
     //utils_vector2_from_parsed(&(res_SpriteText->_new_baked.offset), params, "offset");
     utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.x), params, "offset_left");
     utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.y), params, "offset_top");

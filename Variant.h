@@ -70,3 +70,4 @@ struct iiVariant
 void iiVariant_init();
 
 #endif //VARIANT_H_INCLUDED
+

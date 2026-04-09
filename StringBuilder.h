@@ -52,3 +52,4 @@ struct iiStringBuilder
 void iiStringBuilder_init();
 
 #endif // STRINGBUILDER_H_INCLUDED
+

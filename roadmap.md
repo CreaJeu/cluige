@@ -30,12 +30,13 @@
 - (project.godot parsing : first interesting params, inputs)
 - (re-test windows)
 - (update Readme)
+- (*.c *.h *.md : replace all CRLF with LF, force LF with git)
 - (bugs : see below)
 
 
 **tâches actuelles**
 
-- replace all space-indent with tab-indent + check EOL? + (Node.c +?) ths_Node => this_Node
+- replace all space-indent with tab-indent + (Node.c +?) ths_Node => this_Node
 
 
 **Futures tâches**

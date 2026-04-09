@@ -47,6 +47,7 @@ static void dq_free_all_elems_pointers(Deque* this_Deque)
     }
 }
 
+
 //private utils
 
 static int dq__i_array(const Deque* this_Deque, int i_deque)
@@ -88,6 +89,7 @@ static void dq__grow(Deque* this_Deque)
     this_Deque->_elems = grown;
 }
 
+
 //read
 
 static Variant dq_at(const Deque* this_Deque, int i)
@@ -121,6 +123,7 @@ static bool dq_empty(const Deque* this_Deque)
 {
     return (this_Deque->_nb_elems) == 0;
 }
+
 
 //insertion
 
@@ -436,6 +439,7 @@ static int dq_bsearch(const Deque* this_Deque, ...)
         return -1;
     }
 }
+
 //static int (*find)(const Deque* this_Deque, ...)
 //{
 //

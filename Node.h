@@ -61,7 +61,7 @@ struct _Node
 	void (*enter_tree)(Node* this_node);//called at each tree entering
 	void (*ready)(Node* this_node);//called after enter_tree, but only on the 1st entering ever
 	void (*exit_tree)(Node* this_node);//called just before remove_child logic
-//	void (*on_loop_starting)(Node* this_node);
+	//void (*on_loop_starting)(Node* this_node);
 	void (*erase)(Node* this_node);//abstract (null)
 	void (*process)(Node* this_node);
 	void (*bake)(Node* this_node);//abstract (null)
@@ -154,3 +154,4 @@ void iiNode_init();
 
 
 #endif // NODE_H_INCLUDED
+

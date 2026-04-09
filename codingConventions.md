@@ -29,6 +29,7 @@ comments :
 General :
 -  indentation : tab (no space indent, any remaining space-indents will be fixed in near future) (in Code::Blocks, check the checkbox to force tab-indent)
 -  use but don't abuse of new lines
+-  EOL (end-of-line) format is officially LF. This is enforced by a repository .gitattributes file. Recommandation: in code::blocks editor settings, enable "ensure consistent EOLs" and set "End-of-line mode" to AUTO.
 
 C++ compatibility :
 -  C++ keywords like `new`, `this`, `class`, `delete`, `private`, `public`, `try`, `throw`, `template` are forbidden, to facilitate usage by other projects in C++.

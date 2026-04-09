@@ -1,0 +1,7 @@
+# Force LF (equivalent to core.autocrlf=input behavior) for markdown, C sources/headers
+*.md   text eol=lf
+*.c    text eol=lf
+*.h    text eol=lf
+
+# Prevent any EOL normalization for everything else
+*      -text

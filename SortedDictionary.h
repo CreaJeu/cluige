@@ -12,69 +12,69 @@ typedef struct _SortedDictionary SortedDictionary;
 
 struct _SortedDictionary
 {
-    //private (users should use only functions/methods)
-    Deque _pairs;//Deque< pair* >
-    VariantType _keys_type;
-    VariantType _values_type;
+	//private (users should use only functions/methods)
+	Deque _pairs;//Deque< pair* >
+	VariantType _keys_type;
+	VariantType _values_type;
 };
 
 struct iiSortedDictionary
 {
-    SortedDictionary EMPTY;
+	SortedDictionary EMPTY;
 
-    //constructor/destructor (don't forget to use them)
-    void (*sorted_dictionary_alloc)(SortedDictionary* this_SortedDictionary, VariantType keys_type, VariantType values_type, int capacity);
-    void (*pre_delete_SortedDictionary)(SortedDictionary* this_SortedDictionary);
+	//constructor/destructor (don't forget to use them)
+	void (*sorted_dictionary_alloc)(SortedDictionary* this_SortedDictionary, VariantType keys_type, VariantType values_type, int capacity);
+	void (*pre_delete_SortedDictionary)(SortedDictionary* this_SortedDictionary);
 
-    //helper functions if needed before calling clear() or pre_delete_SortedDictionary()
-    void (*free_all_keys_pointers)(SortedDictionary* this_SortedDictionary);
-    void (*free_all_values_pointers)(SortedDictionary* this_SortedDictionary);
+	//helper functions if needed before calling clear() or pre_delete_SortedDictionary()
+	void (*free_all_keys_pointers)(SortedDictionary* this_SortedDictionary);
+	void (*free_all_values_pointers)(SortedDictionary* this_SortedDictionary);
 
-    void (*set_compare_keys_func)(SortedDictionary* this_SortedDictionary, int (*)(const Deque*, Variant, Variant));
-
-
-    //read
-
-    //result.valid = false if not found
-    Checked_Variant (*get)(const SortedDictionary* this_SortedDictionary, ...);
-
-    //for loops ; returned Variant .ptr is to the Pair at i
-    Pair (*at)(const SortedDictionary* this_SortedDictionary, int i);
-
-    int (*size)(const SortedDictionary* this_SortedDictionary);
-    bool (*is_empty)(const SortedDictionary* this_SortedDictionary);
+	void (*set_compare_keys_func)(SortedDictionary* this_SortedDictionary, int (*)(const Deque*, Variant, Variant));
 
 
-    //insertion
+	//read
 
-    //inserts or automatically replaces if key already present
-    //returns a copy of replaced value (what was its value before replacement),
-    //for example if you need to do some free/delete
-    //result.valid = false if no elem was replaced
-    Checked_Variant (*insert)(SortedDictionary* this_SortedDictionary, ...);
+	//result.valid = false if not found
+	Checked_Variant (*get)(const SortedDictionary* this_SortedDictionary, ...);
 
-    //inserts without any existence check
-    void (*insert_first)(SortedDictionary* this_SortedDictionary, ...);
-    //inserts without any existence check
-    void (*insert_last)(SortedDictionary* this_SortedDictionary, ...);
+	//for loops ; returned Variant .ptr is to the Pair at i
+	Pair (*at)(const SortedDictionary* this_SortedDictionary, int i);
 
-    void (*merge)(SortedDictionary* this_SortedDictionary, const SortedDictionary* other, bool overwrite);
-
-    //deletion
-
-    //no auto free/delete, don't forget to do it yourself, if needed
-    //returns erased key/value (inside a Pair), or
-    // Pair{NULL_VARIANT, NULL_VARIANT} if not found
-    Pair (*erase)(SortedDictionary* this_SortedDictionary, ...);
-
-    //no auto free/delete, don't forget to do it yourself before, if needed
-    void (*clear)(SortedDictionary* this_SortedDictionary);
+	int (*size)(const SortedDictionary* this_SortedDictionary);
+	bool (*is_empty)(const SortedDictionary* this_SortedDictionary);
 
 
-    //search
+	//insertion
 
-    //use get() instead
-    //bool (*has)(const SortedDictionary* this_SortedDictionary, ...);
+	//inserts or automatically replaces if key already present
+	//returns a copy of replaced value (what was its value before replacement),
+	//for example if you need to do some free/delete
+	//result.valid = false if no elem was replaced
+	Checked_Variant (*insert)(SortedDictionary* this_SortedDictionary, ...);
+
+	//inserts without any existence check
+	void (*insert_first)(SortedDictionary* this_SortedDictionary, ...);
+	//inserts without any existence check
+	void (*insert_last)(SortedDictionary* this_SortedDictionary, ...);
+
+	void (*merge)(SortedDictionary* this_SortedDictionary, const SortedDictionary* other, bool overwrite);
+
+	//deletion
+
+	//no auto free/delete, don't forget to do it yourself, if needed
+	//returns erased key/value (inside a Pair), or
+	// Pair{NULL_VARIANT, NULL_VARIANT} if not found
+	Pair (*erase)(SortedDictionary* this_SortedDictionary, ...);
+
+	//no auto free/delete, don't forget to do it yourself before, if needed
+	void (*clear)(SortedDictionary* this_SortedDictionary);
+
+
+	//search
+
+	//use get() instead
+	//bool (*has)(const SortedDictionary* this_SortedDictionary, ...);
 
 
 	//other

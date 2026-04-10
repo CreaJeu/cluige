@@ -10,7 +10,7 @@ typedef struct _ScriptFactory ScriptFactory;
 
 struct _ScriptFactory
 {
-    Script* (*instantiate)(const SortedDictionary* parsed_params);
+	Script* (*instantiate)(const SortedDictionary* parsed_params);
 };
 
 struct _Script

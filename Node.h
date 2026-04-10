@@ -13,7 +13,7 @@ typedef struct _NodeFactory NodeFactory;
 
 struct _NodeFactory
 {
-    Node* (*instantiate)(const SortedDictionary* parsed_params);
+	Node* (*instantiate)(const SortedDictionary* parsed_params);
 };
 
 struct _Node

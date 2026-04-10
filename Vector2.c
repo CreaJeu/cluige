@@ -9,33 +9,33 @@
 
 static void vct2_set(Vector2* v, float x, float y)
 {
-    v->x = x;
-    v->y = y;
+	v->x = x;
+	v->y = y;
 }
 
 static void vct2_add(const Vector2* v1, const Vector2* v2, Vector2 *result)
 {
-    result->x = v1->x + v2->x;
-    result->y = v1->y + v2->y;
+	result->x = v1->x + v2->x;
+	result->y = v1->y + v2->y;
 }
 
 static void vct2_substract(const Vector2* v1, const Vector2* v2, Vector2 *result)
 {
-    result->x = v1->x - v2->x;
-    result->y = v1->y - v2->y;
+	result->x = v1->x - v2->x;
+	result->y = v1->y - v2->y;
 }
 
 static void vct2_k_mul(const Vector2* v, float factor, Vector2 *result)
 {
-    result->x = factor * v->x;
-    result->y = factor * v->y;
+	result->x = factor * v->x;
+	result->y = factor * v->y;
 }
 
 static void vct2_compute_line_equation(const Vector2* v1, const Vector2* v2, float *a, float *b, float *c)
 {
-    *a = v2->y - v1->y;
-    *b = v1->x - v2->x;
-    *c = v2->x * v1->y - v1->x * v2->y;
+	*a = v2->y - v1->y;
+	*b = v1->x - v2->x;
+	*c = v2->x * v1->y - v1->x * v2->y;
 }
 
 static float vct2_length(const Vector2* v)
@@ -81,21 +81,21 @@ static bool vct2_is_normalized(const Vector2* v)
 
 static float vct2_distance_to(const Vector2* v1, const Vector2* v2)
 {
-    float dx = v2->x - v1->x;
-    float dy = v2->y - v1->y;
+	float dx = v2->x - v1->x;
+	float dy = v2->y - v1->y;
 	return sqrtf(dx * dx + dy * dy);
 }
 
 static float vct2_distance_squared_to(const Vector2* v1, const Vector2* v2)
 {
-    float dx = v2->x - v1->x;
-    float dy = v2->y - v1->y;
+	float dx = v2->x - v1->x;
+	float dy = v2->y - v1->y;
 	return dx * dx + dy * dy;
 }
 
 static bool vct2_is_zero_approx(const Vector2* v)
 {
-    return fabs(v->x) < iCluige.EPSILON && fabs(v->y) < iCluige.EPSILON;
+	return fabs(v->x) < iCluige.EPSILON && fabs(v->y) < iCluige.EPSILON;
 }
 
 static bool vct2_is_equal_approx(const Vector2* v1, const Vector2* v2)
@@ -109,27 +109,27 @@ static bool vct2_is_equal_approx(const Vector2* v1, const Vector2* v2)
 
 void iiVector2_init()
 {
-    iCluige.iVector2.set = vct2_set;
-    iCluige.iVector2.add = vct2_add;
-    iCluige.iVector2.substract = vct2_substract;
-    iCluige.iVector2.k_mul = vct2_k_mul;
-    iCluige.iVector2.compute_line_equation = vct2_compute_line_equation;
-    iCluige.iVector2.length = vct2_length;
-    iCluige.iVector2.length_squared = vct2_length_squared;
-    iCluige.iVector2.normalize = vct2_normalize;
-    iCluige.iVector2.normalized = vct2_normalized;
-    iCluige.iVector2.is_normalized = vct2_is_normalized;
-    iCluige.iVector2.distance_to = vct2_distance_to;
-    iCluige.iVector2.distance_squared_to = vct2_distance_squared_to;
-    iCluige.iVector2.is_zero_approx = vct2_is_zero_approx;
-    iCluige.iVector2.is_equal_approx = vct2_is_equal_approx;
+	iCluige.iVector2.set = vct2_set;
+	iCluige.iVector2.add = vct2_add;
+	iCluige.iVector2.substract = vct2_substract;
+	iCluige.iVector2.k_mul = vct2_k_mul;
+	iCluige.iVector2.compute_line_equation = vct2_compute_line_equation;
+	iCluige.iVector2.length = vct2_length;
+	iCluige.iVector2.length_squared = vct2_length_squared;
+	iCluige.iVector2.normalize = vct2_normalize;
+	iCluige.iVector2.normalized = vct2_normalized;
+	iCluige.iVector2.is_normalized = vct2_is_normalized;
+	iCluige.iVector2.distance_to = vct2_distance_to;
+	iCluige.iVector2.distance_squared_to = vct2_distance_squared_to;
+	iCluige.iVector2.is_zero_approx = vct2_is_zero_approx;
+	iCluige.iVector2.is_equal_approx = vct2_is_equal_approx;
 
-    iCluige.iVector2.ZERO = (Vector2){0, 0};
-    iCluige.iVector2.ONE = (Vector2){1, 1};
-    iCluige.iVector2.INF = (Vector2){FLT_MAX, FLT_MAX};
-    iCluige.iVector2.LEFT = (Vector2){-1, 0};
-    iCluige.iVector2.RIGHT = (Vector2){1, 0};
-    iCluige.iVector2.UP = (Vector2){0, -1};
-    iCluige.iVector2.DOWN = (Vector2){0, 1};
+	iCluige.iVector2.ZERO = (Vector2){0, 0};
+	iCluige.iVector2.ONE = (Vector2){1, 1};
+	iCluige.iVector2.INF = (Vector2){FLT_MAX, FLT_MAX};
+	iCluige.iVector2.LEFT = (Vector2){-1, 0};
+	iCluige.iVector2.RIGHT = (Vector2){1, 0};
+	iCluige.iVector2.UP = (Vector2){0, -1};
+	iCluige.iVector2.DOWN = (Vector2){0, 1};
 }
 

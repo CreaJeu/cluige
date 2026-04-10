@@ -38,12 +38,12 @@
 //just a kind of namespace to prevent name collisions
 struct iiCluige
 {
-    struct iiVariant iVariant;
-    struct iiDeque iDeque;
-    struct iiSortedDictionary iSortedDictionary;
-    struct iiFileLineReader iFileLineReader;
+	struct iiVariant iVariant;
+	struct iiDeque iDeque;
+	struct iiSortedDictionary iSortedDictionary;
+	struct iiFileLineReader iFileLineReader;
 	struct iiStringBuilder iStringBuilder;
-    struct iiPackedScene iPackedScene;
+	struct iiPackedScene iPackedScene;
 	struct iiNode iNode;
 	struct iiClock iClock;
 	struct _Clock* clock;
@@ -53,7 +53,7 @@ struct iiCluige
 	struct iiVector2 iVector2;
 	struct iiNode2D iNode2D;
 	struct iiSpriteText iSpriteText;
-    struct iiLineDrawerThin iLineDrawerThin;
+	struct iiLineDrawerThin iLineDrawerThin;
 	struct iiPath2D iPath2D;
 	struct iiSpriteSVG iSpriteSVG;
 	struct iiCamera2D iCamera2D;

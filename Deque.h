@@ -14,91 +14,91 @@ typedef struct _Deque Deque;
 
 struct _BSearchData
 {
-    int _i_min;
-    int _i_max;
-    bool _found;
-    int _found_deque_index;
-    int _found_insert_deque_index;
+	int _i_min;
+	int _i_max;
+	bool _found;
+	int _found_deque_index;
+	int _found_insert_deque_index;
 };
 
 struct _Deque
 {
-    //all private (users should use only functions/methods)
-    int _capacity;
-    int _front_i;
-    int _nb_elems;
-    Variant* _elems;
-    VariantType _elems_type;
-    bool _sorted;
+	//all private (users should use only functions/methods)
+	int _capacity;
+	int _front_i;
+	int _nb_elems;
+	Variant* _elems;
+	VariantType _elems_type;
+	bool _sorted;
 
-    //for custom use, see example in SortedDictionary
-    Variant meta_data;
+	//for custom use, see example in SortedDictionary
+	Variant meta_data;
 
-    int (*_compare_func)(const Deque* this_Deque, Variant va, Variant vb);
-    //for use by custom _compare_func if needed (see example in SortedDictionary)
-    int (*_compare_sub_func)(const Deque* this_Deque, Variant sub_va, Variant sub_vb);
+	int (*_compare_func)(const Deque* this_Deque, Variant va, Variant vb);
+	//for use by custom _compare_func if needed (see example in SortedDictionary)
+	int (*_compare_sub_func)(const Deque* this_Deque, Variant sub_va, Variant sub_vb);
 };
 
 struct iiDeque
 {
-    Deque EMPTY;
+	Deque EMPTY;
 
-    //constructor/destructor (don't forget to use them)
-    void (*deque_alloc)(Deque* this_Deque, VariantType elems_type, int capacity);
-    void (*pre_delete_Deque)(Deque* this_Deque);
+	//constructor/destructor (don't forget to use them)
+	void (*deque_alloc)(Deque* this_Deque, VariantType elems_type, int capacity);
+	void (*pre_delete_Deque)(Deque* this_Deque);
 
-    //helper function if needed before calling clear() or pre_delete_Deque()
-    void (*free_all_elems_pointers)(Deque* this_Deque);
+	//helper function if needed before calling clear() or pre_delete_Deque()
+	void (*free_all_elems_pointers)(Deque* this_Deque);
 
-    //read
+	//read
 
-    //(assert if out of bound)
-    Variant (*at)(const Deque* this_Deque, int i);
-    Variant (*back)(const Deque* this_Deque);
-    Variant (*front)(const Deque* this_Deque);
-    int (*size)(const Deque* this_Deque);
-    bool (*empty)(const Deque* this_Deque);
+	//(assert if out of bound)
+	Variant (*at)(const Deque* this_Deque, int i);
+	Variant (*back)(const Deque* this_Deque);
+	Variant (*front)(const Deque* this_Deque);
+	int (*size)(const Deque* this_Deque);
+	bool (*empty)(const Deque* this_Deque);
 
-    //insertion
+	//insertion
 
-    void (*push_back)(Deque* this_Deque, ...);//variadic for easier use than Variant
-    void (*push_front)(Deque* this_Deque, ...);
-    void (*append)(Deque* this_Deque, ...);//same as push_back()
-    void (*insert)(Deque* this_Deque, int i, ...);
+	void (*push_back)(Deque* this_Deque, ...);//variadic for easier use than Variant
+	void (*push_front)(Deque* this_Deque, ...);
+	void (*append)(Deque* this_Deque, ...);//same as push_back()
+	void (*insert)(Deque* this_Deque, int i, ...);
 
-    //returns a copy of replaced elem (what was its value before replacement)
-    //for example if you need to do some free/delete
-    //result.valid = false if no elem was replaced
-    Checked_Variant (*insert_or_replace_sorted)(Deque* this_Deque, bool replace, ...);
-    //one day? append_array()
+	//returns a copy of replaced elem (what was its value before replacement)
+	//for example if you need to do some free/delete
+	//result.valid = false if no elem was replaced
+	Checked_Variant (*insert_or_replace_sorted)(Deque* this_Deque, bool replace, ...);
+	//one day? append_array()
 
-    //deletion
+	//deletion
 
-    Variant (*pop_back)(Deque* this_Deque);
-    Variant (*pop_front)(Deque* this_Deque);
-    void (*remove)(Deque* this_Deque, int i);
-    void (*clear)(Deque* this_Deque);
-    void (*replace)(Deque* this_Deque, int i, Variant new_v);
-    //TODO one day? shuffle(), slice(iMin, iMax)
+	Variant (*pop_back)(Deque* this_Deque);
+	Variant (*pop_front)(Deque* this_Deque);
+	void (*remove)(Deque* this_Deque, int i);
+	void (*clear)(Deque* this_Deque);
+	void (*replace)(Deque* this_Deque, int i, Variant new_v);
+	//TODO one day? shuffle(), slice(iMin, iMax)
 
-    //search
+	//search
 
-    int (*default_compare_func)(const Deque* this_Deque, Variant va, Variant vb);
-    int (*default_compare_pair_key_func)(const Deque* this_Deque, Variant va, Variant vb);
-    int (*default_compare_sub_pair_key_func)(const Deque* this_Deque, Variant va, Variant vb);
-    int (*default_compare_string_func)(const Deque* this_Deque, Variant va, Variant vb);//for convenience
+	int (*default_compare_func)(const Deque* this_Deque, Variant va, Variant vb);
+	int (*default_compare_pair_key_func)(const Deque* this_Deque, Variant va, Variant vb);
+	int (*default_compare_sub_pair_key_func)(const Deque* this_Deque, Variant va, Variant vb);
+	int (*default_compare_string_func)(const Deque* this_Deque, Variant va, Variant vb);//for convenience
 
-    int (*bsearch)(const Deque* this_Deque, ...);
-    void (*bsearch_rec)(const Deque* this_Deque, Variant searched_elem, struct _BSearchData* bsd);
-//    int (*find)(const Deque* this_Deque, ...);
-//    int (*rsearch)(const Deque* this_Deque, ...);//find last occurence
-//    bool (*has)(const Deque* this_Deque, ...);
-//    //one day? min(), max()
+	int (*bsearch)(const Deque* this_Deque, ...);
+	void (*bsearch_rec)(const Deque* this_Deque, Variant searched_elem, struct _BSearchData* bsd);
+//	int (*find)(const Deque* this_Deque, ...);
+//	int (*rsearch)(const Deque* this_Deque, ...);//find last occurence
+//	bool (*has)(const Deque* this_Deque, ...);
+//	//one day? min(), max()
 
-    //sort
+	//sort
 
-    //TODO void (*sort)(Deque* this_Deque);
-    //TODO void (*sort_custom)(Deque* this_Deque, int (*compare_func)(Variant, Variant));
+	//TODO void (*sort)(Deque* this_Deque);
+	//TODO void (*sort_custom)(Deque* this_Deque, int (*compare_func)(Variant, Variant));
 
 	//only for Deque<char*>
 	//in_out must be previously malloced

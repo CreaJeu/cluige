@@ -9,14 +9,14 @@
 
 static void* clg_checked_malloc(size_t s)//TODO : move to Utils, add a checked_realloc()
 {
-    void* res = malloc(s);
-    if(res == NULL)
-    {
-        printf("\n\n\n    fatal memory alloc error !\n\n\n");
-        CLUIGE_ASSERT(false, "that day has come");//for breakpoint
-        exit(EXIT_FAILURE);
-    }
-    return res;
+	void* res = malloc(s);
+	if(res == NULL)
+	{
+		printf("\n\n\n    fatal memory alloc error !\n\n\n");
+		CLUIGE_ASSERT(false, "that day has come");//for breakpoint
+		exit(EXIT_FAILURE);
+	}
+	return res;
 }
 
 static void clg_set_window_title(const char* new_title)
@@ -66,65 +66,65 @@ struct iiCluige iCluige;
 
 void cluige_init(void (*register_user_scripts)())
 {
-    iCluige.checked_malloc = clg_checked_malloc;
-    iCluige.set_window_title = clg_set_window_title;
-    iCluige.set_resource_path = clg_set_resource_path;
-    iCluige.get_screen_size = clg_get_screen_size;
-    iCluige.wanted_frame_seconds = .0666;//15 fps by default
+	iCluige.checked_malloc = clg_checked_malloc;
+	iCluige.set_window_title = clg_set_window_title;
+	iCluige.set_resource_path = clg_set_resource_path;
+	iCluige.get_screen_size = clg_get_screen_size;
+	iCluige.wanted_frame_seconds = .0666;//15 fps by default
 
 	iCluige.window_initial_size_cols = 110;
 	iCluige.window_initial_size_lines = 50;
-    iCluige.EPSILON = 0.00001;
-    iCluige.quit_asked = false;
+	iCluige.EPSILON = 0.00001;
+	iCluige.quit_asked = false;
 
-    iiVariant_init();
-    iiDeque_init();
-    iiSortedDictionary_init();
-    iiFileLineReader_init();
-    iiStringBuilder_init();
-    iiPackedScene_init();
-    iiNode_init();
-    iCluige._private_root_2D = iCluige.iNode.new_Node();
-    iCluige.iNode.set_name(iCluige._private_root_2D, "private_root_2D");
+	iiVariant_init();
+	iiDeque_init();
+	iiSortedDictionary_init();
+	iiFileLineReader_init();
+	iiStringBuilder_init();
+	iiPackedScene_init();
+	iiNode_init();
+	iCluige._private_root_2D = iCluige.iNode.new_Node();
+	iCluige.iNode.set_name(iCluige._private_root_2D, "private_root_2D");
 
-    iiScript_init();
-    iiVector2_init();
-    iiNode2D_init();
-    iiSpriteText_init();
-    iiLineDrawerThin_init();
-    iiPath2D_init();
-    iiSpriteSVG_init();
+	iiScript_init();
+	iiVector2_init();
+	iiNode2D_init();
+	iiSpriteText_init();
+	iiLineDrawerThin_init();
+	iiPath2D_init();
+	iiSpriteSVG_init();
 
-    iiClock_init();
-    iCluige.clock = iCluige.iClock.new_Clock();
-    iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.clock->_this_Node);
+	iiClock_init();
+	iCluige.clock = iCluige.iClock.new_Clock();
+	iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.clock->_this_Node);
 
-    iiInput_init();
-    iCluige.input = iCluige.iInput.new_Input();
-    iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.input->_this_Node);
+	iiInput_init();
+	iCluige.input = iCluige.iInput.new_Input();
+	iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.input->_this_Node);
 
-    iiCamera2D_init();
-    Camera2D* default_camera = iCluige.iCamera2D.new_Camera2D();
-    iCluige.iNode.set_name(default_camera->_this_Node2D->_this_Node,"default_camera");
-    default_camera->anchor_mode = ANCHOR_MODE_FIXED_TOP_LEFT;
-    iCluige.iNode.add_child(iCluige._private_root_2D, default_camera->_this_Node2D->_this_Node);
-    iCluige.iCamera2D.default_camera = default_camera;
-//    iCluige.iCamera2D.current_camera = default_camera;
+	iiCamera2D_init();
+	Camera2D* default_camera = iCluige.iCamera2D.new_Camera2D();
+	iCluige.iNode.set_name(default_camera->_this_Node2D->_this_Node,"default_camera");
+	default_camera->anchor_mode = ANCHOR_MODE_FIXED_TOP_LEFT;
+	iCluige.iNode.add_child(iCluige._private_root_2D, default_camera->_this_Node2D->_this_Node);
+	iCluige.iCamera2D.default_camera = default_camera;
+//	iCluige.iCamera2D.current_camera = default_camera;
 	iCluige.iCamera2D.make_current(default_camera);
-    //iCluige.iNode.print_tree_pretty(iCluige.private_root_2D);
+	//iCluige.iNode.print_tree_pretty(iCluige.private_root_2D);
 
-    iCluige.public_root_2D = iCluige.iNode.new_Node();
-    iCluige.iNode.set_name(iCluige.public_root_2D, "public_root_2D");
-    iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.public_root_2D);
+	iCluige.public_root_2D = iCluige.iNode.new_Node();
+	iCluige.iNode.set_name(iCluige.public_root_2D, "public_root_2D");
+	iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.public_root_2D);
 
-    iiTscnParser_init();
-    iiProjectDotGodotParser_init();
+	iiTscnParser_init();
+	iiProjectDotGodotParser_init();
 
-    //...
-    //...
+	//...
+	//...
 
-    //...
-    //...
+	//...
+	//...
 	iCluige.window_title = NULL;
 	iCluige.set_window_title("Cluige");
 	iCluige.resource_path = NULL;
@@ -143,11 +143,11 @@ Don't forget to register user scripts in the pointed function.");
 
 enum ProcessPass
 {
-//    STARTING_LOOP_PASS,
-    PROCESS_PASS,
-    BAKE_PASS,
-    ERASE_PASS,
-    DRAW_PASS
+//	STARTING_LOOP_PASS,
+	PROCESS_PASS,
+	BAKE_PASS,
+	ERASE_PASS,
+	DRAW_PASS
 };
 
 static void _do_process_prioritized()
@@ -171,24 +171,24 @@ static void _do_process_prioritized()
 
 static void process_tree(Node* root, enum ProcessPass pass)
 {
-    //recursion mode : DFS
-    switch(pass)
-    {
-//    case STARTING_LOOP_PASS:
-//        if(root->on_loop_starting != NULL)
-//        {
-//            root->on_loop_starting(root);
-//        }
-//        break;
-    case ERASE_PASS:
-        if(root->erase != NULL)
-        {
-            root->erase(root);
-        }
-        break;
-    case PROCESS_PASS:
-        if(root->process != NULL)
-        {
+	//recursion mode : DFS
+	switch(pass)
+	{
+//	case STARTING_LOOP_PASS:
+//		if(root->on_loop_starting != NULL)
+//		{
+//			root->on_loop_starting(root);
+//		}
+//		break;
+	case ERASE_PASS:
+		if(root->erase != NULL)
+		{
+			root->erase(root);
+		}
+		break;
+	case PROCESS_PASS:
+		if(root->process != NULL)
+		{
 			//root->process(root);
 			int64_t p = root->process_priority;
 			SortedDictionary* dico = &(iCluige._prioritized_nodes_to_process);
@@ -206,56 +206,56 @@ static void process_tree(Node* root, enum ProcessPass pass)
 				iCluige.iSortedDictionary.insert(dico, p, nodes_with_prio_p);
 			}
 			iCluige.iDeque.push_back(nodes_with_prio_p, root);
-        }
-        break;
-    case BAKE_PASS:
-        if(root->bake != NULL)
-        {
-            root->bake(root);
-        }
-        break;
-    case DRAW_PASS:
-        if(root->draw != NULL)
-        {
-            root->draw(root);
-        }
-        break;
-    }
+		}
+		break;
+	case BAKE_PASS:
+		if(root->bake != NULL)
+		{
+			root->bake(root);
+		}
+		break;
+	case DRAW_PASS:
+		if(root->draw != NULL)
+		{
+			root->draw(root);
+		}
+		break;
+	}
 
-    if(root->children != NULL)
-    {
-        process_tree(root->children, pass);
-    }
+	if(root->children != NULL)
+	{
+		process_tree(root->children, pass);
+	}
 
-    if(root->next_sibling != NULL)
-    {
-        process_tree(root->next_sibling, pass);
-    }
+	if(root->next_sibling != NULL)
+	{
+		process_tree(root->next_sibling, pass);
+	}
 }
 
 void cluige_run()
 {
-    //curses  //TODO separate from core cluige via 'display server'
-    _cluige_initscr();
-    nodelay(stdscr, true);
-    cbreak();
-    //nl();//?
-    noecho();
-    curs_set(0);
-    timeout(0);// for getch() : 0=blocking 0=return ERR/...
-    keypad(stdscr, true);
+	//curses  //TODO separate from core cluige via 'display server'
+	_cluige_initscr();
+	nodelay(stdscr, true);
+	cbreak();
+	//nl();//?
+	noecho();
+	curs_set(0);
+	timeout(0);// for getch() : 0=blocking 0=return ERR/...
+	keypad(stdscr, true);
 
-//    process_tree(iCluige._private_root_2D, STARTING_LOOP_PASS);
+//	process_tree(iCluige._private_root_2D, STARTING_LOOP_PASS);
 	//in case remove_child() was called before loop
 	iCluige.iDeque.clear(&(iCluige.iNode._just_removed_nodes));
 
-    //game loop
-    while(!(iCluige.quit_asked))
-    {
-    	//BAKE
-        process_tree(iCluige._private_root_2D, BAKE_PASS);
-        int nb_just_removed = iCluige.iDeque.size(&(iCluige.iNode._just_removed_nodes));
-        for(int i=0; i<nb_just_removed; i++)
+	//game loop
+	while(!(iCluige.quit_asked))
+	{
+		//BAKE
+		process_tree(iCluige._private_root_2D, BAKE_PASS);
+		int nb_just_removed = iCluige.iDeque.size(&(iCluige.iNode._just_removed_nodes));
+		for(int i=0; i<nb_just_removed; i++)
 		{
 			Node* n = (Node*)iCluige.iDeque.at(&(iCluige.iNode._just_removed_nodes), i).ptr;
 			if(n->bake != NULL)
@@ -265,8 +265,8 @@ void cluige_run()
 		}
 
 		//ERASE
-        process_tree(iCluige._private_root_2D, ERASE_PASS);
-        for(int i=0; i<nb_just_removed; i++)
+		process_tree(iCluige._private_root_2D, ERASE_PASS);
+		for(int i=0; i<nb_just_removed; i++)
 		{
 			Node* n = (Node*)iCluige.iDeque.at(&(iCluige.iNode._just_removed_nodes), i).ptr;
 			if(n->erase != NULL)
@@ -276,26 +276,26 @@ void cluige_run()
 		}
 
 		//queue_free_early
-        iCluige.iNode._do_all_queue_free_early_step();
+		iCluige.iNode._do_all_queue_free_early_step();
 
-        //curses handling of "screen" resize
+		//curses handling of "screen" resize
 		if(is_termresized())
 		{
 			resize_term(0,0);
 		}
 
-        //DRAW
-        process_tree(iCluige._private_root_2D, DRAW_PASS);
+		//DRAW
+		process_tree(iCluige._private_root_2D, DRAW_PASS);
 
-        //curses refresh
-        refresh();
+		//curses refresh
+		refresh();
 
-        //queue_free_late
-        iCluige.iNode._do_all_queue_free_late_step();
+		//queue_free_late
+		iCluige.iNode._do_all_queue_free_late_step();
 		iCluige.iDeque.clear(&(iCluige.iNode._just_removed_nodes));
 
-        //curses sleep
-        int sleep_frame_milliseconds = 1;
+		//curses sleep
+		int sleep_frame_milliseconds = 1;
 		float pu_delta = iCluige.iClock._precise_unscaled_elapsed_seconds(iCluige.clock, false);
 		// '+.002' to be sure to sleep
 		// '*.972' to prefer small under-sleep than small over-sleep
@@ -310,21 +310,21 @@ void cluige_run()
 //				printf("\t%f\n", iCluige.clock->elapsed_seconds);
 		napms(sleep_frame_milliseconds);//sleep to avoid 100% CPU and approach wanted FPS
 
-        //PROCESS
-        process_tree(iCluige._private_root_2D, PROCESS_PASS);//just computes priorities
-        _do_process_prioritized();//actually processes
-        //while-test about quit_asked is executed just after process
-        // to avoid unnecessary erase, draw, free...
-    }
+		//PROCESS
+		process_tree(iCluige._private_root_2D, PROCESS_PASS);//just computes priorities
+		_do_process_prioritized();//actually processes
+		//while-test about quit_asked is executed just after process
+		// to avoid unnecessary erase, draw, free...
+	}
 }
 
 int cluige_finish()
 {
-    //iCluige.iNode.delete_Node(iCluige.private_root_2D);
-    iCluige._private_root_2D->delete_Node(iCluige._private_root_2D);
-    //close files
-    //free tmp locks
-    //...
+	//iCluige.iNode.delete_Node(iCluige.private_root_2D);
+	iCluige._private_root_2D->delete_Node(iCluige._private_root_2D);
+	//close files
+	//free tmp locks
+	//...
 
 #ifdef CLUIGE_DEBUG
 //in release mode : skip last free() calls because OS will free all app RAM at once

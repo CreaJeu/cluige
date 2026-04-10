@@ -8,7 +8,7 @@
 
 static void scpt_delete_Script(Script* this_Script)
 {
-    free(this_Script);
+	free(this_Script);
 }
 
 
@@ -16,20 +16,20 @@ static void scpt_delete_Script(Script* this_Script)
 
 static Script* scpt_new_Script()
 {
-    Script* this_Script = iCluige.checked_malloc(sizeof(Script));
-    this_Script->node = NULL;
+	Script* this_Script = iCluige.checked_malloc(sizeof(Script));
+	this_Script->node = NULL;
 
-//    StringBuilder sb;
-//    this_Script->_class_name = iCluige.iStringBuilder.string_alloc(&sb, 6);
-//    iCluige.iStringBuilder.append(&sb, "Script");
-    this_Script->_sub_class = NULL;
+//	StringBuilder sb;
+//	this_Script->_class_name = iCluige.iStringBuilder.string_alloc(&sb, 6);
+//	iCluige.iStringBuilder.append(&sb, "Script");
+	this_Script->_sub_class = NULL;
 
-    this_Script->delete_Script = scpt_delete_Script;
-    this_Script->enter_tree = NULL;
-    this_Script->ready = NULL;
-    this_Script->exit_tree = NULL;
-    this_Script->process = NULL;
-    return this_Script;
+	this_Script->delete_Script = scpt_delete_Script;
+	this_Script->enter_tree = NULL;
+	this_Script->ready = NULL;
+	this_Script->exit_tree = NULL;
+	this_Script->process = NULL;
+	return this_Script;
 }
 
 //path : absolute from res:// (excluding res://),
@@ -116,17 +116,17 @@ static Script* scpt_instantiate_from_factories_no_ext(const char* script_file_pa
 
 void iiScript_init()
 {
-    iCluige.iScript.new_Script = scpt_new_Script;
+	iCluige.iScript.new_Script = scpt_new_Script;
 
-    SortedDictionary* fcties = &(iCluige.iScript.script_factories);
-    iCluige.iSortedDictionary.sorted_dictionary_alloc(
+	SortedDictionary* fcties = &(iCluige.iScript.script_factories);
+	iCluige.iSortedDictionary.sorted_dictionary_alloc(
 		fcties, VT_POINTER, VT_POINTER, 20);
-    iCluige.iSortedDictionary.set_compare_keys_func(
+	iCluige.iSortedDictionary.set_compare_keys_func(
 		fcties, iCluige.iDeque.default_compare_string_func);
 
-    iCluige.iScript.register_ScriptFactory_with_ext = scpt_register_ScriptFactory_with_ext;
-    iCluige.iScript.register_ScriptFactory_no_ext = scpt_register_ScriptFactory_no_ext;
-    iCluige.iScript.instantiate_from_factories_with_ext = scpt_instantiate_from_factories_with_ext;
-    iCluige.iScript.instantiate_from_factories_no_ext = scpt_instantiate_from_factories_no_ext;
+	iCluige.iScript.register_ScriptFactory_with_ext = scpt_register_ScriptFactory_with_ext;
+	iCluige.iScript.register_ScriptFactory_no_ext = scpt_register_ScriptFactory_no_ext;
+	iCluige.iScript.instantiate_from_factories_with_ext = scpt_instantiate_from_factories_with_ext;
+	iCluige.iScript.instantiate_from_factories_no_ext = scpt_instantiate_from_factories_no_ext;
 }
 

@@ -7,10 +7,10 @@
 
 struct _SVGParser
 {
-    //bool file_finished;
+	//bool file_finished;
 
-    //Deque<float> [x y x y x y x y x y...]
-    Deque coordinates_sequence;
+	//Deque<float> [x y x y x y x y x y...]
+	Deque coordinates_sequence;
 
 	//from
 	//  <svg width="30cm" height="30cm" ...>
@@ -19,9 +19,9 @@ struct _SVGParser
 	float height;
 	float width;
 
-    //TODO
-    //bool _visible;
-    //color, thickness...
+	//TODO
+	//bool _visible;
+	//color, thickness...
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
@@ -32,8 +32,8 @@ struct iiSVGParser
 
 	bool (*prepare_parsing)(struct _SVGParser* this_SVGParser, char* file_path);
 	bool (*parse_svg_tag)(struct _SVGParser* this_SVGParser);
-    bool (*parse_path)(struct _SVGParser* this_SVGParser);
-    void (*end_parsing)(struct _SVGParser* this_SVGParser);
+	bool (*parse_path)(struct _SVGParser* this_SVGParser);
+	void (*end_parsing)(struct _SVGParser* this_SVGParser);
 };
 //iSVGParser : in iiSpriteSVG
 

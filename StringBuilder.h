@@ -5,18 +5,18 @@ typedef struct _StringBuilder StringBuilder;
 
 struct _StringBuilder
 {
-    char* built_string;
-    size_t remaining_size;
+	char* built_string;
+	size_t remaining_size;
 	char* next_char;
 };
 
 //~namespace
 struct iiStringBuilder
 {
-    int DECIMAL_DIGITS_FOR_INT;
-    int DECIMAL_DIGITS_FOR_POINTER;
+	int DECIMAL_DIGITS_FOR_INT;
+	int DECIMAL_DIGITS_FOR_POINTER;
 
-    //char* string_alloc(StringBuilder* sb, size_t max_size)
+	//char* string_alloc(StringBuilder* sb, size_t max_size)
 	char* (*string_alloc)(StringBuilder* sb, size_t max_size);
 
 	//void connect_existing_string(StringBuilder* sb, char* dest, int capacity)

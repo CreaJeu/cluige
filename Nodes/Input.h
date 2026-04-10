@@ -11,30 +11,30 @@
 
 struct _InputAction
 {
-    char* name;
-    int nb_pressed;
-//    bool just_pressed;//tmp lists instead
-//    bool just_released;
+	char* name;
+	int nb_pressed;
+//	bool just_pressed;//tmp lists instead
+//	bool just_released;
 };
 
 struct _InputKey
 {
-    int unicode_char;
-    bool pressed;
-//    bool just_pressed;//tmp lists instead
-//    bool just_released;
-    Deque bound_actions;//Deque<int32_t>
+	int unicode_char;
+	bool pressed;
+//	bool just_pressed;//tmp lists instead
+//	bool just_released;
+	Deque bound_actions;//Deque<int32_t>
 };
 
 struct _Input
 {
-    Deque available_actions;//Deque<InputAction>
-    Deque bound_keys;//Deque<InputKey> //sorted
+	Deque available_actions;//Deque<InputAction>
+	Deque bound_keys;//Deque<InputKey> //sorted
 
-    Deque just_pressed_actions;//Deque<int32_t>
-    Deque just_released_actions;//Deque<int32_t>
-    Deque just_pressed_keys;//Deque<InputKey>
-    Deque just_released_keys;//Deque<InputKey>
+	Deque just_pressed_actions;//Deque<int32_t>
+	Deque just_released_actions;//Deque<int32_t>
+	Deque just_pressed_keys;//Deque<InputKey>
+	Deque just_released_keys;//Deque<InputKey>
 
 	//private
 	Node* _this_Node;
@@ -55,7 +55,7 @@ struct iiInput
 //	struct _InputAction* (*new_Action)(const char* name);
 //	struct _InputKey* (*newKey)(int charVal);
 
-    //action_name will be copied, can be freed afterward or stack allocated
+	//action_name will be copied, can be freed afterward or stack allocated
 	int (*add_action)(const char* action_name);
 
 	int (*action_id_from_name)(const char* action_name, bool assert_exists);

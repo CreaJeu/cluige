@@ -18,28 +18,28 @@ static void pksc_packed_scene_alloc(PackedScene* this_PackedScene)
 	this_PackedScene->uid = NULL;
 	this_PackedScene->tscn_format = NULL;
 
-    SortedDictionary* dico_node = &(this_PackedScene->dico_node);
-    iCluige.iSortedDictionary.sorted_dictionary_alloc(dico_node, VT_POINTER, VT_POINTER, 7);
-    iCluige.iSortedDictionary.set_compare_keys_func(dico_node, iCluige.iDeque.default_compare_string_func);
+	SortedDictionary* dico_node = &(this_PackedScene->dico_node);
+	iCluige.iSortedDictionary.sorted_dictionary_alloc(dico_node, VT_POINTER, VT_POINTER, 7);
+	iCluige.iSortedDictionary.set_compare_keys_func(dico_node, iCluige.iDeque.default_compare_string_func);
 
-    //not used! see TscnParser
-//    SortedDictionary* dico_svg_paths = &(this_PackedScene->dico_svg_paths);
-//    iCluige.iSortedDictionary.sorted_dictionary_alloc(dico_svg_paths, VT_POINTER, VT_POINTER, 7);
-//    iCluige.iSortedDictionary.set_compare_keys_func(dico_svg_paths, iCluige.iDeque.default_compare_string_func);
+	//not used! see TscnParser
+//	SortedDictionary* dico_svg_paths = &(this_PackedScene->dico_svg_paths);
+//	iCluige.iSortedDictionary.sorted_dictionary_alloc(dico_svg_paths, VT_POINTER, VT_POINTER, 7);
+//	iCluige.iSortedDictionary.set_compare_keys_func(dico_svg_paths, iCluige.iDeque.default_compare_string_func);
 
-    //later : signals
+	//later : signals
 
-    Deque* children = &(this_PackedScene->children);
-    iCluige.iDeque.deque_alloc(children, VT_POINTER, 2);
-    this_PackedScene->type = NULL;
-    this_PackedScene->instance_path = NULL;
+	Deque* children = &(this_PackedScene->children);
+	iCluige.iDeque.deque_alloc(children, VT_POINTER, 2);
+	this_PackedScene->type = NULL;
+	this_PackedScene->instance_path = NULL;
 }
 
 static PackedScene* pksc_new_PackedScene()
 {
-    PackedScene* new_PackedScene = iCluige.checked_malloc(sizeof(PackedScene));
-    pksc_packed_scene_alloc(new_PackedScene);
-    return new_PackedScene;
+	PackedScene* new_PackedScene = iCluige.checked_malloc(sizeof(PackedScene));
+	pksc_packed_scene_alloc(new_PackedScene);
+	return new_PackedScene;
 }
 
 //maybe one day, think carefully, remove from dico? are pointed strings used elsewhere? ...
@@ -48,15 +48,15 @@ static PackedScene* pksc_new_PackedScene()
 //	free(this_PackedScene->instance_res);
 //	// really not name, type, parent, uid, tscn_format???
 //
-//    SortedDictionary* dico_node = &(this_PackedScene->dico_node);
-//    iCluige.iSortedDictionary.free_all_keys_pointers(dico_node);
-//    iCluige.iSortedDictionary.free_all_values_pointers(dico_node);
-//    iCluige.iSortedDictionary.pre_delete_SortedDictionary(dico_node);
-//    // ? script
-//    //later : signals
-//    Deque* children = &(this_PackedScene->children);
-//    iCluige.iDeque.free_all_elems_pointers(children);//TODO whaaat??
-//    iCluige.iDeque.pre_delete_Deque(children);
+//	SortedDictionary* dico_node = &(this_PackedScene->dico_node);
+//	iCluige.iSortedDictionary.free_all_keys_pointers(dico_node);
+//	iCluige.iSortedDictionary.free_all_values_pointers(dico_node);
+//	iCluige.iSortedDictionary.pre_delete_SortedDictionary(dico_node);
+//	// ? script
+//	//later : signals
+//	Deque* children = &(this_PackedScene->children);
+//	iCluige.iDeque.free_all_elems_pointers(children);//TODO whaaat??
+//	iCluige.iDeque.pre_delete_Deque(children);
 //}
 
 static PackedScene* pksc_get_packed_node(PackedScene* root, const char* path)
@@ -307,15 +307,15 @@ static char* pksc_debug_recrusive(const PackedScene* root, Deque* strings)
 
 void iiPackedScene_init()
 {
-    iCluige.iPackedScene.packed_scene_alloc = pksc_packed_scene_alloc;
-    //iCluige.iPackedScene.pre_delete_PackedScene = pksc_pre_delete_PackedScene;
-    iCluige.iPackedScene.new_PackedScene = pksc_new_PackedScene;
-    iCluige.iPackedScene.get_packed_node = pksc_get_packed_node;
-    iCluige.iPackedScene.packed_scene_from_uid = pksc_packed_scene_from_uid;
-    iCluige.iPackedScene.instantiate = pksc_instantiate;
-    iCluige.iPackedScene.prepare_ext_instantiate = pksc_prepare_ext_instantiate;
-    iCluige.iPackedScene.debug = pksc_debug;
-    iCluige.iPackedScene.debug_recrusive = pksc_debug_recrusive;
+	iCluige.iPackedScene.packed_scene_alloc = pksc_packed_scene_alloc;
+	//iCluige.iPackedScene.pre_delete_PackedScene = pksc_pre_delete_PackedScene;
+	iCluige.iPackedScene.new_PackedScene = pksc_new_PackedScene;
+	iCluige.iPackedScene.get_packed_node = pksc_get_packed_node;
+	iCluige.iPackedScene.packed_scene_from_uid = pksc_packed_scene_from_uid;
+	iCluige.iPackedScene.instantiate = pksc_instantiate;
+	iCluige.iPackedScene.prepare_ext_instantiate = pksc_prepare_ext_instantiate;
+	iCluige.iPackedScene.debug = pksc_debug;
+	iCluige.iPackedScene.debug_recrusive = pksc_debug_recrusive;
 
 	SortedDictionary* dico = &(iCluige.iPackedScene.dico_path_to_packed);
 	iCluige.iSortedDictionary.sorted_dictionary_alloc(dico, VT_POINTER, VT_POINTER, 7);

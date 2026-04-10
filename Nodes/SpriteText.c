@@ -12,22 +12,22 @@
 
 static void sprtx_delete_SpriteText(Node* this_Node)
 {
-    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
-    SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
-    //tmp memorize function pointer before calling free(this)
-    void (*delete_super)(Node*) = this_SpriteText->_delete_super;
-    free(this_SpriteText->_old_baked.text);
-    free(this_SpriteText->_new_baked.text);
-    CLUIGE_ASSERT(this_SpriteText->_sub_class == NULL, "SpriteText::delete_SpriteText() : not null subclass found");
-    free(this_SpriteText);
-    this_Node2D->_sub_class = NULL;
-    delete_super(this_Node);
+	Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+	SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
+	//tmp memorize function pointer before calling free(this)
+	void (*delete_super)(Node*) = this_SpriteText->_delete_super;
+	free(this_SpriteText->_old_baked.text);
+	free(this_SpriteText->_new_baked.text);
+	CLUIGE_ASSERT(this_SpriteText->_sub_class == NULL, "SpriteText::delete_SpriteText() : not null subclass found");
+	free(this_SpriteText);
+	this_Node2D->_sub_class = NULL;
+	delete_super(this_Node);
 }
 
 //static void sprtx_enter_tree_SpriteText(Node* this_Node)
 //{
-//    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
-//    SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
+//	Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+//	SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
 //	CLUIGE_ASSERT(
 //		this_SpriteText->_allocated_text_length >= 0,
 //		"SpriteText::enter_tree() : text must be given before entering tree");
@@ -36,41 +36,41 @@ static void sprtx_delete_SpriteText(Node* this_Node)
 
 static void sprtx_erase(Node* this_Node)
 {
-    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
-    SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
+	Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+	SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
 
-    bool must_erase = this_Node2D->_old_baked.visible;//was visible last time
-    must_erase = must_erase &&
-        (
-            this_Node2D->_position_changed ||
-            iCluige.iCamera2D._old_baked.state_changed ||
-            (!(this_Node2D->visible)) ||
-            this_SpriteText->_text_changed ||
-            this_Node->_marked_for_queue_free
-        );
-    if(!must_erase)
-    {
-//        this_SpriteText->_erase_super(this_Node);//NULL
-        return;
-    }
+	bool must_erase = this_Node2D->_old_baked.visible;//was visible last time
+	must_erase = must_erase &&
+		(
+			this_Node2D->_position_changed ||
+			iCluige.iCamera2D._old_baked.state_changed ||
+			(!(this_Node2D->visible)) ||
+			this_SpriteText->_text_changed ||
+			this_Node->_marked_for_queue_free
+		);
+	if(!must_erase)
+	{
+//		this_SpriteText->_erase_super(this_Node);//NULL
+		return;
+	}
 
-    //clear old one
-    Vector2 orig;
-    iCluige.iVector2.add(
-            &(this_Node2D->_old_baked.tmp_global_position),
-            &(this_SpriteText->_old_baked.offset),
-            &orig);
-    int flat_i = 0;
+	//clear old one
+	Vector2 orig;
+	iCluige.iVector2.add(
+			&(this_Node2D->_old_baked.tmp_global_position),
+			&(this_SpriteText->_old_baked.offset),
+			&orig);
+	int flat_i = 0;
 
-    float x_camera = iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position.x;
-    float y_camera = iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position.y;
-    float res_x;
-    float res_y;
-    float res_zoom_x;
-    float res_zoom_y;
-    Vector2 zoom = iCluige.iCamera2D._old_baked.zoom;
+	float x_camera = iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position.x;
+	float y_camera = iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position.y;
+	float res_x;
+	float res_y;
+	float res_zoom_x;
+	float res_zoom_y;
+	Vector2 zoom = iCluige.iCamera2D._old_baked.zoom;
 
-    int line = 0;
+	int line = 0;
 	int col = 0;
 
 	while(flat_i < this_SpriteText->_old_baked.nb_chars)
@@ -125,8 +125,8 @@ static void sprtx_erase(Node* this_Node)
 		flat_i++;
 	}
 
-    //call super()
-//    this_SpriteText->_erase_super(this_Node);//NULL
+	//call super()
+//	this_SpriteText->_erase_super(this_Node);//NULL
 	this_SpriteText->_old_baked.offset = this_SpriteText->_new_baked.offset;
 	if(this_SpriteText->_text_changed)
 	{
@@ -147,38 +147,38 @@ static void sprtx_erase(Node* this_Node)
 
 static void sprtx_draw(Node* this_Node)
 {
-    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
-    SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
+	Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+	SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
 	this_SpriteText->_draw_super(this_Node);
-    //call super()
-//    this_SpriteText->_post_process_super(this_Node);//no, just pre_draw in Node2D, not overridden here
+	//call super()
+//	this_SpriteText->_post_process_super(this_Node);//no, just pre_draw in Node2D, not overridden here
 
-    if(!(this_Node2D->visible))
-    {
-        return;
-    }
+	if(!(this_Node2D->visible))
+	{
+		return;
+	}
 
-    //clear old one (unless immobile? => no, because other masking things
-    //could have moved and made this sprite visible again;
-    //and curses already has characters cache)
-    Vector2 orig;
-    iCluige.iVector2.add(
-            &(this_Node2D->_new_baked.tmp_global_position),
-            &(this_SpriteText->_new_baked.offset),
-            &orig);
-    int flat_i = 0;
-    Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-    CLUIGE_ASSERT(current_camera != NULL, "SpriteText::draw() : current_camera is null");
+	//clear old one (unless immobile? => no, because other masking things
+	//could have moved and made this sprite visible again;
+	//and curses already has characters cache)
+	Vector2 orig;
+	iCluige.iVector2.add(
+			&(this_Node2D->_new_baked.tmp_global_position),
+			&(this_SpriteText->_new_baked.offset),
+			&orig);
+	int flat_i = 0;
+	Camera2D* current_camera = iCluige.iCamera2D.current_camera;
+	CLUIGE_ASSERT(current_camera != NULL, "SpriteText::draw() : current_camera is null");
 
-    float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
-    float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
-    float res_x;
-    float res_y;
-    float res_zoom_x;
-    float res_zoom_y;
-    Vector2 zoom = current_camera->zoom;
+	float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
+	float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+	float res_x;
+	float res_y;
+	float res_zoom_x;
+	float res_zoom_y;
+	Vector2 zoom = current_camera->zoom;
 
-    int line = 0;
+	int line = 0;
 	int col = 0;
 
 	while(flat_i < this_SpriteText->_new_baked.nb_chars)
@@ -240,13 +240,13 @@ static void sprtx_draw(Node* this_Node)
 static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
 {
 	Node* new_Node = new_Node2D->_this_Node;
-    SpriteText* new_SpriteText = iCluige.checked_malloc(sizeof(SpriteText));
+	SpriteText* new_SpriteText = iCluige.checked_malloc(sizeof(SpriteText));
 
-    new_SpriteText->_new_baked.offset = (Vector2) { 0., 0. };
-    new_SpriteText->_new_baked.text = NULL;//the ASCII art / unicode art
-    new_SpriteText->_new_baked.allocated_text_length = -1;
-    new_SpriteText->_new_baked.nb_chars = 0;
-    new_SpriteText->_old_baked = new_SpriteText->_new_baked;
+	new_SpriteText->_new_baked.offset = (Vector2) { 0., 0. };
+	new_SpriteText->_new_baked.text = NULL;//the ASCII art / unicode art
+	new_SpriteText->_new_baked.allocated_text_length = -1;
+	new_SpriteText->_new_baked.nb_chars = 0;
+	new_SpriteText->_old_baked = new_SpriteText->_new_baked;
 	new_SpriteText->_this_Node2D = new_Node2D;
 	new_SpriteText->_sub_class = NULL;
 	new_SpriteText->_text_changed = true;
@@ -261,22 +261,22 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
 //	new_SpriteText->_erase_super = new_Node->erase;//NULL
 //	new_SpriteText->_post_process_super = new_Node->post_process;
 
-    new_Node2D->_sub_class = new_SpriteText;
+	new_Node2D->_sub_class = new_SpriteText;
 
-    free(new_Node->_class_name); //TODO static value to avoid free
-    StringBuilder sb;
-    new_Node->_class_name = iCluige.iStringBuilder.string_alloc(
-            &sb, 1 + strlen("NodeNode2DSpriteText"));
-    iCluige.iStringBuilder.append(&sb, "NodeNode2DSpriteText");
-    new_Node2D->_sub_class = new_SpriteText;
+	free(new_Node->_class_name); //TODO static value to avoid free
+	StringBuilder sb;
+	new_Node->_class_name = iCluige.iStringBuilder.string_alloc(
+			&sb, 1 + strlen("NodeNode2DSpriteText"));
+	iCluige.iStringBuilder.append(&sb, "NodeNode2DSpriteText");
+	new_Node2D->_sub_class = new_SpriteText;
 
-    new_Node->delete_Node = sprtx_delete_SpriteText;
-//    new_Node->enter_tree = sprtx_enter_tree_SpriteText;
-    new_Node->erase = sprtx_erase;
-    new_SpriteText->_draw_super = new_Node->draw;
-    new_Node->draw = sprtx_draw;
+	new_Node->delete_Node = sprtx_delete_SpriteText;
+//	new_Node->enter_tree = sprtx_enter_tree_SpriteText;
+	new_Node->erase = sprtx_erase;
+	new_SpriteText->_draw_super = new_Node->draw;
+	new_Node->draw = sprtx_draw;
 
-    return new_SpriteText;
+	return new_SpriteText;
 }
 
 static SpriteText* sprtx_new_SpriteText()
@@ -305,41 +305,41 @@ static void sprtx_set_text(SpriteText* this_SpriteText, const char* new_text)
 		this_SpriteText->_new_baked.allocated_text_length = new_total_length;
 	}
 	strcpy(this_SpriteText->_new_baked.text, new_text);
-    sprtx__bake_text(this_SpriteText);
-    this_SpriteText->_text_changed = true;
+	sprtx__bake_text(this_SpriteText);
+	this_SpriteText->_text_changed = true;
 }
 
 static Node* sprtx_instantiate(const SortedDictionary* params)
 {
-    //mother class
-    Node* res_node = iCluige.iNode2D._Node2D_factory.instantiate(params);
-    Node2D* res_node2D = (Node2D*)(res_node->_sub_class);
-    SpriteText* res_SpriteText = sprtx_new_SpriteText_from_Node2D(res_node2D);
+	//mother class
+	Node* res_node = iCluige.iNode2D._Node2D_factory.instantiate(params);
+	Node2D* res_node2D = (Node2D*)(res_node->_sub_class);
+	SpriteText* res_SpriteText = sprtx_new_SpriteText_from_Node2D(res_node2D);
 
-    //offset = Vector2(2.265, -3.2)
-    //text = "un autre label
-    //sans param modifié
-    //à part texte et pos"
-    //utils_vector2_from_parsed(&(res_SpriteText->_new_baked.offset), params, "offset");
-    utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.x), params, "offset_left");
-    utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.y), params, "offset_top");
-    CLUIGE_ASSERT(res_SpriteText->_new_baked.text == NULL, "SpriteText::instantiate() : trying to instantiate() into non empty object");
-    utils_str_from_parsed(&(res_SpriteText->_new_baked.text), params, "text");
-    CLUIGE_ASSERT(res_SpriteText->_new_baked.text != NULL, "SpriteText::instantiate() : text not instantiated, missing 'text' field?");
-    res_SpriteText->_new_baked.allocated_text_length = strlen(res_SpriteText->_new_baked.text);
-    sprtx__bake_text(res_SpriteText);
-    return res_node;
+	//offset = Vector2(2.265, -3.2)
+	//text = "un autre label
+	//sans param modifié
+	//à part texte et pos"
+	//utils_vector2_from_parsed(&(res_SpriteText->_new_baked.offset), params, "offset");
+	utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.x), params, "offset_left");
+	utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.y), params, "offset_top");
+	CLUIGE_ASSERT(res_SpriteText->_new_baked.text == NULL, "SpriteText::instantiate() : trying to instantiate() into non empty object");
+	utils_str_from_parsed(&(res_SpriteText->_new_baked.text), params, "text");
+	CLUIGE_ASSERT(res_SpriteText->_new_baked.text != NULL, "SpriteText::instantiate() : text not instantiated, missing 'text' field?");
+	res_SpriteText->_new_baked.allocated_text_length = strlen(res_SpriteText->_new_baked.text);
+	sprtx__bake_text(res_SpriteText);
+	return res_node;
 }
 
 /////////////////////////////////// global //////////
 
 void iiSpriteText_init()
 {
-    iCluige.iSpriteText.new_SpriteText = sprtx_new_SpriteText;
-    iCluige.iSpriteText.new_SpriteText_from_Node2D = sprtx_new_SpriteText_from_Node2D;
-    iCluige.iSpriteText.set_text = sprtx_set_text;
+	iCluige.iSpriteText.new_SpriteText = sprtx_new_SpriteText;
+	iCluige.iSpriteText.new_SpriteText_from_Node2D = sprtx_new_SpriteText_from_Node2D;
+	iCluige.iSpriteText.set_text = sprtx_set_text;
 
-    iCluige.iSpriteText._SpriteText_factory.instantiate = sprtx_instantiate;
-    iCluige.iNode.register_NodeFactory("Label", &(iCluige.iSpriteText._SpriteText_factory));
+	iCluige.iSpriteText._SpriteText_factory.instantiate = sprtx_instantiate;
+	iCluige.iNode.register_NodeFactory("Label", &(iCluige.iSpriteText._SpriteText_factory));
 }
 

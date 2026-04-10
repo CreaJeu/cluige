@@ -7,10 +7,10 @@ typedef struct _Path2D Path2D;
 
 struct _Path2D
 {
-    Deque _points;//Deque<Vector2*>
-    bool _visible;
+	Deque _points;//Deque<Vector2*>
+	bool _visible;
 
-    //TODO color, thick/thin
+	//TODO color, thick/thin
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)
@@ -27,7 +27,7 @@ struct iiPath2D
 	void (*pre_delete_Path2D)(Path2D* this_Path2D);
 
 	Vector2* (*at)(const Path2D* this_Path2D, int i);
-    int (*size)(const Path2D* this_Path2D);
+	int (*size)(const Path2D* this_Path2D);
 };
 //iPath2D : in iiCluige
 

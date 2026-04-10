@@ -5,34 +5,34 @@ typedef struct _Vector2 Vector2;
 
 struct _Vector2
 {
-    float x;
-    float y;
+	float x;
+	float y;
 };
 
 struct iiVector2
 {
-    Vector2 ZERO;
-    Vector2 ONE;
-    Vector2 INF;
-    Vector2 LEFT;
-    Vector2 RIGHT;
-    Vector2 UP;
-    Vector2 DOWN;
+	Vector2 ZERO;
+	Vector2 ONE;
+	Vector2 INF;
+	Vector2 LEFT;
+	Vector2 RIGHT;
+	Vector2 UP;
+	Vector2 DOWN;
 
-    void (*set)(Vector2* v, float x, float y);
-    void (*add)(const Vector2* v1, const Vector2* v2, Vector2 *result);
-    void (*substract)(const Vector2* v1, const Vector2* v2, Vector2 *res);
-    void (*k_mul)(const Vector2* v, float factor, Vector2 *res);
-    void (*compute_line_equation)(const Vector2* v1, const Vector2* v2, float *a, float *b, float *c);
-    float (*length)(const Vector2* v);
-    float (*length_squared)(const Vector2* v);
-    void (*normalize)(Vector2* v);
-    void (*normalized)(const Vector2* this_, Vector2 *res);
-    bool (*is_normalized)(const Vector2* v);
-    float (*distance_to)(const Vector2* v1, const Vector2* v2);
-    float (*distance_squared_to)(const Vector2* v1, const Vector2* v2);
-    bool (*is_zero_approx)(const Vector2* v);
-    bool (*is_equal_approx)(const Vector2* v1, const Vector2* v2);
+	void (*set)(Vector2* v, float x, float y);
+	void (*add)(const Vector2* v1, const Vector2* v2, Vector2 *result);
+	void (*substract)(const Vector2* v1, const Vector2* v2, Vector2 *res);
+	void (*k_mul)(const Vector2* v, float factor, Vector2 *res);
+	void (*compute_line_equation)(const Vector2* v1, const Vector2* v2, float *a, float *b, float *c);
+	float (*length)(const Vector2* v);
+	float (*length_squared)(const Vector2* v);
+	void (*normalize)(Vector2* v);
+	void (*normalized)(const Vector2* this_, Vector2 *res);
+	bool (*is_normalized)(const Vector2* v);
+	float (*distance_to)(const Vector2* v1, const Vector2* v2);
+	float (*distance_squared_to)(const Vector2* v1, const Vector2* v2);
+	bool (*is_zero_approx)(const Vector2* v);
+	bool (*is_equal_approx)(const Vector2* v1, const Vector2* v2);
 
 };
 

@@ -27,7 +27,7 @@ comments :
 -  put comments above concerned lines rather than below (trick to remember : think usual .h). Short comments at the end of short lines is acceptable.
 
 General :
--  indentation : tab (no space indent, any remaining space-indents will be fixed in near future) (in Code::Blocks, check the checkbox to force tab-indent)
+-  indentation : tab (no space indent, all previous space-indents are now fixed, any new one must be fixed immediately) (in Code::Blocks, check the checkbox to force tab-indent, also always show whitespaces)
 -  use but don't abuse of new lines
 -  EOL (end-of-line) format is officially LF. This is enforced by a repository .gitattributes file. Recommandation: in code::blocks editor settings, enable "ensure consistent EOLs" and set "End-of-line mode" to AUTO.
 

@@ -200,7 +200,7 @@ static bool pdgp__value(ProjectDotGodotParser* this_ProjectDotGodotParser)
 		this_ProjectDotGodotParser->_current_line_i++;
 		return true;
 	}
-	utils_breakpoint_trick(NULL, true);//why gone here?
+	CLUIGE_BREAKPOINT(NULL, true);//why gone here?
 	return false;
 }
 
@@ -563,7 +563,8 @@ static void pdgp_pre_delete_ProjectDotGodotParser(ProjectDotGodotParser* this_Pr
 	iCluige.iFileLineReader.pre_delete_FileLineReader(fr);
 
 	SortedDictionary* dico = &(this_ProjectDotGodotParser->_dico_params);
-	for(int i=0; i < iCluige.iSortedDictionary.size(dico); i++)
+	int n = iCluige.iSortedDictionary.size(dico);
+	for(int i=0; i < n; i++)
 	{
 		Pair p = iCluige.iSortedDictionary.at(dico, i);
 		free( (char*)(p.first.ptr) );
@@ -572,7 +573,8 @@ static void pdgp_pre_delete_ProjectDotGodotParser(ProjectDotGodotParser* this_Pr
 	iCluige.iSortedDictionary.pre_delete_SortedDictionary(dico);
 
 	SortedDictionary* dic_in = &(this_ProjectDotGodotParser->_dico_inputs);
-	for(int i=0; i < iCluige.iSortedDictionary.size(dic_in); i++)
+	n = iCluige.iSortedDictionary.size(dic_in);
+	for(int i=0; i < n; i++)
 	{
 		Pair p = iCluige.iSortedDictionary.at(dic_in, i);
 		free( (char*)(p.first.ptr) );

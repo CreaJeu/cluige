@@ -13,6 +13,12 @@
 	#define CLUIGE_ASSERT(right, ...)
 #endif // CLUIGE_DEBUG
 
+#ifdef CLUIGE_DEBUG
+	#define CLUIGE_BREAKPOINT(anything, break) utils_breakpoint_trick((anything), (break))
+#else
+	#define CLUIGE_BREAKPOINT(anything, break)
+#endif // CLUIGE_DEBUG
+
 typedef struct _SortedDictionary SortedDictionary;
 typedef struct _Vector2 Vector2;
 

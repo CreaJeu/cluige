@@ -175,17 +175,17 @@ static int nde_get_depth(const Node* node)
 //negative values can also be used to start from the end of the list
 //(-1 meaning last)
 //or returns NULL if out of those bounds
-static Node* nde_get_child(const Node* ths_node, int i)
+static Node* nde_get_child(const Node* this_node, int i)
 {
-	CLUIGE_ASSERT(ths_node != NULL, "Node::get_child(i) : calling object is null");
-	CLUIGE_ASSERT(-(iCluige.iNode.get_child_count(ths_node)) < i && i < iCluige.iNode.get_child_count(ths_node),
+	CLUIGE_ASSERT(this_node != NULL, "Node::get_child(i) : calling object is null");
+	CLUIGE_ASSERT(-(iCluige.iNode.get_child_count(this_node)) < i && i < iCluige.iNode.get_child_count(this_node),
 				"Node::get_child(i) : i is out of bound (even if negative for reverse order)");
 	int nb_steps = i;
 	if(i < 0)//reverse order
 	{
-		nb_steps = iCluige.iNode.get_child_count(ths_node) + i;
+		nb_steps = iCluige.iNode.get_child_count(this_node) + i;
 	}
-	Node* next_sib = ths_node->children;
+	Node* next_sib = this_node->children;
 	int curr_step = 0;
 //	while(next_sib != NULL && curr_step != nb_steps)
 //	{
@@ -201,11 +201,11 @@ static Node* nde_get_child(const Node* ths_node, int i)
 	return next_sib;
 }
 
-static int nde_get_child_count(const Node* ths_node)
+static int nde_get_child_count(const Node* this_node)
 {
-	CLUIGE_ASSERT(ths_node != NULL, "Node::get_child_count() : calling object is null");
+	CLUIGE_ASSERT(this_node != NULL, "Node::get_child_count() : calling object is null");
 	int count = 0;
-	Node* next_sib = ths_node->children;
+	Node* next_sib = this_node->children;
 	while(next_sib != NULL)
 	{
 		count++;
@@ -217,9 +217,9 @@ static int nde_get_child_count(const Node* ths_node)
 //private util
 //returns a Node among next siblings (including this) having given name
 //or NULL if none found
-static Node* nde__on_level(Node* ths_node, const char* name)
+static Node* nde__on_level(Node* this_node, const char* name)
 {
-	Node* next_sib = ths_node;
+	Node* next_sib = this_node;
 	while(next_sib != NULL)
 	{
 		if(strcmp(next_sib->name, name) == 0)
@@ -232,7 +232,7 @@ static Node* nde__on_level(Node* ths_node, const char* name)
 }
 
 //private util
-static Node* nde__get_node_rec(Node* ths_node, const char* node_path, bool absolute )//Not completed
+static Node* nde__get_node_rec(Node* this_node, const char* node_path, bool absolute )//Not completed
 {
 	CLUIGE_ASSERT(node_path != NULL, "Node::get_node_rec() : node_path is null");
 	int i =0;
@@ -246,7 +246,7 @@ static Node* nde__get_node_rec(Node* ths_node, const char* node_path, bool absol
 		//for  "." case
 		if(strcmp(".",element) == 0)
 		{
-			return ths_node;
+			return this_node;
 		}
 
 		//for ".."
@@ -254,22 +254,22 @@ static Node* nde__get_node_rec(Node* ths_node, const char* node_path, bool absol
 		{
 			if(i>=size)
 			{
-				return ths_node->parent;
+				return this_node->parent;
 			}
 			else
 			{
-				return nde__get_node_rec(ths_node->parent,i + node_path,absolute);
+				return nde__get_node_rec(this_node->parent,i + node_path,absolute);
 			}
 		}
 
 
 		if(absolute)
 		{
-			tmp = nde__on_level(ths_node,element);
+			tmp = nde__on_level(this_node,element);
 		}
 		else
 		{
-			tmp = nde__on_level(ths_node->children,element);
+			tmp = nde__on_level(this_node->children,element);
 		}
 
 
@@ -293,7 +293,7 @@ static Node* nde__get_node_rec(Node* ths_node, const char* node_path, bool absol
 	}
 }
 
-static Node* nde_get_node(Node* ths_node,const char* node_path )//Not completed
+static Node* nde_get_node(Node* this_node,const char* node_path )//Not completed
 {
 	CLUIGE_ASSERT(node_path != NULL, "Node::get_node() : node_path is null");
 	bool absolute = node_path[0] == '/';
@@ -307,50 +307,50 @@ static Node* nde_get_node(Node* ths_node,const char* node_path )//Not completed
 	}
 	else
 	{
-		next_child = ths_node;
+		next_child = this_node;
 	}
 	return nde__get_node_rec(next_child,node_path + ab,absolute);
 }
 
 //evaluates if a node is the parent (or grandparent etc..) of current node
-static bool nde_is_ancestor_of(Node* ths_node, Node* potential_ancestor)
+static bool nde_is_ancestor_of(Node* this_node, Node* potential_ancestor)
 {
-	CLUIGE_ASSERT(ths_node != NULL, "Node::is_ancestor_of() : calling object is null");
+	CLUIGE_ASSERT(this_node != NULL, "Node::is_ancestor_of() : calling object is null");
 	CLUIGE_ASSERT(potential_ancestor != NULL, "Node::is_ancestor_of() : potential_ancestor is null");
-	if(ths_node == potential_ancestor)
+	if(this_node == potential_ancestor)
 	{
 		return true;
 	}
-	else if (ths_node->parent == NULL)
+	else if (this_node->parent == NULL)
 	{
 		return false;
 	}
 	else
 	{
-		return nde_is_ancestor_of(ths_node->parent,potential_ancestor);
+		return nde_is_ancestor_of(this_node->parent,potential_ancestor);
 	}
 }
 
 //returns true if given node is higher in hierarchy than current node
 //also true if pther_node is just a higher son of the same parent node
 //TODO : if used critically one day, check if exact same behavior than Godot
-static bool nde_is_higher_than(Node* ths_node, Node* other_node)
+static bool nde_is_higher_than(Node* this_node, Node* other_node)
 {
-	if(ths_node == other_node)// same nodes
+	if(this_node == other_node)// same nodes
 	{
 		return false;
 	}
-	int depth_ths_node = nde_get_depth(ths_node);
+	int depth_this_node = nde_get_depth(this_node);
 	int depth_other_node = nde_get_depth(other_node);
-	if(depth_ths_node < depth_other_node)
+	if(depth_this_node < depth_other_node)
 	{
 		return true;
 	}
-	else if (depth_ths_node == depth_other_node && ths_node->parent == other_node->parent)
+	else if (depth_this_node == depth_other_node && this_node->parent == other_node->parent)
 	{
 		while(other_node != NULL)
 		{
-			if(other_node->next_sibling == ths_node)
+			if(other_node->next_sibling == this_node)
 			{
 				return true;
 			}
@@ -365,46 +365,46 @@ static bool nde_is_higher_than(Node* ths_node, Node* other_node)
 }
 
 //private util
-static int nde__path_char_length(const Node* ths_node)
+static int nde__path_char_length(const Node* this_node)
 {
-	if(ths_node != iCluige.public_root_2D)
+	if(this_node != iCluige.public_root_2D)
 	{
-		return strlen(ths_node->name) + nde__path_char_length(ths_node->parent) + 1;
+		return strlen(this_node->name) + nde__path_char_length(this_node->parent) + 1;
 	}
 	else
 	{
-		return strlen(ths_node->name);
+		return strlen(this_node->name);
 	}
 }
 
 //private util
-static void nde__rec_get_path(const Node* ths_node, char* res, int remaining_path_size)
+static void nde__rec_get_path(const Node* this_node, char* res, int remaining_path_size)
 {
-	if(ths_node == iCluige.public_root_2D)
+	if(this_node == iCluige.public_root_2D)
 	{
-		strncpy(res,"/public_root_2D",strlen(ths_node->name));
+		strncpy(res,"/public_root_2D",strlen(this_node->name));
 	}
 	else
 	{
-		int this_name_length = strlen(ths_node->name);
+		int this_name_length = strlen(this_node->name);
 		char* write_here = res + remaining_path_size - this_name_length - 1;
 
 		write_here[0] = '/';
 		write_here++;
 
-		strncpy(write_here,ths_node->name,this_name_length);
+		strncpy(write_here,this_node->name,this_name_length);
 
-		nde__rec_get_path(ths_node->parent,res,remaining_path_size - this_name_length - 1);
+		nde__rec_get_path(this_node->parent,res,remaining_path_size - this_name_length - 1);
 	}
 }
 
-static char* nde_get_path_mallocing(const Node* ths_node)
+static char* nde_get_path_mallocing(const Node* this_node)
 {
-	CLUIGE_ASSERT(ths_node != NULL, "Node::get_path_mallocing() : calling object is null");
-	int max = nde__path_char_length(ths_node);
+	CLUIGE_ASSERT(this_node != NULL, "Node::get_path_mallocing() : calling object is null");
+	int max = nde__path_char_length(this_node);
 	char* res = iCluige.checked_malloc((max + 1) * sizeof(char));
 
-	nde__rec_get_path(ths_node,res,max);
+	nde__rec_get_path(this_node,res,max);
 	res[max] = '\0';
 	return res;
 }
@@ -430,11 +430,6 @@ static char* nde_get_path_mallocing(const Node* ths_node)
 		nde_print_tree_pretty(node->next_sibling);
 	}
 }
-
-
-
-////////// iiNode /////////
-
 
 //private utility
 //true if name is valid (contains none of : / " % @ : .) else false
@@ -558,12 +553,12 @@ static void nde_add_child(Node* parent, Node* child)
 	}
 }
 
-static void nde_remove_child( Node* ths_node, Node* child)
+static void nde_remove_child( Node* this_node, Node* child)
 {
-	CLUIGE_ASSERT(ths_node != NULL, "Node::remove_child() : calling object is null ");
+	CLUIGE_ASSERT(this_node != NULL, "Node::remove_child() : calling object is null ");
 	CLUIGE_ASSERT(child != NULL, "Node::remove_child() : asked child is null");
-	CLUIGE_ASSERT(child->parent == ths_node, "Node::remove_child() : child->parent != ths_node");
-	if(iCluige.iNode.is_ancestor_of(ths_node, iCluige._private_root_2D))
+	CLUIGE_ASSERT(child->parent == this_node, "Node::remove_child() : child->parent != this_node");
+	if(iCluige.iNode.is_ancestor_of(this_node, iCluige._private_root_2D))
 	{
 		nde__branch_exit_tree(child);
 	}
@@ -571,11 +566,11 @@ static void nde_remove_child( Node* ths_node, Node* child)
 
 	if(pos == 0 )
 	{
-		ths_node->children = child->next_sibling;
+		this_node->children = child->next_sibling;
 	}
 	else
 	{
-		Node* node_to_mod = iCluige.iNode.get_child(ths_node, pos-1);
+		Node* node_to_mod = iCluige.iNode.get_child(this_node, pos-1);
 		node_to_mod->next_sibling = child->next_sibling;
 	}
 	child->next_sibling = NULL;//remove the link between the child and the rest
@@ -691,7 +686,7 @@ static void nde_set_script(Node* this_node, Script* s)
 	}
 }
 
-/////////////////////////////////// Node //////////
+/////////////////////////////////// iNode //////////
 
 void iiNode_init()
 {

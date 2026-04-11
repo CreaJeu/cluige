@@ -287,7 +287,7 @@ static bool svp__parse_tag_attributes(struct _SVGParser* this_SVGParser)
 			int nbc = sscanf(buffer_tag, "=\"%f%8[^\"]s", &h, buffer_unit);
 			if(nbc < 1)
 			{
-				utils_breakpoint_trick("can't read height", true);
+				CLUIGE_BREAKPOINT("can't read height", true);
 				return false;
 			}
 			this_SVGParser->height = svp__scale_by_unit(buffer_unit, h);
@@ -300,7 +300,7 @@ static bool svp__parse_tag_attributes(struct _SVGParser* this_SVGParser)
 			int nbc = sscanf(buffer_tag, "=\"%f%8[^\"]s", &w, buffer_unit);
 			if(nbc < 1)
 			{
-				utils_breakpoint_trick("can't read width", true);
+				CLUIGE_BREAKPOINT("can't read width", true);
 				return false;
 			}
 			this_SVGParser->width = svp__scale_by_unit(buffer_unit, w);
@@ -344,7 +344,7 @@ static bool svp_parse_svg_tag(struct _SVGParser* this_SVGParser)
 			bool ok = svp__parse_tag_attributes(this_SVGParser);
 			if(!ok)
 			{
-				utils_breakpoint_trick("VGParser::_svp_parse_svg_tag() incorrect <svg> attributes", true);
+				CLUIGE_BREAKPOINT("VGParser::_svp_parse_svg_tag() incorrect <svg> attributes", true);
 				return false;
 			}
 			else

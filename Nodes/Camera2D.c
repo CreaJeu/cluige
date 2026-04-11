@@ -191,11 +191,11 @@ static void c2d_bake(Node* this_Node)
 	cam->global_tmp_cos_rotation = cosf(cam->rotation_radians);
 	cam->global_tmp_sin_rotation = sinf(cam->rotation_radians);
 
-	//TODO gné?
-	iCluige.iCamera2D._screen_width = iCluige.iCamera2D._screen_width * (1/cam->zoom.x);
-	iCluige.iCamera2D._screen_height = iCluige.iCamera2D._screen_height * (1/cam->zoom.y);
-	iCluige.iCamera2D._screen_anchor_center_x = iCluige.iCamera2D._screen_width/2;
-	iCluige.iCamera2D._screen_anchor_center_y = iCluige.iCamera2D._screen_height/2;
+	Vector2 screen_size_vec = iCluige.get_screen_size();
+	float screen_width = screen_size_vec.x * (1/cam->zoom.x);
+	float screen_height = screen_size_vec.y * (1/cam->zoom.y);
+	iCluige.iCamera2D._screen_anchor_center_x = screen_width / 2;
+	iCluige.iCamera2D._screen_anchor_center_y = screen_height / 2;
 
 	//updates values
 	if(cam->anchor_mode == ANCHOR_MODE_FIXED_TOP_LEFT)
@@ -400,11 +400,6 @@ static Node* c2d_instantiate(const SortedDictionary* params)
 
 void iiCamera2D_init()
 {
-	iCluige.iCamera2D._screen_height = 100.0;
-	iCluige.iCamera2D._screen_width = 200.0;
-	iCluige.iCamera2D._screen_anchor_center_x = iCluige.iCamera2D._screen_width / 2;
-	iCluige.iCamera2D._screen_anchor_center_y = iCluige.iCamera2D._screen_height / 2;
-
 	iCluige.iCamera2D.new_Camera2D = c2d_new_Camera2D;
 	iCluige.iCamera2D.get_zoom = c2d_get_zoom;
 	iCluige.iCamera2D.set_zoom = c2d_set_zoom;

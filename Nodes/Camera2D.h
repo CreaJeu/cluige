@@ -110,11 +110,8 @@ struct iiCamera2D
 	//private method
 	//void (*_predraw)(Node* this_node);//now virtual
 
-	//temporary TODO
-	float _screen_height;
 	float _screen_anchor_center_y;
 	float _screen_anchor_center_x;
-	float _screen_width;
 
 
 	Vector2 (*get_zoom)(const Camera2D* c2d);

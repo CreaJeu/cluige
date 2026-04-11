@@ -27,10 +27,14 @@ struct _ProjectDotGodotParser //"mother class", Godot 4 by default
 	Deque* _current_input_action_triggers;
 	SortedDictionary _dico_inputs;
 
+//	//for inheritance, later
+//	char* _class_name;
+//	void* _sub_class;
+
 	//public
 	bool (*run)(ProjectDotGodotParser* this_ProjectDotGodotParser);
 
-	//private
+	//private/protected
 	bool (*_parse_whole)(ProjectDotGodotParser* this_ProjectDotGodotParser);
 	bool (*_comment)(ProjectDotGodotParser* this_ProjectDotGodotParser);
 	bool (*_section)(ProjectDotGodotParser* this_ProjectDotGodotParser);

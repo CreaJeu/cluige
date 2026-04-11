@@ -31,29 +31,25 @@
 - (re-test windows)
 - (update Readme)
 - (*.c *.h *.md : replace all CRLF with LF, force LF with git)
+- (replace all space-indent with tab-indent + Node.c ths_Node => this_Node)
+- (macro CLUIGE_BREAKPOINT() => utils_breakpoint_trick())
+- (hunt every for...; i < iCluige.iDeque.size... )
 - (bugs : see below)
 
 
 **tâches actuelles**
 
-- replace all space-indent with tab-indent + (Node.c +?) ths_Node => this_Node
 
 
 **Futures tâches**
 
-- checked_malloc() : separate sizeof(...) as another arg (to help never forget)
-- macro CLUIGE_BREAKPOINT() => utils_breakpoint_trick()
-- hunt every
-	for(...; i < iCluige.iDeque.size( ...
-	printf()
-	todo
-- fatal error => end loop + printf
-- sprite svg (no anim) : file parsing fix discontinued paths
+- node2D (et autre?) : meilleur test instanceof / class_name static par classe
+- **sprite svg (no anim) : file parsing fix discontinued paths**
 - sprite svg : choose rastering algo from thickness
 - sprite svg : optim big segments out of screen (cf. futurs chantiers)
-- more-like-godot-todos
+- **more-like-godot-todos**
     - wanted_frame_seconds rename as wanted_seconds_per_frame or like godot
-    - refactor utils to iCluige.iGlobals, match contents whith godot Globals, move check_malloc() in there
+    - refactor utils to iCluige.iGlobals, match contents whith godot Globals, move check_malloc() in there ( + separate sizeof(...) as another arg to help never forget)
     - godotify move_local(vec2) : move_local_x/y(dx/dy) + translate(Vec2) + global_translate(Vec2)
     - rename SpriteText to Label ?
     - rename Path2D to SvgPath2D (confusion with godot Node2D subclass Path2D)
@@ -62,7 +58,10 @@
 - Deque::sort()
 - custom app icon
 - reallocate in Deque::grow()
-- node2D (et autre?) : meilleur test instanceof / class_name static par classe
+- hunt every
+	printf()
+	todo
+- fatal error => end loop + printf
 - add types in Variant (in union, VariantType, from_val(), compare()...) : char*, Pair*
 
 

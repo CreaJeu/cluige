@@ -372,7 +372,7 @@ static void ssvg_parse_file(SpriteSVG* this_SpriteSVG, char* file_path)
 	bool ok = iCluige.iSpriteSVG.iSVGParser.parse_svg_tag(&_svg_parser);
 	if(!ok)
 	{
-		utils_breakpoint_trick("SpriteSVG::parse_file() incorrect <svg> attributes", true);
+		CLUIGE_BREAKPOINT("SpriteSVG::parse_file() incorrect <svg> attributes", true);
 	}
 	this_SpriteSVG->size_svg.x = _svg_parser.width;
 	this_SpriteSVG->size_svg.y = _svg_parser.height;
@@ -408,7 +408,7 @@ static Node* ssvg_instantiate(const SortedDictionary* params)
 	//'texture'=>'path/to/file.svg' see TscnParser::node()
 	bool ok = utils_nonquoted_str_from_parsed(&svg_file_path, params, "svg_file_path");
 //	char* dbg = iCluige.iSortedDictionary.debug_str_str(params);
-//	utils_breakpoint_trick(dbg, !ok);
+//	CLUIGE_BREAKPOINT(dbg, !ok);
 	CLUIGE_ASSERT(ok, "SpriteSVG::instantiate() : missing 'texture' field");
 	ssvg_parse_file(res_SpriteSVG, svg_file_path);
 	//free(svg_file_path);no need with utils_nonquoted_str_from_parsed()

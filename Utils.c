@@ -224,7 +224,7 @@ void _cluige_assert(bool right, const char* msg, ...)
 		vprintf(msg, args);// TODO see utils_cluige_printf() in .h
 		va_end(args);
 		printf("\n");
-		utils_breakpoint_trick(msg, true);
+		CLUIGE_BREAKPOINT(msg, true);
 		assert(right);
 	}
 	//memo to 'replace all' with regex in code::blocks :

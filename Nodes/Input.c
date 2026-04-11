@@ -13,7 +13,8 @@ static void inp_delete_Input(Node* this_Node)
 	//tmp memorize function pointer before calling free(this)
 	void (*delete_super)(Node*) = this_Input->_delete_super;
 
-	for(int i=0; i < iCluige.iDeque.size(&(this_Input->available_actions)); i++)
+	int n = iCluige.iDeque.size(&(this_Input->available_actions));
+	for(int i=0; i < n; i++)
 	{
 		Variant v = iCluige.iDeque.at(&(this_Input->available_actions), i);
 		struct _InputAction* va = (struct _InputAction*)(v.ptr);
@@ -22,7 +23,8 @@ static void inp_delete_Input(Node* this_Node)
 	}
 	iCluige.iDeque.pre_delete_Deque(&(this_Input->available_actions));
 
-	for(int i=0; i < iCluige.iDeque.size(&(this_Input->bound_keys)); i++)
+	n = iCluige.iDeque.size(&(this_Input->bound_keys));
+	for(int i=0; i < n; i++)
 	{
 		Variant v = iCluige.iDeque.at(&(this_Input->bound_keys), i);
 		struct _InputKey* k = (struct _InputKey*)(v.ptr);
@@ -67,7 +69,8 @@ static int inp__compare_InputKey_func(const Deque* this_Deque, Variant va, Varia
 //}
 static int inp__find_action(const Deque* action_ids, int32_t id_action)
 {
-	for(int i=0; i < iCluige.iDeque.size(action_ids); i++)
+	int n = iCluige.iDeque.size(action_ids);
+	for(int i=0; i < n; i++)
 	{
 		int32_t candidate = iCluige.iDeque.at(action_ids, i).i32;
 		if(candidate == id_action)
@@ -98,7 +101,8 @@ static void inp_process(Node* this_Node)
 			struct _InputKey* key = iCluige.iDeque.at(&(this_Input->bound_keys), bound_key_index).ptr;
 //			if(!(key->pressed))
 //			{
-				for(int i=0; i < iCluige.iDeque.size(&(key->bound_actions)); i++)
+				int n = iCluige.iDeque.size(&(key->bound_actions));
+				for(int i=0; i < n; i++)
 				{
 					int32_t action_id = iCluige.iDeque.at(&(key->bound_actions), i).i32;
 					struct _InputAction* action = iCluige.iDeque.at(
@@ -255,7 +259,7 @@ static void inp_un_bind_key_one_action(int action_id, int key_char_val)
 			return;
 		}
 	}
-	utils_breakpoint_trick("Input::un_bind_key_one_action() : action_id not found", true);
+	CLUIGE_BREAKPOINT("Input::un_bind_key_one_action() : action_id not found", true);
 }
 
 //also removes key from bound_keys

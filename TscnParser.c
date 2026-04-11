@@ -201,7 +201,7 @@ static bool tsnp_value(TscnParser* this_TscnParser)
 		this_TscnParser->_current_line++;
 		return true;
 	}
-	utils_breakpoint_trick(NULL, true);//why gone here?
+	CLUIGE_BREAKPOINT(NULL, true);//why gone here?
 	return false;
 }
 
@@ -439,7 +439,7 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 				free(keeped_val);
 				keeped_val = file_path;
 				//char* dbg = iCluige.iSortedDictionary.debug_str_str(dic);
-				//utils_breakpoint_trick(dbg, true);
+				//CLUIGE_BREAKPOINT(dbg, true);
 			}
 			free(svg_id);
 		}
@@ -471,7 +471,7 @@ static bool tsnp_node(TscnParser* this_TscnParser)
 				free(keeped_val);//'ExtResource("2_efpur")\0'
 				keeped_val = file_path_no_ext;
 				//char* dbg = iCluige.iSortedDictionary.debug_str_str(dic);
-				//utils_breakpoint_trick(dbg, true);
+				//CLUIGE_BREAKPOINT(dbg, true);
 			}
 			free(script_id);
 		}
@@ -565,7 +565,7 @@ static bool tsnp_ext_res(TscnParser* this_TscnParser)
 //		{
 			SortedDictionary* dico = &(this_TscnParser->_dico_id_to_path);
 			Checked_Variant cv = iCluige.iSortedDictionary.insert(dico, keeped_key, keeped_val);
-			utils_breakpoint_trick(dico, cv.valid);//key/val overwriten
+			CLUIGE_BREAKPOINT(dico, cv.valid);//key/val overwriten
 //		}
 //		else
 //		{
@@ -615,7 +615,7 @@ static bool tsnp_parse_scene(TscnParser* this_TscnParser)
 		}
 		more_node = this_TscnParser->node(this_TscnParser);
 //		PackedScene* ps = this_TscnParser->_current_packed_scene;//dbg
-//		utils_breakpoint_trick(ps, false);
+//		CLUIGE_BREAKPOINT(ps, false);
 		if(more_node)
 		{
 			iCluige.iFileLineReader.forget_lines_before(fr, this_TscnParser->_current_line);

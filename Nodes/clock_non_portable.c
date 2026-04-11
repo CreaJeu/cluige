@@ -26,7 +26,7 @@ float clk__precise_unscaled_elapsed_seconds(struct _Clock* this_Clock, bool memo
 	}
 	else if (delta_sec < 0 && delta_nsec > 0)
 	{
-		utils_breakpoint_trick("why delta_sec < 0 ?", true);
+		CLUIGE_BREAKPOINT("why delta_sec < 0 ?", true);
 		delta_nsec -= 1000000000;
 		delta_sec++;
 	}
@@ -61,7 +61,7 @@ float clk__precise_unscaled_elapsed_seconds(struct _Clock* this_Clock, bool memo
 	if(res < 0)
 	{
 		//arbitrary value to provoque a short sleep in main loop
-		utils_breakpoint_trick("clock() wrap around", true);
+		CLUIGE_BREAKPOINT("clock() wrap around", true);
 		res = iCluige.wanted_frame_seconds * .9;
 	}
 	if(memorize)

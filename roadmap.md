@@ -103,6 +103,7 @@
 - other Node2D subclasses? see https://docs.godotengine.org/en/stable/classes/class_node2d.html e.g. Line2D, Marker2D, Polygon2D
 - add draw() function in scripts like in godot?
 - mods : design how to integrate them as easy as possible
+- resource (like parsed SVG) : reference/sharing like in godot + "Local to the scene" param
 
 
 

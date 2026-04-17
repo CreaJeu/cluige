@@ -34,6 +34,7 @@
 #include "Nodes/Camera2D.h"
 #include "TscnParser.h"
 #include "ProjectDotGodotParser.h"
+#include "Rect2.h"
 
 //just a kind of namespace to prevent name collisions
 struct iiCluige
@@ -59,6 +60,7 @@ struct iiCluige
 	struct iiCamera2D iCamera2D;
 	struct iiTscnParser iTscnParser;
 	struct iiProjectDotGodotParser iProjectDotGodotParser;
+	struct iiRect2 iRect2;
 
 	//for target FPS, 15 fps by default
 	float wanted_frame_seconds;//TODO rename wanted_seconds_per_frame

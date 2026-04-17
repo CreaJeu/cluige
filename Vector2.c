@@ -93,6 +93,20 @@ static float vct2_distance_squared_to(const Vector2* v1, const Vector2* v2)
 	return dx * dx + dy * dy;
 }
 
+static Vector2 vct2_min(const Vector2* v1, const Vector2* v2)
+{
+	return (Vector2){
+			fminf(v1->x, v2->x),
+			fminf(v1->y, v2->y)};
+}
+
+static Vector2 vct2_max(const Vector2* v1, const Vector2* v2)
+{
+	return (Vector2){
+			fmaxf(v1->x, v2->x),
+			fmaxf(v1->y, v2->y)};
+}
+
 static bool vct2_is_zero_approx(const Vector2* v)
 {
 	return fabs(v->x) < iCluige.EPSILON && fabs(v->y) < iCluige.EPSILON;
@@ -121,6 +135,8 @@ void iiVector2_init()
 	iCluige.iVector2.is_normalized = vct2_is_normalized;
 	iCluige.iVector2.distance_to = vct2_distance_to;
 	iCluige.iVector2.distance_squared_to = vct2_distance_squared_to;
+	iCluige.iVector2.min = vct2_min;
+	iCluige.iVector2.max = vct2_max;
 	iCluige.iVector2.is_zero_approx = vct2_is_zero_approx;
 	iCluige.iVector2.is_equal_approx = vct2_is_equal_approx;
 

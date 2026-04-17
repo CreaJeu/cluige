@@ -120,6 +120,8 @@ void cluige_init(void (*register_user_scripts)())
 	iiTscnParser_init();
 	iiProjectDotGodotParser_init();
 
+	iiRect2_init();
+
 	//...
 	//...
 

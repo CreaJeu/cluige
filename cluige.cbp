@@ -244,6 +244,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="ProjectDotGodotParser.h" />
+		<Unit filename="Rect2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Rect2.h" />
 		<Unit filename="SVGParser.c">
 			<Option compilerVar="CC" />
 		</Unit>

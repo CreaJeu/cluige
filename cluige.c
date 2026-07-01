@@ -84,8 +84,8 @@ void cluige_init(void (*register_user_scripts)())
 	iiStringBuilder_init();
 	iiPackedScene_init();
 	iiNode_init();
-	iCluige._private_root_2D = iCluige.iNode.new_Node();
-	iCluige.iNode.set_name(iCluige._private_root_2D, "private_root_2D");
+	iCluige._private_root = iCluige.iNode.new_Node();
+	iCluige.iNode.set_name(iCluige._private_root, "private_root");
 
 	iiScript_init();
 	iiVector2_init();
@@ -97,25 +97,25 @@ void cluige_init(void (*register_user_scripts)())
 
 	iiClock_init();
 	iCluige.clock = iCluige.iClock.new_Clock();
-	iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.clock->_this_Node);
+	iCluige.iNode.add_child(iCluige._private_root, iCluige.clock->_this_Node);
 
 	iiInput_init();
 	iCluige.input = iCluige.iInput.new_Input();
-	iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.input->_this_Node);
+	iCluige.iNode.add_child(iCluige._private_root, iCluige.input->_this_Node);
 
 	iiCamera2D_init();
 	Camera2D* default_camera = iCluige.iCamera2D.new_Camera2D();
 	iCluige.iNode.set_name(default_camera->_this_Node2D->_this_Node,"default_camera");
 	default_camera->anchor_mode = ANCHOR_MODE_FIXED_TOP_LEFT;
-	iCluige.iNode.add_child(iCluige._private_root_2D, default_camera->_this_Node2D->_this_Node);
+	iCluige.iNode.add_child(iCluige._private_root, default_camera->_this_Node2D->_this_Node);
 	iCluige.iCamera2D.default_camera = default_camera;
 //	iCluige.iCamera2D.current_camera = default_camera;
 	iCluige.iCamera2D.make_current(default_camera);
 	//iCluige.iNode.print_tree_pretty(iCluige.private_root_2D);
 
-	iCluige.public_root_2D = iCluige.iNode.new_Node();
-	iCluige.iNode.set_name(iCluige.public_root_2D, "public_root_2D");
-	iCluige.iNode.add_child(iCluige._private_root_2D, iCluige.public_root_2D);
+	iCluige.public_root = iCluige.iNode.new_Node();
+	iCluige.iNode.set_name(iCluige.public_root, "root");
+	iCluige.iNode.add_child(iCluige._private_root, iCluige.public_root);
 
 	iiTscnParser_init();
 	iiProjectDotGodotParser_init();
@@ -255,7 +255,7 @@ void cluige_run()
 	while(!(iCluige.quit_asked))
 	{
 		//BAKE
-		process_tree(iCluige._private_root_2D, BAKE_PASS);
+		process_tree(iCluige._private_root, BAKE_PASS);
 		int nb_just_removed = iCluige.iDeque.size(&(iCluige.iNode._just_removed_nodes));
 		for(int i=0; i<nb_just_removed; i++)
 		{
@@ -267,7 +267,7 @@ void cluige_run()
 		}
 
 		//ERASE
-		process_tree(iCluige._private_root_2D, ERASE_PASS);
+		process_tree(iCluige._private_root, ERASE_PASS);
 		for(int i=0; i<nb_just_removed; i++)
 		{
 			Node* n = (Node*)iCluige.iDeque.at(&(iCluige.iNode._just_removed_nodes), i).ptr;
@@ -287,7 +287,7 @@ void cluige_run()
 		}
 
 		//DRAW
-		process_tree(iCluige._private_root_2D, DRAW_PASS);
+		process_tree(iCluige._private_root, DRAW_PASS);
 
 		//curses refresh
 		refresh();
@@ -313,7 +313,7 @@ void cluige_run()
 		napms(sleep_frame_milliseconds);//sleep to avoid 100% CPU and approach wanted FPS
 
 		//PROCESS
-		process_tree(iCluige._private_root_2D, PROCESS_PASS);//just computes priorities
+		process_tree(iCluige._private_root, PROCESS_PASS);//just computes priorities
 		_do_process_prioritized();//actually processes
 		//while-test about quit_asked is executed just after process
 		// to avoid unnecessary erase, draw, free...
@@ -323,7 +323,7 @@ void cluige_run()
 int cluige_finish()
 {
 	//iCluige.iNode.delete_Node(iCluige.private_root_2D);
-	iCluige._private_root_2D->delete_Node(iCluige._private_root_2D);
+	iCluige._private_root->delete_Node(iCluige._private_root);
 	//close files
 	//free tmp locks
 	//...

@@ -109,7 +109,9 @@ struct iiNode
 	//          test1/child_test1/
 	//          test1/child_test1
 	//          ../sibling3
-	Node* (*get_node)(Node* this_node, const char* node_path);
+	//set assert_exists to false only if you use this function to check some node existence
+	//set assert_exists to true if you need the wanted node to exist
+	Node* (*get_node)(Node* this_node, const char* node_path, bool assert_exists);
 
 	bool (*is_ancestor_of)(Node* this_node, Node* potential_ancestor);
 	bool (*is_higher_than)(Node* this_node, Node* node);
@@ -119,6 +121,7 @@ struct iiNode
 
 	//void print_tree_pretty()
 	void (*print_tree_pretty)(const Node* this_node);
+	char* (*debug_tree_pretty_mallocing)(const Node* node);
 
 	// write
 

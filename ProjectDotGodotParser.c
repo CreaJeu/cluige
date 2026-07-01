@@ -480,7 +480,7 @@ static bool pdgp_run(ProjectDotGodotParser* this_ProjectDotGodotParser)
 		CLUIGE_ASSERT(false, "ProjectDotGodotParser::run() : main_scene not found from known UIDs (scenes have to be parsed beforehand)");
 		return false;
 	}
-	iCluige.iNode.add_child(iCluige.public_root_2D, root_node);
+	iCluige.iNode.add_child(iCluige.public_root, root_node);
 
 	//inputs
 	SortedDictionary* dic_in = &(this_ProjectDotGodotParser->_dico_inputs);

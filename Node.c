@@ -232,84 +232,91 @@ static Node* nde__on_level(Node* this_node, const char* name)
 }
 
 //private util
-static Node* nde__get_node_rec(Node* this_node, const char* node_path, bool absolute )//Not completed
+static Node* nde__get_node_rec(Node* this_node, const char* node_path, bool assert_exists)//Not complete?
 {
+	//asserts to do even if assert_exists is false
 	CLUIGE_ASSERT(node_path != NULL, "Node::get_node_rec() : node_path is null");
-	int i =0;
-	char element[iCluige.iNode._MAX_NAME_LENGTH];
-	int size = strlen(node_path);
-	Node* tmp;
-	if(sscanf(node_path, "%[^/]/", element) == 1)// "test/main" or "main" format
-	{
-		i += strlen(element) + 1;
+	CLUIGE_ASSERT(this_node != NULL, "Node::get_node_rec() : this_node is null");
+	char curr_name[iCluige.iNode._MAX_NAME_LENGTH];
+	CLUIGE_ASSERT(sscanf(node_path, "%[^/]/", curr_name) == 1,
+			"Node::get_node_rec() : cluige bug : path should not start with '/' (%s)", node_path);
 
-		//for  "." case
-		if(strcmp(".",element) == 0)
+	int curr_name_len = strlen(curr_name);
+	int path_len = strlen(node_path);
+
+	// "" case, useful to end recursivity
+	if(curr_name[0] == '\0')
+	{
+		return this_node;
+	}
+	// "." case
+	else if(strcmp(".", curr_name) == 0)
+	{
+		if(path_len == 1) // "."
 		{
 			return this_node;
 		}
-
-		//for ".."
-		if(strcmp("..",element) == 0)
+		else // "./xxx/yyy"
 		{
-			if(i>=size)
-			{
-				return this_node->parent;
-			}
-			else
-			{
-				return nde__get_node_rec(this_node->parent,i + node_path,absolute);
-			}
-		}
-
-
-		if(absolute)
-		{
-			tmp = nde__on_level(this_node,element);
-		}
-		else
-		{
-			tmp = nde__on_level(this_node->children,element);
-		}
-
-
-		if(tmp == NULL) //general cases like : "test" "root/test"
-		{
-			return NULL;
-		}
-		else if(i >= size)
-		{
-			return tmp;
-		}
-		else
-		{
-			if(absolute) return nde__get_node_rec(tmp->children,i + node_path,absolute);
-			else         return nde__get_node_rec(tmp,i + node_path,absolute);
+			return nde__get_node_rec(this_node, node_path + 2, assert_exists);
 		}
 	}
-	else//HOW DO YOU GET HERE
+	// ".."
+	else if(strcmp("..",curr_name) == 0)
 	{
+		if(curr_name_len == path_len) // ".."
+		{
+			return this_node->parent;
+		}
+		else // "../xxx/yyy"
+		{
+			return nde__get_node_rec(this_node->parent, node_path + 3, assert_exists);
+		}
+	}
+
+	Node* curr_node = nde__on_level(this_node->children, curr_name);
+	if(curr_node == NULL) //not found
+	{
+		//assert only if assert_exists is true
+		if(assert_exists)
+		{
+			CLUIGE_ASSERT(false,
+					"Node::get_node_rec() : the node '%s' has no child '%s'.\nWhole tree is:\n%s",
+					this_node->name, curr_name, iCluige.iNode.debug_tree_pretty_mallocing(iCluige.public_root));
+		}
 		return NULL;
+	}
+	else if(curr_name_len == path_len) // "xxx"
+	{
+		return curr_node;
+	}
+	else // "xxx/yyy"
+	{
+		return nde__get_node_rec(curr_node, node_path + curr_name_len + 1, assert_exists);
 	}
 }
 
-static Node* nde_get_node(Node* this_node,const char* node_path )//Not completed
+static Node* nde_get_node(Node* this_node, const char* node_path, bool assert_exists)//Not complete?
 {
 	CLUIGE_ASSERT(node_path != NULL, "Node::get_node() : node_path is null");
-	bool absolute = node_path[0] == '/';
-	Node* next_child;
-	int ab = 0;
-
-	if (absolute)
+	if (node_path[0] == '/')
 	{
-		next_child = iCluige.public_root_2D;
-		ab++;
+		//absolute path
+		int root_len = strlen("/root/");
+		if(strncmp(node_path, "/root/", root_len) != 0)
+		{
+			CLUIGE_ASSERT(false,
+					"Node::get_node() : absolute path must start with '/root/' (which is iCluige.public_root). Path asked : %s",
+					node_path);
+			return NULL;
+		}
+		else
+		{
+			return nde__get_node_rec(iCluige.public_root, node_path + root_len, assert_exists);
+		}
 	}
-	else
-	{
-		next_child = this_node;
-	}
-	return nde__get_node_rec(next_child,node_path + ab,absolute);
+	//else relative path
+	return nde__get_node_rec(this_node, node_path, assert_exists);
 }
 
 //evaluates if a node is the parent (or grandparent etc..) of current node
@@ -367,22 +374,23 @@ static bool nde_is_higher_than(Node* this_node, Node* other_node)
 //private util
 static int nde__path_char_length(const Node* this_node)
 {
-	if(this_node != iCluige.public_root_2D)
+	if(this_node != iCluige.public_root)
 	{
 		return strlen(this_node->name) + nde__path_char_length(this_node->parent) + 1;
 	}
 	else
 	{
-		return strlen(this_node->name);
+		return 1 + strlen(this_node->name);
 	}
 }
 
 //private util
 static void nde__rec_get_path(const Node* this_node, char* res, int remaining_path_size)
 {
-	if(this_node == iCluige.public_root_2D)
+	if(this_node == iCluige.public_root)
 	{
-		strncpy(res,"/public_root_2D",strlen(this_node->name));
+		res[0] = '/';
+		strncpy(res+1, this_node->name, strlen(this_node->name));
 	}
 	else
 	{
@@ -409,7 +417,7 @@ static char* nde_get_path_mallocing(const Node* this_node)
 	return res;
 }
 
- void nde_print_tree_pretty(const Node* node)
+static void nde_print_tree_pretty(const Node* node)
 {
 	static int depth = 0;
 
@@ -429,6 +437,53 @@ static char* nde_get_path_mallocing(const Node* this_node)
 	{
 		nde_print_tree_pretty(node->next_sibling);
 	}
+}
+
+static int debug_tree_pretty_rec_len(const Node* node, int depth)
+{
+	int res = 0;
+	for(int i=0; i<depth; i++)
+	{
+		res += strlen("   ");
+	}
+	res += strlen("\\_ ()\n") + strlen(node->name) + strlen(node->_class_name);
+
+	if(node->children != NULL)
+	{
+		res += debug_tree_pretty_rec_len(node->children, depth+1);
+	}
+	if(node->next_sibling != NULL)
+	{
+		res += debug_tree_pretty_rec_len(node->next_sibling, depth);
+	}
+	return res;
+}
+
+static void debug_tree_pretty_rec(const Node* node, StringBuilder* sb, int depth)
+{
+	for(int i=0; i<depth; i++)
+	{
+		iCluige.iStringBuilder.append(sb, "   ");
+	}
+	iCluige.iStringBuilder.append(sb, "\\_%s (%s)\n", node->name, node->_class_name);
+
+	if(node->children != NULL)
+	{
+		debug_tree_pretty_rec(node->children, sb, depth+1);
+	}
+	if(node->next_sibling != NULL)
+	{
+		debug_tree_pretty_rec(node->next_sibling, sb, depth);
+	}
+}
+
+static char* nde_debug_tree_pretty_mallocing(const Node* node)
+{
+	int len = debug_tree_pretty_rec_len(node, 0);
+	StringBuilder sb;
+	iCluige.iStringBuilder.string_alloc(&sb, len+1);
+	debug_tree_pretty_rec(node, &sb, 0);
+	return sb.built_string;
 }
 
 //private utility
@@ -451,6 +506,9 @@ static void nde_set_name(Node* n, const char* new_name)
 	//allocate new name to prevent pointing to the stack
 	int size = strlen(new_name);
 
+	CLUIGE_ASSERT(size < iCluige.iNode._MAX_NAME_LENGTH,
+			"Node::set_name() : new_name length must be less than iNode._MAX_NAME_LENGTH (%d). Name asked : %s",
+			iCluige.iNode._MAX_NAME_LENGTH, new_name);
 	CLUIGE_ASSERT(nde__valid_name(new_name), "Node::set_name() : should contain none of : / \" % @ : .");
 	char* next_name = iCluige.checked_malloc((size + 1) * sizeof(char));
 	strcpy(next_name, new_name);
@@ -526,7 +584,7 @@ static void nde_add_child(Node* parent, Node* child)
 	CLUIGE_ASSERT(child->parent == NULL, "Node::add_child() : child must have no parent");
 	CLUIGE_ASSERT(child != parent, "Node::add_child() : same Node is asked for both child and parent");
 	CLUIGE_ASSERT(
-			child->name == NULL || NULL == iCluige.iNode.get_node(parent, child->name),
+			child->name == NULL || NULL == iCluige.iNode.get_node(parent, child->name, false),
 			"Node::add_child() : a Node with the same name already exists among future siblings");
 	if(parent->children == NULL)
 	{
@@ -547,7 +605,7 @@ static void nde_add_child(Node* parent, Node* child)
 	{
 		nde__auto_name(child);
 	}
-	if(iCluige.iNode.is_ancestor_of(parent, iCluige._private_root_2D))
+	if(iCluige.iNode.is_ancestor_of(parent, iCluige._private_root))
 	{
 		nde__branch_enter_tree(child);
 	}
@@ -558,7 +616,7 @@ static void nde_remove_child( Node* this_node, Node* child)
 	CLUIGE_ASSERT(this_node != NULL, "Node::remove_child() : calling object is null ");
 	CLUIGE_ASSERT(child != NULL, "Node::remove_child() : asked child is null");
 	CLUIGE_ASSERT(child->parent == this_node, "Node::remove_child() : child->parent != this_node");
-	if(iCluige.iNode.is_ancestor_of(this_node, iCluige._private_root_2D))
+	if(iCluige.iNode.is_ancestor_of(this_node, iCluige._private_root))
 	{
 		nde__branch_exit_tree(child);
 	}
@@ -707,6 +765,7 @@ void iiNode_init()
 	iCluige.iNode.is_higher_than = nde_is_higher_than;
 	iCluige.iNode.get_path_mallocing = nde_get_path_mallocing;
 	iCluige.iNode.print_tree_pretty = nde_print_tree_pretty;
+	iCluige.iNode.debug_tree_pretty_mallocing = nde_debug_tree_pretty_mallocing;
 
 	iCluige.iNode.set_name = nde_set_name;
 	iCluige.iNode.add_child = nde_add_child;

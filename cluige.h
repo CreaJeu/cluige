@@ -74,10 +74,10 @@ struct iiCluige
 
 	//private
 	//for cluige nodes like clock
-	Node* _private_root_2D;
+	Node* _private_root;
 
 	//for user nodes
-	Node* public_root_2D;
+	Node* public_root;
 
 	float EPSILON;
 

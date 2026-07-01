@@ -30,10 +30,11 @@
 - (project.godot parsing : first interesting params, inputs)
 - (re-test windows)
 - (update Readme)
-- (*.c *.h *.md : replace all CRLF with LF, force LF with git)
+- (all .c .h .md : replace all CRLF with LF, force LF with git)
 - (replace all space-indent with tab-indent + Node.c ths_Node => this_Node)
 - (macro CLUIGE_BREAKPOINT() => utils_breakpoint_trick())
 - (hunt every for...; i < iCluige.iDeque.size... )
+- (Node.get_node() : add a param bool assert_found)
 - (bugs : see below)
 
 
@@ -43,6 +44,8 @@
 
 **Futures tâches**
 
+- instanciate : add auto_name arg
+- test gcc & ld last version linux
 - node2D (et autre?) : meilleur test instanceof / class_name static par classe
 - **sprite svg (no anim) : file parsing fix discontinued paths**
 - sprite svg : choose rastering algo from thickness
@@ -55,6 +58,9 @@
     - rename Path2D to SvgPath2D (confusion with godot Node2D subclass Path2D)
     - inherited_visibility (car parent invisible => branche invisible), màj dans bake()
     - process_mode (disabled, pausable, etc. : enum in godot instead of just a 'active' bool field)
+    - change_scene + function easier to instanciate a scene from path without params dico
+- parse scene param PackedScene
+- parse scene param Array[Building] = [NodePath("../Windmills"), NodePath("../bacteria_factory")]
 - Deque::sort()
 - custom app icon
 - reallocate in Deque::grow()
@@ -68,6 +74,10 @@
 
 **FUTURS CHANTIERS**
 
+- svg : parse layer/group translate
+- tinydir to find all .tscn
+- big text
+- script to help switching from godot to cluige (generate .c/.h skeletons from each .gd)
 - signals
 - collision rectangle + layers
 - cluige game templates
@@ -84,6 +94,7 @@
     clip drawing inside visible window (cf. futures tâches)
 - utf8 in SpriteText
 - input :
+	keys like escape
 	parse other than 'unicode' from project.godot + mouse + joystick
 	generate godot default even if absent from projetc.godot ?
 	just_released? => MVC for inputs (input server, platform-specific)

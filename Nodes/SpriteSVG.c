@@ -76,7 +76,7 @@ static void ssvg_erase(Node* this_Node)
 	must_erase = must_erase &&
 		(
 			this_Node2D->_position_changed ||
-			(!(this_Node2D->visible)) ||
+			(!(this_Node2D->_new_baked.visible)) ||
 			iCluige.iCamera2D._old_baked.state_changed ||
 			this_Node->_marked_for_queue_free //||
 //			this_SpriteSVG->_state_changes.state_changed
@@ -188,7 +188,7 @@ static void ssvg_draw(Node* this_Node)
 	Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
 	SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
 	this_SpriteSVG->_draw_super(this_Node);
-	if(!(this_Node2D->visible))
+	if(!(this_Node2D->_new_baked.visible))
 	{
 		return;
 	}
@@ -415,6 +415,15 @@ static Node* ssvg_instantiate(const SortedDictionary* params)
 	return res_node;
 }
 
+static SpriteSVG* ssvg_cast_from_Node(Node* this_Node)
+{
+	Node2D* n2D = iCluige.iNode2D.cast_from_Node(this_Node);
+	CLUIGE_ASSERT(strncmp(this_Node->_class_name, "NodeNode2DSpriteSVG", strlen("NodeNode2DSpriteSVG")) == 0,
+			"SpriteSVG::cast_from_Node() : node '%s' is not an instance SpriteSVG",
+			this_Node->name);
+	return (SpriteSVG*)(n2D->_sub_class);
+}
+
 /////////////////////////////////// Node //////////
 
 void iiSpriteSVG_init()
@@ -425,6 +434,7 @@ void iiSpriteSVG_init()
 	iCluige.iSpriteSVG.add_path_from_array_relative = ssvg_add_path_from_array_relative;
 	iCluige.iSpriteSVG.add_path_from_parsed_deque = ssvg_add_path_from_parsed_deque;
 	iCluige.iSpriteSVG.parse_file = ssvg_parse_file;
+	iCluige.iSpriteSVG.cast_from_Node = ssvg_cast_from_Node;
 
 	iCluige.iSpriteSVG._SpriteSVG_factory.instantiate = ssvg_instantiate;
 	iCluige.iNode.register_NodeFactory("Sprite2D", &(iCluige.iSpriteSVG._SpriteSVG_factory));

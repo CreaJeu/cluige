@@ -49,6 +49,9 @@ struct iiNode2D
 	void (*hide)(Node2D*);
 	void (*move_local)(Node2D*, Vector2);
 	void (*set_local_position)(Node2D*, Vector2);
+
+	//with type assert
+	Node2D* (*cast_from_Node)(Node* this_Node);
 	//later : moveGlobal
 };
 //iNode2D : in iiCluige

@@ -44,7 +44,7 @@ static void sprtx_erase(Node* this_Node)
 		(
 			this_Node2D->_position_changed ||
 			iCluige.iCamera2D._old_baked.state_changed ||
-			(!(this_Node2D->visible)) ||
+			(!(this_Node2D->_new_baked.visible)) ||
 			this_SpriteText->_text_changed ||
 			this_Node->_marked_for_queue_free
 		);
@@ -153,7 +153,7 @@ static void sprtx_draw(Node* this_Node)
 	//call super()
 //	this_SpriteText->_post_process_super(this_Node);//no, just pre_draw in Node2D, not overridden here
 
-	if(!(this_Node2D->visible))
+	if(!(this_Node2D->_new_baked.visible))
 	{
 		return;
 	}
@@ -331,6 +331,15 @@ static Node* sprtx_instantiate(const SortedDictionary* params)
 	return res_node;
 }
 
+static SpriteText* sprtx_cast_from_Node(Node* this_Node)
+{
+	Node2D* n2D = iCluige.iNode2D.cast_from_Node(this_Node);
+	CLUIGE_ASSERT(strncmp(this_Node->_class_name, "NodeNode2DSpriteText", strlen("NodeNode2DSpriteText")) == 0,
+			"SpriteText::cast_from_Node() : node '%s' is not an instance SpriteText",
+			this_Node->name);
+	return (SpriteText*)(n2D->_sub_class);
+}
+
 /////////////////////////////////// global //////////
 
 void iiSpriteText_init()
@@ -338,6 +347,7 @@ void iiSpriteText_init()
 	iCluige.iSpriteText.new_SpriteText = sprtx_new_SpriteText;
 	iCluige.iSpriteText.new_SpriteText_from_Node2D = sprtx_new_SpriteText_from_Node2D;
 	iCluige.iSpriteText.set_text = sprtx_set_text;
+	iCluige.iSpriteText.cast_from_Node = sprtx_cast_from_Node;
 
 	iCluige.iSpriteText._SpriteText_factory.instantiate = sprtx_instantiate;
 	iCluige.iNode.register_NodeFactory("Label", &(iCluige.iSpriteText._SpriteText_factory));

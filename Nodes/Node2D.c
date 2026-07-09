@@ -79,7 +79,27 @@ static void n2d_bake(Node* this_Node)
 		}
 		this_Node2D->_position_changed = true;
 	}
+	//visible :
+	//this_Node2D->_new_baked.visible = this_Node2D->visible;
+	//experiment wether can benefit from DFS
+	n = this_Node;
 	this_Node2D->_new_baked.visible = this_Node2D->visible;
+	bool keep_up = true;
+	while(n->parent != NULL && keep_up && this_Node2D->_new_baked.visible)
+	{
+		n = n->parent;
+		void* n_subclass = n->_sub_class;
+		if(n_subclass != NULL)
+		{
+			char* found = strstr(n->_class_name, "NodeNode2D");
+			if(found == n->_class_name) //n is a Node2D
+			{
+				Node2D* n2d = (Node2D*)(n->_sub_class);
+				this_Node2D->_new_baked.visible = this_Node2D->_new_baked.visible && n2d->_new_baked.visible;
+				keep_up = false;//end loop
+			}
+		}
+	}
 }
 
 static void n2d_draw(Node* this_Node)
@@ -189,6 +209,14 @@ static Node* n2d_instantiate(const SortedDictionary* params)
 	return res_node;
 }
 
+static Node2D* n2d_cast_from_Node(Node* this_Node)
+{
+	CLUIGE_ASSERT(strncmp(this_Node->_class_name, "NodeNode2D", strlen("NodeNode2D")) == 0,
+			"Node2D::cast_from_Node() : node '%s' is not an instance Node2D",
+			this_Node->name);
+	return (Node2D*)(this_Node->_sub_class);
+}
+
 /////////////////////////////////// Node //////////
 
 void iiNode2D_init()
@@ -199,6 +227,7 @@ void iiNode2D_init()
 	iCluige.iNode2D.hide = n2d_hide;
 	iCluige.iNode2D.move_local = n2d_move_local;
 	iCluige.iNode2D.set_local_position = n2d_set_local_position;
+	iCluige.iNode2D.cast_from_Node = n2d_cast_from_Node;
 
 	iCluige.iNode2D._Node2D_factory.instantiate = n2d_instantiate;
 	iCluige.iNode.register_NodeFactory("Node2D", &(iCluige.iNode2D._Node2D_factory));

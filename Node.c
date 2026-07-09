@@ -238,7 +238,8 @@ static Node* nde__get_node_rec(Node* this_node, const char* node_path, bool asse
 	CLUIGE_ASSERT(node_path != NULL, "Node::get_node_rec() : node_path is null");
 	CLUIGE_ASSERT(this_node != NULL, "Node::get_node_rec() : this_node is null");
 	char curr_name[iCluige.iNode._MAX_NAME_LENGTH];
-	CLUIGE_ASSERT(sscanf(node_path, "%[^/]/", curr_name) == 1,
+	int scan_res = sscanf(node_path, "%[^/]/", curr_name);
+	CLUIGE_ASSERT(scan_res == 1,
 			"Node::get_node_rec() : cluige bug : path should not start with '/' (%s)", node_path);
 
 	int curr_name_len = strlen(curr_name);
@@ -522,24 +523,38 @@ static void nde_set_name(Node* n, const char* new_name)
 
 //private util
 //make unique name
-static void nde__auto_name(Node* node)
+static void nde__auto_name(Node* this_Node, Node* parent)
 {
+	if(this_Node->name != NULL)
+	{
+		free(this_Node->name);
+	}
 	int b2d = iCluige.iStringBuilder.DECIMAL_DIGITS_FOR_INT;
 	int p2d = iCluige.iStringBuilder.DECIMAL_DIGITS_FOR_POINTER;
-	size_t name_size_max = b2d + p2d + strlen(node->_class_name) + 3;
-	if(node->parent != NULL && node->parent->name != NULL)
+	size_t name_size_max = b2d + p2d + strlen(this_Node->_class_name) + 3;
+	if(this_Node->parent != NULL && this_Node->parent->name != NULL)
 	{
-		name_size_max += 1 + strlen(node->parent->name);
+		name_size_max += 1 + strlen(this_Node->parent->name);
 	}
 
 	StringBuilder sb;
-	node->name = iCluige.iStringBuilder.string_alloc(&sb, name_size_max);
-	if(node->parent != NULL && node->parent->name != NULL)
+	iCluige.iStringBuilder.string_alloc(&sb, name_size_max);
+	if(this_Node->parent != NULL && this_Node->parent->name != NULL)
 	{
-		iCluige.iStringBuilder.append(&sb, "%s>", node->parent->name);
+		iCluige.iStringBuilder.append(&sb, "%s>", this_Node->parent->name);
 	}
-	iCluige.iStringBuilder.append(&sb, "%s@%p-%d", node->_class_name, node, nde_get_index(node));
-
+	iCluige.iStringBuilder.append(&sb, "%s@%p", this_Node->_class_name, this_Node);
+	int tmp_len = strlen(sb.built_string);
+	iCluige.iStringBuilder.append(&sb, "-%d", nde_get_index(this_Node));
+	//check name is unique among siblings
+	Node* should_be_null = nde__get_node_rec(parent, sb.built_string, false);
+	while(should_be_null != NULL)
+	{
+		iCluige.iStringBuilder.shrink(&sb, tmp_len);
+		iCluige.iStringBuilder.append(&sb, "-%d", rand());
+		should_be_null = nde__get_node_rec(parent, sb.built_string, false);
+	}
+	this_Node->name = sb.built_string;
 }
 
 static void nde__branch_enter_tree(Node* root)
@@ -583,9 +598,14 @@ static void nde_add_child(Node* parent, Node* child)
 {
 	CLUIGE_ASSERT(child->parent == NULL, "Node::add_child() : child must have no parent");
 	CLUIGE_ASSERT(child != parent, "Node::add_child() : same Node is asked for both child and parent");
-	CLUIGE_ASSERT(
-			child->name == NULL || NULL == iCluige.iNode.get_node(parent, child->name, false),
-			"Node::add_child() : a Node with the same name already exists among future siblings");
+//	CLUIGE_ASSERT(
+//			child->name == NULL || NULL == iCluige.iNode.get_node(parent, ),
+//			"Node::add_child() : a Node with the same name already exists among future siblings");
+	if(child->name == NULL || nde__get_node_rec(parent, child->name, false))
+	{
+		//must generate other name
+		nde__auto_name(child, parent);
+	}
 	if(parent->children == NULL)
 	{
 		parent->children = child;
@@ -601,10 +621,6 @@ static void nde_add_child(Node* parent, Node* child)
 	}
 	child->parent = parent;
 
-	if(child->name == NULL)
-	{
-		nde__auto_name(child);
-	}
 	if(iCluige.iNode.is_ancestor_of(parent, iCluige._private_root))
 	{
 		nde__branch_enter_tree(child);

@@ -50,6 +50,9 @@ struct iiSpriteText
 
 	//void set_text(const char*)
 	void (*set_text)(SpriteText*, const char*);
+
+	//with type assert
+	SpriteText* (*cast_from_Node)(Node* this_Node);
 };
 //iSpriteText : in iiCluige
 

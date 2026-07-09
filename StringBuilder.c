@@ -13,7 +13,7 @@ static char* sbr_string_alloc(StringBuilder* sb, size_t max_size)
 {
 	sb->built_string = iCluige.checked_malloc((max_size + 1) * sizeof(char));
 	sb->next_char = sb->built_string;
-	sb->next_char[0] = 0;
+	sb->next_char[0] = '\0';
 	sb->remaining_size = max_size;
 	return sb->next_char;
 }
@@ -65,6 +65,19 @@ static void sbr_replace(StringBuilder* sb, const char* formatted_tail, ...)
 	sb->next_char = sb->built_string + written;
 
 	va_end(args);
+}
+
+static void sbr_shrink(StringBuilder* sb, int wanted_length)
+{
+	int old_len = strlen(sb->built_string);
+	if(old_len <= wanted_length)
+	{
+		return;
+	}
+	int nb_back = old_len - wanted_length;
+	sb->remaining_size += nb_back;
+	sb->next_char = sb->built_string + wanted_length;
+	sb->next_char[0] = '\0';
 }
 
 static char* sbr_clone(const char* source)
@@ -148,6 +161,7 @@ void iiStringBuilder_init()
 	iCluige.iStringBuilder.append = sbr_append;
 	iCluige.iStringBuilder.nappend = sbr_nappend;
 	iCluige.iStringBuilder.replace = sbr_replace;
+	iCluige.iStringBuilder.shrink = sbr_shrink;
 	iCluige.iStringBuilder.clone = sbr_clone;
 	iCluige.iStringBuilder.clone_formatted = sbr_clone_formatted;
 	//iCluige.iStringBuilder.split = sbr_split;

@@ -459,6 +459,26 @@ static bool pdgp_run(ProjectDotGodotParser* this_ProjectDotGodotParser)
 	utils_int_from_parsed(&(iCluige.window_initial_size_lines), params, "display/window/size/viewport_height");
 	utils_str_from_parsed(&(iCluige.window_title), params, "application/config/name");
 
+	//inputs
+	SortedDictionary* dic_in = &(this_ProjectDotGodotParser->_dico_inputs);
+	int d_n = iCluige.iSortedDictionary.size(dic_in);
+	for(int i=0; i<d_n; i++)
+	{
+		Pair pair_i = iCluige.iSortedDictionary.at(dic_in, i);
+		const char* action_name = (const char*)(pair_i.first.ptr);
+		Deque* dq = (Deque*)(pair_i.second.ptr);
+		int m = iCluige.iDeque.size(dq);
+		if(m > 0)
+		{
+			iCluige.iInput.add_action(action_name);
+			for(int j=0; j<m; j++)
+			{
+				uint64_t uni = iCluige.iDeque.at(dq, j).ui64;
+				iCluige.iInput.bind_key(action_name, uni);
+			}
+		}
+	}
+
 	//instantiate main scene
 	char* tmp_uid = NULL;
 	ok = utils_str_from_parsed(&tmp_uid, params, "application/run/main_scene");
@@ -481,26 +501,6 @@ static bool pdgp_run(ProjectDotGodotParser* this_ProjectDotGodotParser)
 		return false;
 	}
 	iCluige.iNode.add_child(iCluige.public_root, root_node);
-
-	//inputs
-	SortedDictionary* dic_in = &(this_ProjectDotGodotParser->_dico_inputs);
-	int d_n = iCluige.iSortedDictionary.size(dic_in);
-	for(int i=0; i<d_n; i++)
-	{
-		Pair pair_i = iCluige.iSortedDictionary.at(dic_in, i);
-		const char* action_name = (const char*)(pair_i.first.ptr);
-		Deque* dq = (Deque*)(pair_i.second.ptr);
-		int m = iCluige.iDeque.size(dq);
-		if(m > 0)
-		{
-			iCluige.iInput.add_action(action_name);
-			for(int j=0; j<m; j++)
-			{
-				uint64_t uni = iCluige.iDeque.at(dq, j).ui64;
-				iCluige.iInput.bind_key(action_name, uni);
-			}
-		}
-	}
 	return true;
 }
 

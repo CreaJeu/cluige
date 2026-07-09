@@ -316,6 +316,25 @@ static bool inp_is_action_just_pressed(int action_id)
 	return (found_at != -1);
 }
 
+static float inp_get_action_strength(int action_id)
+{
+	///TODO is_action_pressed instead of is_action_just_pressed
+	if(inp_is_action_just_pressed(action_id))
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+static float inp_get_axis(int negative_action_id, int positive_action_id)
+{
+	return inp_get_action_strength(positive_action_id) - inp_get_action_strength(negative_action_id);
+}
+
+
 /////////////////////////////////// Node //////////
 
 void iiInput_init()
@@ -333,6 +352,8 @@ void iiInput_init()
 
 //	iCluige.iInput.is_action_pressed = inp_is_action_pressed;
 	iCluige.iInput.is_action_just_pressed = inp_is_action_just_pressed;
+	iCluige.iInput.get_action_strength = inp_get_action_strength;
+	iCluige.iInput.get_axis = inp_get_axis;
 //	iCluige.iInput.is_key_pressed = inp_is_key_pressed;
 //	iCluige.iInput.is_key_just_pressed = inp_is_key_just_pressed;
 

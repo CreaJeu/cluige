@@ -69,6 +69,8 @@ struct iiInput
 	bool (*is_action_just_pressed)(int action_id);
 //	bool (*is_key_pressed)(int charVal);
 //	bool (*is_key_just_pressed)(int charVal);
+	float (*get_action_strength)(int action_id);
+	float (*get_axis)(int negative_action_id, int positive_action_id);
 };
 //iInput : in iiCluige
 

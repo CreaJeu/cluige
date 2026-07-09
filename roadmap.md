@@ -35,6 +35,8 @@
 - (macro CLUIGE_BREAKPOINT() => utils_breakpoint_trick())
 - (hunt every for...; i < iCluige.iDeque.size... )
 - (Node.get_node() : add a param bool assert_found)
+- (instanciate : add auto_name arg : no, but auto_name forced at add_child() if needed)
+- (inherited visibility (parent invisible => branch invisible), cf. bake())
 - (bugs : see below)
 
 
@@ -44,7 +46,6 @@
 
 **Futures tâches**
 
-- instanciate : add auto_name arg
 - test gcc & ld last version linux
 - node2D (et autre?) : meilleur test instanceof / class_name static par classe
 - **sprite svg (no anim) : file parsing fix discontinued paths**
@@ -56,7 +57,6 @@
     - godotify move_local(vec2) : move_local_x/y(dx/dy) + translate(Vec2) + global_translate(Vec2)
     - rename SpriteText to Label ?
     - rename Path2D to SvgPath2D (confusion with godot Node2D subclass Path2D)
-    - inherited_visibility (car parent invisible => branche invisible), màj dans bake()
     - process_mode (disabled, pausable, etc. : enum in godot instead of just a 'active' bool field)
     - change_scene + function easier to instanciate a scene from path without params dico
 - parse scene param PackedScene
@@ -119,7 +119,7 @@
 
 
 **bugs**
-- things not well erased when running test_cluige quickly by keeping keys pressed to keep moving camera or sprite when also pressing 'N' for next phase
+- things not well erased when running test_cluige quickly by keeping keys pressed to keep moving camera or sprite when also pressing 'N' for next phase (erreur d'arrondi dans les x/y du erase() qui donne d'autres x/y?)
 
 
 **fixed bugs**

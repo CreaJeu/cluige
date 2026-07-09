@@ -138,6 +138,9 @@ struct iiSpriteSVG
 	void (*add_path_from_parsed_deque)(SpriteSVG*, Deque*);
 
 	void (*parse_file)(SpriteSVG*, char* file_path);
+
+	//with type assert
+	SpriteSVG* (*cast_from_Node)(Node* this_Node);
 };
 //iSpriteSVG : in iiCluige
 

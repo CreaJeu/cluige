@@ -32,6 +32,8 @@ struct iiStringBuilder
 	//void replace(StringBuilder* sb, const char* formatted_tail, ...)
 	void (*replace)(StringBuilder* sb, const char* formatted_tail, ...);
 
+	void (*shrink)(StringBuilder* sb, int wanted_length);
+
 	//shortcut function to use string_alloc+append
 	//source can be allocated on stack
 	//user is responsible to free the returned char*

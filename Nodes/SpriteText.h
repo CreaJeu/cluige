@@ -18,6 +18,13 @@ struct _SpriteText
 
 		char* text;//the ASCII art / unicode art
 
+		//default ' ', draw() will skip this char
+		//to choose another char, in godot, in the Label,
+		// add a metadata named "transparent_char" of type String
+		//(remember this is a "char", so unicode chars won't work)
+		//(instanciation will assert if incorrect value)
+		char transparent_char;
+
 		int nb_chars;
 		int allocated_text_length;
 	} _new_baked, _old_baked;

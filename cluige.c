@@ -256,29 +256,35 @@ void cluige_run()
 	{
 		//BAKE
 		process_tree(iCluige._private_root, BAKE_PASS);
-		int nb_just_removed = iCluige.iDeque.size(&(iCluige.iNode._just_removed_nodes));
-		for(int i=0; i<nb_just_removed; i++)
-		{
-			Node* n = (Node*)iCluige.iDeque.at(&(iCluige.iNode._just_removed_nodes), i).ptr;
-			if(n->bake != NULL)
-			{
-				n->bake(n);
-			}
-		}
+//		int nb_just_removed = iCluige.iDeque.size(&(iCluige.iNode._just_removed_nodes));
+//		for(int i=0; i<nb_just_removed; i++) //should never happen here
+//		{
+//			Node* n = (Node*)iCluige.iDeque.at(&(iCluige.iNode._just_removed_nodes), i).ptr;
+//			if(n->bake != NULL)
+//			{
+//				n->bake(n);
+//			}
+//		}
 
 		//ERASE
 		process_tree(iCluige._private_root, ERASE_PASS);
-		for(int i=0; i<nb_just_removed; i++)
-		{
-			Node* n = (Node*)iCluige.iDeque.at(&(iCluige.iNode._just_removed_nodes), i).ptr;
-			if(n->erase != NULL)
-			{
-				n->erase(n);
-			}
-		}
+//		for(int i=0; i<nb_just_removed; i++) //should never happen here
+//		{
+//			Node* n = (Node*)iCluige.iDeque.at(&(iCluige.iNode._just_removed_nodes), i).ptr;
+//			if(n->erase != NULL)
+//			{
+//				n->erase(n);
+//			}
+//		}
 
 		//queue_free_early
 		iCluige.iNode._do_all_queue_free_early_step();
+
+		///TODO tmp?
+		if(iCluige.iDeque.size(&(iCluige.iNode._just_removed_nodes)) > 0)
+		{
+			erase();//curses low-cost clear screen
+		}
 
 		//curses handling of "screen" resize
 		if(is_termresized())

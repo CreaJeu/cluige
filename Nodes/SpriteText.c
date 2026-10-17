@@ -46,6 +46,9 @@ static void sprtx_erase(Node* this_Node)
 			iCluige.iCamera2D._old_baked.state_changed ||
 			(!(this_Node2D->_new_baked.visible)) ||
 			this_SpriteText->_text_changed ||
+			memcmp(&(this_SpriteText->_old_baked),
+					&(this_SpriteText->_new_baked),
+					sizeof (this_SpriteText->_old_baked)) != 0 ||
 			this_Node->_marked_for_queue_free
 		);
 	if(!must_erase)
@@ -81,7 +84,7 @@ static void sprtx_erase(Node* this_Node)
 			line++;
 			col = 0;
 		}
-		else if(curr_char == ' ')
+		else if(curr_char == this_SpriteText->_old_baked.transparent_char)
 		{
 			col++;
 		}
@@ -127,7 +130,9 @@ static void sprtx_erase(Node* this_Node)
 
 	//call super()
 //	this_SpriteText->_erase_super(this_Node);//NULL
-	this_SpriteText->_old_baked.offset = this_SpriteText->_new_baked.offset;
+//	this_SpriteText->_old_baked.offset = this_SpriteText->_new_baked.offset;
+	memcpy(&(this_SpriteText->_old_baked.offset), &(this_SpriteText->_new_baked.offset),
+		sizeof(this_SpriteText->_old_baked.offset));
 	if(this_SpriteText->_text_changed)
 	{
 		if(this_SpriteText->_new_baked.nb_chars >= this_SpriteText->_old_baked.allocated_text_length)
@@ -189,7 +194,7 @@ static void sprtx_draw(Node* this_Node)
 			line++;
 			col = 0;
 		}
-		else if(curr_char == ' ')
+		else if(curr_char == this_SpriteText->_new_baked.transparent_char)
 		{
 			col++;
 		}
@@ -244,6 +249,7 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
 
 	new_SpriteText->_new_baked.offset = (Vector2) { 0., 0. };
 	new_SpriteText->_new_baked.text = NULL;//the ASCII art / unicode art
+	new_SpriteText->_new_baked.transparent_char = ' ';
 	new_SpriteText->_new_baked.allocated_text_length = -1;
 	new_SpriteText->_new_baked.nb_chars = 0;
 	new_SpriteText->_old_baked = new_SpriteText->_new_baked;
@@ -320,6 +326,8 @@ static Node* sprtx_instantiate(const SortedDictionary* params)
 	//text = "un autre label
 	//sans param modifié
 	//à part texte et pos"
+	//metadata/transparent_char = "$"
+
 	//utils_vector2_from_parsed(&(res_SpriteText->_new_baked.offset), params, "offset");
 	utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.x), params, "offset_left");
 	utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.y), params, "offset_top");
@@ -328,6 +336,16 @@ static Node* sprtx_instantiate(const SortedDictionary* params)
 	CLUIGE_ASSERT(res_SpriteText->_new_baked.text != NULL, "SpriteText::instantiate() : text not instantiated, missing 'text' field?");
 	res_SpriteText->_new_baked.allocated_text_length = strlen(res_SpriteText->_new_baked.text);
 	sprtx__bake_text(res_SpriteText);
+	char* tmp_transp_char = NULL;
+	bool found = utils_str_from_parsed(&tmp_transp_char, params, "metadata/transparent_char");
+	if(found)
+	{
+		CLUIGE_ASSERT(tmp_transp_char != NULL && strlen(tmp_transp_char) == 1,
+				"SpriteText::instantiate() : metadata/transparent_char must have exactly 1 (8-bit) char (found: %d)",
+				strlen(tmp_transp_char));
+		res_SpriteText->_new_baked.transparent_char = tmp_transp_char[0];
+		free(tmp_transp_char);
+	}
 	return res_node;
 }
 

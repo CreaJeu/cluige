@@ -95,13 +95,18 @@ struct _SpriteSVG
 
 	Vector2 scale;//tmp before general Node2D scale
 
+	//rotation, tmp solution (not Node2D, no local/global, no transform...)
+	float rotation;
+
 	Deque paths;//Deque<Path2D* > all paths of the svg
 
 	//private
-//	struct
-//	{
-//		bool state_changed;
-//	} _state_changes;//see old_baked/new_baked in Node2D for example if needed
+	struct
+	{
+		//rotation, tmp solution (not Node2D, no local/global, no transform...)
+		float cos_rot;
+		float sin_rot;
+	} _new_baked, _old_baked;;//see old_baked/new_baked in Node2D for example if needed
 
 	//private
 	Node2D* _this_Node2D;
@@ -109,6 +114,7 @@ struct _SpriteSVG
 
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
+	void (*_bake_super)(Node*);
 //	void (*_erase_super)(Node*);
 	void (*_draw_super)(Node*);
 
@@ -129,6 +135,8 @@ struct iiSpriteSVG
 	//SpriteSVG* new_SpriteSVG()
 	SpriteSVG* (*new_SpriteSVG)();
 	SpriteSVG* (*new_SpriteSVG_from_Node2D)();
+
+	void (*rotate)(SpriteSVG*, float radians);
 
 	//copies the points from the array
 	void (*add_path_from_array)(SpriteSVG*, Vector2*, int nb_points);

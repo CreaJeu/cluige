@@ -75,6 +75,8 @@ void cluige_init(void (*register_user_scripts)())
 	iCluige.window_initial_size_cols = 110;
 	iCluige.window_initial_size_lines = 50;
 	iCluige.EPSILON = 0.00001;
+	iCluige.PI = 3.14159265358979f;
+	iCluige.TAU = 2 * iCluige.PI;
 	iCluige.quit_asked = false;
 
 	iiVariant_init();
@@ -280,11 +282,11 @@ void cluige_run()
 		//queue_free_early
 		iCluige.iNode._do_all_queue_free_early_step();
 
-		///TODO tmp?
-		if(iCluige.iDeque.size(&(iCluige.iNode._just_removed_nodes)) > 0)
-		{
-			erase();//curses low-cost clear screen
-		}
+//erase();		///TODO tmp?
+//		if(iCluige.iDeque.size(&(iCluige.iNode._just_removed_nodes)) > 0)
+//		{
+//			erase();//curses low-cost clear screen
+//		}
 
 		//curses handling of "screen" resize
 		if(is_termresized())

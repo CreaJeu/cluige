@@ -81,6 +81,9 @@ struct iiCluige
 
 	float EPSILON;
 
+	float PI;
+	float TAU;
+
 	char* resource_path;
 
 	//private

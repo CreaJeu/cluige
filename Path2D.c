@@ -10,6 +10,17 @@
 ////////////////////////////////// iiPath2D /////////
 
 
+static void p2D__alloc_baked_points(Deque* points, int nb_points)
+{
+	iCluige.iDeque.deque_alloc(points, VT_POINTER, nb_points);
+	for(int i=0; i<nb_points; i++)
+	{
+		Vector2* point_i = iCluige.checked_malloc(sizeof(Vector2));
+		*point_i = (Vector2){0,0};
+		iCluige.iDeque.push_back(points, point_i);
+	}
+}
+
 static void p2D_path2D_alloc(Path2D* this_Path2D, Vector2* points, int nb_points, bool absolute)
 {
 	Deque* new_path = &(this_Path2D->_points);
@@ -30,6 +41,8 @@ static void p2D_path2D_alloc(Path2D* this_Path2D, Vector2* points, int nb_points
 		}
 		iCluige.iDeque.push_back(new_path, pointI);
 	}
+	p2D__alloc_baked_points(&(this_Path2D->_old_baked._baked_points), nb_points);
+	p2D__alloc_baked_points(&(this_Path2D->_new_baked._baked_points), nb_points);
 	this_Path2D->_visible = true;
 }
 
@@ -48,6 +61,8 @@ static void p2D_path2D_alloc_from_parsed(Path2D* this_Path2D, Deque* coordinates
 		pointI->y = iCluige.iDeque.at(coordinates_sequence, i_y).f;
 		iCluige.iDeque.push_back(new_path, pointI);
 	}
+	p2D__alloc_baked_points(&(this_Path2D->_old_baked._baked_points), nb_points);
+	p2D__alloc_baked_points(&(this_Path2D->_new_baked._baked_points), nb_points);
 	this_Path2D->_visible = true;
 }
 
@@ -61,13 +76,30 @@ static Path2D* p2D_new_Path2D(Vector2* points, int nb_points, bool absolute)
 static void p2D_pre_delete_Path2D(Path2D* this_Path2D)
 {
 	Deque* points = &(this_Path2D->_points);
+	Vector2* point_j;
 	int nb_points = iCluige.iDeque.size(points);
 	for(int j=0; j<nb_points; j++)
 	{
-		Vector2* point_j = iCluige.iDeque.at(points, j).ptr;
+		point_j = iCluige.iDeque.at(points, j).ptr;
+		free(point_j);
+	}
+	Deque* old_baked_points = &(this_Path2D->_old_baked._baked_points);
+	nb_points = iCluige.iDeque.size(old_baked_points);
+	for(int j=0; j<nb_points; j++)
+	{
+		point_j = iCluige.iDeque.at(old_baked_points, j).ptr;
+		free(point_j);
+	}
+	Deque* new_baked_points = &(this_Path2D->_new_baked._baked_points);
+	nb_points = iCluige.iDeque.size(new_baked_points);
+	for(int j=0; j<nb_points; j++)
+	{
+		point_j = iCluige.iDeque.at(new_baked_points, j).ptr;
 		free(point_j);
 	}
 	iCluige.iDeque.pre_delete_Deque(points);
+	iCluige.iDeque.pre_delete_Deque(old_baked_points);
+	iCluige.iDeque.pre_delete_Deque(new_baked_points);
 }
 
 static Vector2* p2D_at(const Path2D* this_Path2D, int i)

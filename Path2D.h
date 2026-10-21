@@ -10,6 +10,12 @@ struct _Path2D
 	Deque _points;//Deque<Vector2*>
 	bool _visible;
 
+	struct
+	{
+		Deque _baked_points;//Deque<Vector2*>
+		//TODO : visible
+	} _new_baked, _old_baked;
+
 	//TODO color, thick/thin
 };
 

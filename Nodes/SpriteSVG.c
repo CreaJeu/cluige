@@ -33,7 +33,6 @@ static void ssvg_delete_SpriteSVG(Node* this_Node)
 		free(path_i);
 	}
 	iCluige.iDeque.pre_delete_Deque(paths);
-	//free(paths);
 
 	CLUIGE_ASSERT(this_SpriteSVG->_sub_class == NULL, "SpriteSVG::delete_SpriteSVG() : not null subclass found");
 	free(this_SpriteSVG);
@@ -41,14 +40,38 @@ static void ssvg_delete_SpriteSVG(Node* this_Node)
 	delete_super(this_Node);
 }
 
-//utility function
-static void ssvg_draw_line(const float start_x, const float start_y, const float end_x, const float end_y, bool draw)
+static void ssvg_bake(Node* this_Node)
 {
-	Vector2 start_pos = {start_x, start_y};
-	Vector2 end_pos = {end_x, end_y};
+	Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+	SpriteSVG* this_SpriteSVG = (SpriteSVG*)(this_Node2D->_sub_class);
 
+	this_SpriteSVG->_bake_super(this_Node);
+	if(!(this_Node2D->_new_baked.visible))
+	{
+		return;
+	}
+
+	//backup old baked data
+	memcpy(&(this_SpriteSVG->_old_baked), &(this_SpriteSVG->_new_baked),
+		sizeof(this_SpriteSVG->_new_baked));
+	//memcpy instead of =
+	//so we can later use memcmp
+	//whatever alignment bits might be inside
+
+	this_SpriteSVG->_new_baked.cos_rot = cosf(this_SpriteSVG->rotation);
+	this_SpriteSVG->_new_baked.sin_rot = sinf(this_SpriteSVG->rotation);
+
+	//bake paths : not here (see draw()) because needs camera::bake()
+	//which might be executed later, according to
+	//relative position between camera node and this node
+	//in scene tree
+}
+
+//utility function
+static void ssvg_draw_line(const Vector2* start_pos, const Vector2* end_pos, bool draw)
+{
 	LineDrawerThin d;
-	iCluige.iLineDrawerThin.start(&d, &start_pos, &end_pos);
+	iCluige.iLineDrawerThin.start(&d, start_pos, end_pos);
 	while(!iCluige.iLineDrawerThin.has_finished(&d))
 	{
 		if(draw)
@@ -78,8 +101,10 @@ static void ssvg_erase(Node* this_Node)
 			this_Node2D->_position_changed ||
 			(!(this_Node2D->_new_baked.visible)) ||
 			iCluige.iCamera2D._old_baked.state_changed ||
-			this_Node->_marked_for_queue_free //||
-//			this_SpriteSVG->_state_changes.state_changed
+			this_Node->_marked_for_queue_free ||
+			memcmp(&(this_SpriteSVG->_old_baked),
+					&(this_SpriteSVG->_new_baked),
+					sizeof (this_SpriteSVG->_old_baked)) != 0
 		);
 	if(!must_erase)
 	{
@@ -87,100 +112,30 @@ static void ssvg_erase(Node* this_Node)
 		return;
 	}
 
-	//clear old one
-	Vector2 orig;
-	iCluige.iVector2.add(
-			&(this_Node2D->_old_baked.tmp_global_position),
-			&(this_SpriteSVG->offset),
-			&orig);
-	iCluige.iVector2.add(
-			&orig,
-			&(this_SpriteSVG->_centered_offest),
-			&orig);
-
-	float x_camera = iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position.x;
-	float y_camera = iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position.y;
-	float res_x_1 ;
-	float res_y_1 ;
-	float res_x_2 ;
-	float res_y_2 ;
-	float res_zoom_x_1;
-	float res_zoom_y_1;
-	float res_zoom_x_2;
-	float res_zoom_y_2;
-	Vector2 zoom = iCluige.iCamera2D._old_baked.zoom;
-
-	float sX = this_SpriteSVG->scale.x;
-	float sY = this_SpriteSVG->scale.y;
 	Deque* paths = &(this_SpriteSVG->paths);
 	int nb_paths = iCluige.iDeque.size(paths);
 	for(int i=0; i<nb_paths; i++)
 	{
 		Path2D* path_i = iCluige.iDeque.at(paths, i).ptr;
+
+		//trick instead of copying all elems one by one
+		Deque tmp_old_baked_points_light_copy = path_i->_old_baked._baked_points;
+		path_i->_old_baked._baked_points = path_i->_new_baked._baked_points;
+		path_i->_new_baked._baked_points = tmp_old_baked_points_light_copy;
+
 		if(path_i->_visible)
 		{
-			int nb_points = iCluige.iPath2D.size(path_i);
-			for(int j=0; j<(nb_points-1); j++)
+			//erase old
+			Deque* old_baked_points = &(path_i->_old_baked._baked_points);
+			int nb_old_points = iCluige.iDeque.size(old_baked_points);
+			for(int j=1; j<nb_old_points; j++)
 			{
-				Vector2* p1 = iCluige.iPath2D.at(path_i, j);
-				Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
-
-				//Apply zoom + center on camera
-				res_zoom_x_1 = (((orig.x + ((p1->x) * sX)) - x_camera)*zoom.x);
-				res_zoom_y_1 = (((orig.y + ((p1->y) * sY)) - y_camera)*zoom.y);
-				res_zoom_x_2 = (((orig.x + ((p2->x) * sX)) - x_camera)*zoom.x);
-				res_zoom_y_2 = (((orig.y + ((p2->y) * sY)) - y_camera)*zoom.y);
-
-				if(!iCluige.iCamera2D._old_baked.ignore_rotation)
-				{
-					//float rotation_angle = -iCluige.iCamera2D.iCluige.iCamera2D._state_changes.rotation;
-					float cf =  iCluige.iCamera2D._old_baked.global_tmp_cos_rotation;
-					float sf = iCluige.iCamera2D._old_baked.global_tmp_sin_rotation;
-
-					if(iCluige.iCamera2D._old_baked.anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
-					{
-						float drag_center_offset_x = iCluige.iCamera2D._old_baked._screen_anchor_center_x;
-						float drag_center_offset_y = iCluige.iCamera2D._old_baked._screen_anchor_center_y;
-
-						res_x_1 = (res_zoom_x_1 - drag_center_offset_x)  * cf - (res_zoom_y_1 - drag_center_offset_y)  * sf;
-						res_y_1 = (res_zoom_x_1 - drag_center_offset_x)  * sf + (res_zoom_y_1 - drag_center_offset_y)  * cf;
-
-						res_x_2 = (res_zoom_x_2 - drag_center_offset_x)  * cf - (res_zoom_y_2 - drag_center_offset_y)  * sf;
-						res_y_2 = (res_zoom_x_2 - drag_center_offset_x)  * sf + (res_zoom_y_2 - drag_center_offset_y)  * cf;
-
-						res_x_1 += drag_center_offset_x;
-						res_y_1 += drag_center_offset_y;
-						res_x_2 += drag_center_offset_x;
-						res_y_2 += drag_center_offset_y;
-					}
-					else
-					{
-						res_x_1 = res_zoom_x_1  * cf - res_zoom_y_1  * sf;
-						res_y_1 = res_zoom_x_1  * sf + res_zoom_y_1  * cf;
-						res_x_2 = res_zoom_x_2  * cf - res_zoom_y_2  * sf;
-						res_y_2 = res_zoom_x_2  * sf + res_zoom_y_2  * cf;
-					}
-				}
-				else
-				{
-					res_x_1 = res_zoom_x_1;
-					res_y_1 = res_zoom_y_1;
-					res_x_2 = res_zoom_x_2;
-					res_y_2 = res_zoom_y_2;
-				}
-
-				ssvg_draw_line(
-					res_x_1,
-					res_y_1,
-					res_x_2,
-					res_y_2,
-				false);
+				Vector2* p1 = (Vector2*)(iCluige.iDeque.at(old_baked_points, j-1).ptr);
+				Vector2* p2 = (Vector2*)(iCluige.iDeque.at(old_baked_points, j).ptr);
+				ssvg_draw_line(p1, p2, false);
 			}
 		}
 	}
-	//call super()
-//	this_SpriteSVG->_erase_super(this_Node);//NULL
-//	this_SpriteSVG->_state_changes.state_changed = false;
 }
 
 static void ssvg_draw(Node* this_Node)
@@ -192,12 +147,7 @@ static void ssvg_draw(Node* this_Node)
 	{
 		return;
 	}
-	//call super()
-	//this_SpriteSVG->_post_process_super(this_Node);//no, just pre_draw in Node2D, not overridden here
 
-	//clear old one (unless immobile? => no, because other masking things
-	//could have moved and made this sprite visible again;
-	//and curses already has characters cache)
 	Vector2 orig;
 	iCluige.iVector2.add(
 			&(this_Node2D->_new_baked.tmp_global_position),
@@ -213,18 +163,19 @@ static void ssvg_draw(Node* this_Node)
 
 	float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
 	float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
-	float res_x_1 ;
-	float res_y_1 ;
-	float res_x_2 ;
-	float res_y_2 ;
-	float res_zoom_x_1;
-	float res_zoom_y_1;
-	float res_zoom_x_2;
-	float res_zoom_y_2;
+	float res_zoom_x;
+	float res_zoom_y;
 	Vector2 zoom = current_camera->zoom;
+
+	float c_r = this_SpriteSVG->_new_baked.cos_rot;
+	float s_r = this_SpriteSVG->_new_baked.sin_rot;
+	Vector2 p2_copy_rotated;
 
 	float sX = this_SpriteSVG->scale.x;
 	float sY = this_SpriteSVG->scale.y;
+	float half_width = this_SpriteSVG->size_svg.x / 2;
+	float half_height = this_SpriteSVG->size_svg.y / 2;
+
 	Deque* paths = &(this_SpriteSVG->paths);
 	int nb_paths = iCluige.iDeque.size(paths);
 	for(int i=0; i<nb_paths; i++)
@@ -232,17 +183,30 @@ static void ssvg_draw(Node* this_Node)
 		Path2D* path_i = iCluige.iDeque.at(paths, i).ptr;
 		if(path_i->_visible)
 		{
+			//bake new (done here instead of bake() because
+			//needs camera::bake()
+			//which might be executed later, according to
+			//relative position between camera node and this node
+			//in scene tree)
 			int nb_points = iCluige.iPath2D.size(path_i);
-			for(int j=0; j<(nb_points-1); j++)
+			Deque* new_baked_points = &(path_i->_new_baked._baked_points);
+			float res_x = -1;
+			float res_y = -1;
+			for(int j=0; j<nb_points; j++)
 			{
-				Vector2* p1 = iCluige.iPath2D.at(path_i, j);
-				Vector2* p2 = iCluige.iPath2D.at(path_i, j+1);
+				Vector2 p2_copy = *(iCluige.iPath2D.at(path_i, j));
+				//change of reference point because
+				// godot sprite "center" is not at (0,0) in .svg
+				p2_copy.x -= half_width;
+				p2_copy.y -= half_height;
+				p2_copy_rotated = p2_copy;//copy of the copy
+
+				p2_copy_rotated.x = p2_copy.x * c_r - p2_copy.y * s_r;
+				p2_copy_rotated.y = p2_copy.x * s_r + p2_copy.y * c_r;
 
 				//Apply zoom + center on camera
-				res_zoom_x_1 = (((orig.x + ((p1->x) * sX)) - x_camera)*zoom.x);
-				res_zoom_y_1 = (((orig.y + ((p1->y) * sY)) - y_camera)*zoom.y);
-				res_zoom_x_2 = (((orig.x + ((p2->x) * sX)) - x_camera)*zoom.x);
-				res_zoom_y_2 = (((orig.y + ((p2->y) * sY)) - y_camera)*zoom.y);
+				res_zoom_x = (((orig.x + ((p2_copy_rotated.x) * sX)) + half_width - x_camera)*zoom.x);
+				res_zoom_y = (((orig.y + ((p2_copy_rotated.y) * sY)) + half_height - y_camera)*zoom.y);
 
 				if(!current_camera->ignore_rotation)
 				{
@@ -255,39 +219,36 @@ static void ssvg_draw(Node* this_Node)
 						float drag_center_offset_x = iCluige.iCamera2D._screen_anchor_center_x;
 						float drag_center_offset_y = iCluige.iCamera2D._screen_anchor_center_y;
 
-						res_x_1 = (res_zoom_x_1 - drag_center_offset_x)  * cf - (res_zoom_y_1 - drag_center_offset_y)  * sf;
-						res_y_1 = (res_zoom_x_1 - drag_center_offset_x)  * sf + (res_zoom_y_1 - drag_center_offset_y)  * cf;
+						res_x = (res_zoom_x - drag_center_offset_x)  * cf - (res_zoom_y - drag_center_offset_y)  * sf;
+						res_y = (res_zoom_x - drag_center_offset_x)  * sf + (res_zoom_y - drag_center_offset_y)  * cf;
 
-						res_x_2 = (res_zoom_x_2 - drag_center_offset_x)  * cf - (res_zoom_y_2 - drag_center_offset_y)  * sf;
-						res_y_2 = (res_zoom_x_2 - drag_center_offset_x)  * sf + (res_zoom_y_2 - drag_center_offset_y)  * cf;
-
-						res_x_1 += drag_center_offset_x;
-						res_y_1 += drag_center_offset_y;
-						res_x_2 += drag_center_offset_x;
-						res_y_2 += drag_center_offset_y;
+						res_x += drag_center_offset_x;
+						res_y += drag_center_offset_y;
 					}
 					else
 					{
-						res_x_1 = res_zoom_x_1  * cf - res_zoom_y_1  * sf;
-						res_y_1 = res_zoom_x_1  * sf + res_zoom_y_1  * cf;
-						res_x_2 = res_zoom_x_2  * cf - res_zoom_y_2  * sf;
-						res_y_2 = res_zoom_x_2  * sf + res_zoom_y_2  * cf;
+						res_x = res_zoom_x  * cf - res_zoom_y  * sf;
+						res_y = res_zoom_x  * sf + res_zoom_y  * cf;
 					}
 				}
 				else
 				{
-					res_x_1 = res_zoom_x_1;
-					res_y_1 = res_zoom_y_1;
-					res_x_2 = res_zoom_x_2;
-					res_y_2 = res_zoom_y_2;
+					res_x = res_zoom_x;
+					res_y = res_zoom_y;
 				}
 
-				ssvg_draw_line(
-					res_x_1,
-					res_y_1,
-					res_x_2,
-					res_y_2,
-				true);
+				Vector2* baked_point = (Vector2*)(iCluige.iDeque.at(new_baked_points, j).ptr);
+				baked_point->x = res_x;
+				baked_point->y = res_y;
+			}
+
+//			int nb_points = iCluige.iPath2D.size(path_i);
+//			Deque* baked_points = &(path_i->_new_baked._baked_points);
+			for(int j=1; j<nb_points; j++)
+			{
+				Vector2* p1 = (Vector2*)(iCluige.iDeque.at(new_baked_points, j-1).ptr);
+				Vector2* p2 = (Vector2*)(iCluige.iDeque.at(new_baked_points, j).ptr);
+				ssvg_draw_line(p1, p2, true);
 			}
 		}
 	}
@@ -304,6 +265,11 @@ static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
 	new_SpriteSVG->_centered_offest = (Vector2) { 0., 0. };
 	new_SpriteSVG->offset = (Vector2) { 0., 0. };
 	new_SpriteSVG->scale = (Vector2) { 1., 1. };
+	new_SpriteSVG->rotation = 0;
+	new_SpriteSVG->_old_baked.cos_rot = 1;
+	new_SpriteSVG->_old_baked.sin_rot = 0;
+	new_SpriteSVG->_new_baked.cos_rot = 1;
+	new_SpriteSVG->_new_baked.sin_rot = 0;
 	iCluige.iDeque.deque_alloc(&(new_SpriteSVG->paths), VT_POINTER, 3);
 
 	new_SpriteSVG->_this_Node2D = new_Node2D;
@@ -315,6 +281,8 @@ static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
 	//	new_Node virtual methods pointers are already pointing to
 	//	overriding methods (if any)
 	new_SpriteSVG->_delete_super = new_Node->delete_Node;
+	new_SpriteSVG->_bake_super = new_Node->bake;
+	new_SpriteSVG->_draw_super = new_Node->draw;
 //	new_SpriteSVG->_erase_super = new_Node->erase;
 //	new_SpriteSVG->_post_process_super = new_Node->post_process;
 
@@ -329,7 +297,7 @@ static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
 
 	new_Node->delete_Node = ssvg_delete_SpriteSVG;
 	new_Node->erase = ssvg_erase;
-	new_SpriteSVG->_draw_super = new_Node->draw;
+	new_Node->bake = ssvg_bake;
 	new_Node->draw = ssvg_draw;
 
 	return new_SpriteSVG;
@@ -339,6 +307,11 @@ static SpriteSVG* ssvg_new_SpriteSVG()
 {
 	Node2D* new_Node2D = iCluige.iNode2D.new_Node2D();
 	return ssvg_new_SpriteSVG_from_Node2D(new_Node2D);
+}
+
+static void ssvg_rotate(SpriteSVG* this_SpriteSVG, float radians)
+{
+	this_SpriteSVG->rotation += radians;
 }
 
 static void ssvg_add_path_from_array(SpriteSVG* this_SpriteSVG, Vector2* points, int nb_points)
@@ -403,6 +376,8 @@ static Node* ssvg_instantiate(const SortedDictionary* params)
 	utils_bool_from_parsed(&(res_SpriteSVG->centered), params, "centered");
 	utils_vector2_from_parsed(&(res_SpriteSVG->offset), params, "offset");
 	utils_vector2_from_parsed(&(res_SpriteSVG->scale), params, "scale");//TODO scale in Node2D instead
+	utils_float_from_parsed(&(res_SpriteSVG->rotation), params, "rotation");//TODO tmp, Node2D instead
+	//res_SpriteSVG->rotation *= iCluige.PI / 180;//already in radians in .tscn
 	CLUIGE_ASSERT(iCluige.iDeque.empty(&(res_SpriteSVG->paths)), "SpriteSVG::instantiate() : trying to instantiate() into non empty object");
 	char* svg_file_path;
 	//'texture'=>'path/to/file.svg' see TscnParser::node()
@@ -430,6 +405,7 @@ void iiSpriteSVG_init()
 {
 	iCluige.iSpriteSVG.new_SpriteSVG = ssvg_new_SpriteSVG;
 	iCluige.iSpriteSVG.new_SpriteSVG_from_Node2D = ssvg_new_SpriteSVG_from_Node2D;
+	iCluige.iSpriteSVG.rotate = ssvg_rotate;
 	iCluige.iSpriteSVG.add_path_from_array = ssvg_add_path_from_array;
 	iCluige.iSpriteSVG.add_path_from_array_relative = ssvg_add_path_from_array_relative;
 	iCluige.iSpriteSVG.add_path_from_parsed_deque = ssvg_add_path_from_parsed_deque;

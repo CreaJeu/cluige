@@ -100,7 +100,7 @@ static void ssvg_erase(Node* this_Node)
 		(
 			this_Node2D->_position_changed ||
 			(!(this_Node2D->_new_baked.visible)) ||
-			iCluige.iCamera2D._old_baked.state_changed ||
+			iCluige.iCamera2D.state_changed ||
 			this_Node->_marked_for_queue_free ||
 			memcmp(&(this_SpriteSVG->_old_baked),
 					&(this_SpriteSVG->_new_baked),
@@ -158,14 +158,14 @@ static void ssvg_draw(Node* this_Node)
 			&(this_SpriteSVG->_centered_offest),
 			&orig);
 
-	Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-	CLUIGE_ASSERT(current_camera != NULL, "SpriteSVG::draw() : current_camera is null");
+	//Camera2D* current_camera = iCluige.iCamera2D.current_camera;
+	//CLUIGE_ASSERT(current_camera != NULL, "SpriteSVG::draw() : current_camera is null");
 
-	float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
-	float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+	float x_camera = iCluige.iCamera2D._new_baked._tmp_limited_offseted_global_position.x;
+	float y_camera = iCluige.iCamera2D._new_baked._tmp_limited_offseted_global_position.y;
 	float res_zoom_x;
 	float res_zoom_y;
-	Vector2 zoom = current_camera->zoom;
+	Vector2 zoom = iCluige.iCamera2D._new_baked.zoom;
 
 	float c_r = this_SpriteSVG->_new_baked.cos_rot;
 	float s_r = this_SpriteSVG->_new_baked.sin_rot;
@@ -208,16 +208,16 @@ static void ssvg_draw(Node* this_Node)
 				res_zoom_x = (((orig.x + ((p2_copy_rotated.x) * sX)) + half_width - x_camera)*zoom.x);
 				res_zoom_y = (((orig.y + ((p2_copy_rotated.y) * sY)) + half_height - y_camera)*zoom.y);
 
-				if(!current_camera->ignore_rotation)
+				if(!iCluige.iCamera2D._new_baked.ignore_rotation)
 				{
 					//float rotation_angle = -iCluige.iCamera2D.current_camera->rotation;
-					float cf =  current_camera->global_tmp_cos_rotation;
-					float sf = current_camera->global_tmp_sin_rotation;
+					float cf =  iCluige.iCamera2D._new_baked.global_tmp_cos_rotation;
+					float sf = iCluige.iCamera2D._new_baked.global_tmp_sin_rotation;
 
-					if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
+					if(iCluige.iCamera2D._new_baked.anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
 					{
-						float drag_center_offset_x = iCluige.iCamera2D._screen_anchor_center_x;
-						float drag_center_offset_y = iCluige.iCamera2D._screen_anchor_center_y;
+						float drag_center_offset_x = iCluige.iCamera2D._new_baked._screen_anchor_center_x;
+						float drag_center_offset_y = iCluige.iCamera2D._new_baked._screen_anchor_center_y;
 
 						res_x = (res_zoom_x - drag_center_offset_x)  * cf - (res_zoom_y - drag_center_offset_y)  * sf;
 						res_y = (res_zoom_x - drag_center_offset_x)  * sf + (res_zoom_y - drag_center_offset_y)  * cf;

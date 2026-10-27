@@ -46,11 +46,16 @@
 
 **Futures tâches**
 
+- improve github readme.md
+    - cluige = c... l... User I...
+    - improve the sentence about memo_inkscape.svg
+    - move "...philosophy, huge dico..." besides info about sorted Vs hash
 - test gcc & ld last version linux
 - node2D (et autre?) : meilleur test instanceof / class_name static par classe
-- **sprite svg (no anim) : file parsing fix discontinued paths**
-- sprite svg : choose rastering algo from thickness
-- sprite svg : optim big segments out of screen (cf. futurs chantiers)
+- **sprite svg (no anim) :**
+    - file parsing fix discontinued paths
+    - choose rastering algo from thickness
+    - sprite svg : optim big segments out of screen (cf. futurs chantiers)
 - **more-like-godot-todos**
     - wanted_frame_seconds rename as wanted_seconds_per_frame or like godot
     - refactor utils to iCluige.iGlobals, match contents whith godot Globals, move check_malloc() in there ( + separate sizeof(...) as another arg to help never forget)
@@ -119,10 +124,10 @@
 
 
 **bugs**
-- things not well erased when running test_cluige quickly by keeping keys pressed to keep moving camera or sprite when also pressing 'N' for next phase (erreur d'arrondi dans les x/y du erase() qui donne d'autres x/y?)
 
 
 **fixed bugs**
 - (spriteText not correctly erased when text changes)
 - (erase sometimes skipped when keyboard autorepeat, even if code in erase() is commented to erase everything each frame)
 - (bug camera-test no more showing instructions)
+- (things not well erased when running test_cluige quickly by keeping keys pressed to keep moving camera or sprite when also pressing 'N' for next phase)

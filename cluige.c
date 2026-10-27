@@ -111,6 +111,7 @@ void cluige_init(void (*register_user_scripts)())
 	default_camera->anchor_mode = ANCHOR_MODE_FIXED_TOP_LEFT;
 	iCluige.iNode.add_child(iCluige._private_root, default_camera->_this_Node2D->_this_Node);
 	iCluige.iCamera2D.default_camera = default_camera;
+	iCluige.iCamera2D._future_current_camera = default_camera;
 //	iCluige.iCamera2D.current_camera = default_camera;
 	iCluige.iCamera2D.make_current(default_camera);
 	//iCluige.iNode.print_tree_pretty(iCluige.private_root_2D);
@@ -282,7 +283,8 @@ void cluige_run()
 		//queue_free_early
 		iCluige.iNode._do_all_queue_free_early_step();
 
-//erase();		///TODO tmp?
+//		erase();	//tmp
+//		//tmp
 //		if(iCluige.iDeque.size(&(iCluige.iNode._just_removed_nodes)) > 0)
 //		{
 //			erase();//curses low-cost clear screen

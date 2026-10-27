@@ -16,8 +16,8 @@ static void sprtx_delete_SpriteText(Node* this_Node)
 	SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
 	//tmp memorize function pointer before calling free(this)
 	void (*delete_super)(Node*) = this_SpriteText->_delete_super;
-	free(this_SpriteText->_old_baked.text);
-	free(this_SpriteText->_new_baked.text);
+	free(this_SpriteText->_old_baked_text);
+	free(this_SpriteText->_new_baked_text);
 	CLUIGE_ASSERT(this_SpriteText->_sub_class == NULL, "SpriteText::delete_SpriteText() : not null subclass found");
 	free(this_SpriteText);
 	this_Node2D->_sub_class = NULL;
@@ -43,7 +43,7 @@ static void sprtx_erase(Node* this_Node)
 	must_erase = must_erase &&
 		(
 			this_Node2D->_position_changed ||
-			iCluige.iCamera2D._old_baked.state_changed ||
+			iCluige.iCamera2D.state_changed ||
 			(!(this_Node2D->_new_baked.visible)) ||
 			this_SpriteText->_text_changed ||
 			memcmp(&(this_SpriteText->_old_baked),
@@ -78,7 +78,7 @@ static void sprtx_erase(Node* this_Node)
 
 	while(flat_i < this_SpriteText->_old_baked.nb_chars)
 	{
-		char curr_char = this_SpriteText->_old_baked.text[flat_i];
+		char curr_char = this_SpriteText->_old_baked_text[flat_i];
 		if(curr_char == '\n')
 		{
 			line++;
@@ -130,23 +130,22 @@ static void sprtx_erase(Node* this_Node)
 
 	//call super()
 //	this_SpriteText->_erase_super(this_Node);//NULL
-//	this_SpriteText->_old_baked.offset = this_SpriteText->_new_baked.offset;
-	memcpy(&(this_SpriteText->_old_baked.offset), &(this_SpriteText->_new_baked.offset),
-		sizeof(this_SpriteText->_old_baked.offset));
+
 	if(this_SpriteText->_text_changed)
 	{
 		if(this_SpriteText->_new_baked.nb_chars >= this_SpriteText->_old_baked.allocated_text_length)
 		{
-			if(this_SpriteText->_old_baked.text != NULL)
+			if(this_SpriteText->_old_baked_text != NULL)
 			{
-				free(this_SpriteText->_old_baked.text);
+				free(this_SpriteText->_old_baked_text);
 			}
-			this_SpriteText->_old_baked.text = iCluige.checked_malloc(
+			this_SpriteText->_old_baked_text = iCluige.checked_malloc(
 				(this_SpriteText->_new_baked.nb_chars + 1) * sizeof(char));
 		}
-		this_SpriteText->_old_baked.nb_chars = this_SpriteText->_new_baked.nb_chars;
-		strcpy(this_SpriteText->_old_baked.text, this_SpriteText->_new_baked.text);
+		strcpy(this_SpriteText->_old_baked_text, this_SpriteText->_new_baked_text);
 	}
+	memcpy(&(this_SpriteText->_old_baked), &(this_SpriteText->_new_baked),
+		sizeof(this_SpriteText->_old_baked));
 	this_SpriteText->_text_changed = false;
 }
 
@@ -172,23 +171,23 @@ static void sprtx_draw(Node* this_Node)
 			&(this_SpriteText->_new_baked.offset),
 			&orig);
 	int flat_i = 0;
-	Camera2D* current_camera = iCluige.iCamera2D.current_camera;
-	CLUIGE_ASSERT(current_camera != NULL, "SpriteText::draw() : current_camera is null");
+//	Camera2D* current_camera = iCluige.iCamera2D.current_camera;
+//	CLUIGE_ASSERT(current_camera != NULL, "SpriteText::draw() : current_camera is null");
 
-	float x_camera = current_camera->_tmp_limited_offseted_global_position.x;
-	float y_camera = current_camera->_tmp_limited_offseted_global_position.y;
+	float x_camera = iCluige.iCamera2D._new_baked._tmp_limited_offseted_global_position.x;
+	float y_camera = iCluige.iCamera2D._new_baked._tmp_limited_offseted_global_position.y;
 	float res_x;
 	float res_y;
 	float res_zoom_x;
 	float res_zoom_y;
-	Vector2 zoom = current_camera->zoom;
+	Vector2 zoom = iCluige.iCamera2D._new_baked.zoom;
 
 	int line = 0;
 	int col = 0;
 
 	while(flat_i < this_SpriteText->_new_baked.nb_chars)
 	{
-		char curr_char = this_SpriteText->_new_baked.text[flat_i];
+		char curr_char = this_SpriteText->_new_baked_text[flat_i];
 		if(curr_char == '\n')
 		{
 			line++;
@@ -202,16 +201,16 @@ static void sprtx_draw(Node* this_Node)
 		{
 			res_zoom_x = ((lrintf(orig.x) + col) - x_camera) * zoom.x;
 			res_zoom_y = ((lrintf(orig.y) + line) - y_camera) *zoom.y ;
-			if(!current_camera->ignore_rotation)
+			if(!iCluige.iCamera2D._new_baked.ignore_rotation)
 			{
 				//float rotation_angle = -current_camera->rotation;
-				float cf =  current_camera->global_tmp_cos_rotation;
-				float sf = current_camera->global_tmp_sin_rotation;
+				float cf = iCluige.iCamera2D._new_baked.global_tmp_cos_rotation;
+				float sf = iCluige.iCamera2D._new_baked.global_tmp_sin_rotation;
 
-				if(current_camera->anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
+				if(iCluige.iCamera2D._new_baked.anchor_mode == ANCHOR_MODE_DRAG_CENTER)//rotation around center of screen (camera in center)
 				{
-					float drag_center_offset_x = iCluige.iCamera2D._screen_anchor_center_x;
-					float drag_center_offset_y = iCluige.iCamera2D._screen_anchor_center_y;
+					float drag_center_offset_x = iCluige.iCamera2D._new_baked._screen_anchor_center_x;
+					float drag_center_offset_y = iCluige.iCamera2D._new_baked._screen_anchor_center_y;
 
 					//substract the point you want to turn around (here the camera offset )
 
@@ -248,7 +247,8 @@ static SpriteText* sprtx_new_SpriteText_from_Node2D(Node2D* new_Node2D)
 	SpriteText* new_SpriteText = iCluige.checked_malloc(sizeof(SpriteText));
 
 	new_SpriteText->_new_baked.offset = (Vector2) { 0., 0. };
-	new_SpriteText->_new_baked.text = NULL;//the ASCII art / unicode art
+	new_SpriteText->_old_baked_text = NULL;//the ASCII art / unicode art
+	new_SpriteText->_new_baked_text = NULL;//the ASCII art / unicode art
 	new_SpriteText->_new_baked.transparent_char = ' ';
 	new_SpriteText->_new_baked.allocated_text_length = -1;
 	new_SpriteText->_new_baked.nb_chars = 0;
@@ -295,7 +295,7 @@ static SpriteText* sprtx_new_SpriteText()
 static void sprtx__bake_text(SpriteText* this_SpriteText)
 {
 	this_SpriteText->_new_baked.nb_chars =
-		strlen(this_SpriteText->_new_baked.text);
+		strlen(this_SpriteText->_new_baked_text);
 }
 
 static void sprtx_set_text(SpriteText* this_SpriteText, const char* new_text)
@@ -303,14 +303,14 @@ static void sprtx_set_text(SpriteText* this_SpriteText, const char* new_text)
 	int new_total_length = strlen(new_text);
 	if(this_SpriteText->_new_baked.allocated_text_length < new_total_length)
 	{
-		if(this_SpriteText->_new_baked.text != NULL)
+		if(this_SpriteText->_new_baked_text != NULL)
 		{
-			free(this_SpriteText->_new_baked.text);
+			free(this_SpriteText->_new_baked_text);
 		}
-		this_SpriteText->_new_baked.text = iCluige.checked_malloc((new_total_length + 1) * sizeof(char));
+		this_SpriteText->_new_baked_text = iCluige.checked_malloc((new_total_length + 1) * sizeof(char));
 		this_SpriteText->_new_baked.allocated_text_length = new_total_length;
 	}
-	strcpy(this_SpriteText->_new_baked.text, new_text);
+	strcpy(this_SpriteText->_new_baked_text, new_text);
 	sprtx__bake_text(this_SpriteText);
 	this_SpriteText->_text_changed = true;
 }
@@ -331,10 +331,10 @@ static Node* sprtx_instantiate(const SortedDictionary* params)
 	//utils_vector2_from_parsed(&(res_SpriteText->_new_baked.offset), params, "offset");
 	utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.x), params, "offset_left");
 	utils_float_from_parsed(&(res_SpriteText->_new_baked.offset.y), params, "offset_top");
-	CLUIGE_ASSERT(res_SpriteText->_new_baked.text == NULL, "SpriteText::instantiate() : trying to instantiate() into non empty object");
-	utils_str_from_parsed(&(res_SpriteText->_new_baked.text), params, "text");
-	CLUIGE_ASSERT(res_SpriteText->_new_baked.text != NULL, "SpriteText::instantiate() : text not instantiated, missing 'text' field?");
-	res_SpriteText->_new_baked.allocated_text_length = strlen(res_SpriteText->_new_baked.text);
+	CLUIGE_ASSERT(res_SpriteText->_new_baked_text == NULL, "SpriteText::instantiate() : trying to instantiate() into non empty object");
+	utils_str_from_parsed(&(res_SpriteText->_new_baked_text), params, "text");
+	CLUIGE_ASSERT(res_SpriteText->_new_baked_text != NULL, "SpriteText::instantiate() : text not instantiated, missing 'text' field?");
+	res_SpriteText->_new_baked.allocated_text_length = strlen(res_SpriteText->_new_baked_text);
 	sprtx__bake_text(res_SpriteText);
 	char* tmp_transp_char = NULL;
 	bool found = utils_str_from_parsed(&tmp_transp_char, params, "metadata/transparent_char");

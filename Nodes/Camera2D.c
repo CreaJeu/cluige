@@ -39,7 +39,7 @@ static void c2d_make_current(Camera2D* c2d)
 {
 //	CLUIGE_ASSERT(c2d != NULL, "Camera2D::make_current() : calling object is null");
 //	CLUIGE_ASSERT(c2d->enabled, "Camera2D::make_current() : calling object is not enabled");
-	iCluige.iCamera2D.current_camera = c2d;
+	iCluige.iCamera2D._future_current_camera = c2d;
 	c2d->_this_Node2D->_position_changed = true;
 }
 
@@ -170,64 +170,60 @@ static void c2d_bake(Node* this_Node)
 	Node2D* node2d  = (Node2D*) (this_Node->_sub_class);
 	Camera2D* cam = (Camera2D*) (node2d->_sub_class);
 	cam->_bake_super(this_Node);//super
-	if(cam != iCluige.iCamera2D.current_camera)
+	if(cam != iCluige.iCamera2D._future_current_camera)
 	{
 		return;
 	}
-	//backup state
-	if(iCluige.iCamera2D._old_baked.state_changed)
-	{
-		iCluige.iCamera2D._old_baked.current_camera = cam;
-		iCluige.iCamera2D._old_baked.anchor_mode = cam->anchor_mode;
-		iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position = cam->_tmp_limited_offseted_global_position;
-		iCluige.iCamera2D._old_baked.zoom = cam->zoom;
-		iCluige.iCamera2D._old_baked.ignore_rotation = cam->ignore_rotation;
-		iCluige.iCamera2D._old_baked.global_tmp_cos_rotation = cam->global_tmp_cos_rotation;
-		iCluige.iCamera2D._old_baked.global_tmp_sin_rotation = cam->global_tmp_sin_rotation;
-		iCluige.iCamera2D._old_baked._screen_anchor_center_y = iCluige.iCamera2D._screen_anchor_center_y;
-		iCluige.iCamera2D._old_baked._screen_anchor_center_x = iCluige.iCamera2D._screen_anchor_center_x;
-	}
 
-	cam->global_tmp_cos_rotation = cosf(cam->rotation_radians);
-	cam->global_tmp_sin_rotation = sinf(cam->rotation_radians);
+	//backup old baked data
+	memcpy(&(iCluige.iCamera2D._old_baked), &(iCluige.iCamera2D._new_baked),
+		sizeof(iCluige.iCamera2D._new_baked));
+	//memcpy instead of =
+	//so we can later use memcmp
+	//whatever alignment bits might be inside
+
+	//updates values
+	iCluige.iCamera2D._new_baked.current_camera = cam;
+	iCluige.iCamera2D._new_baked.anchor_mode = cam->anchor_mode;
+	iCluige.iCamera2D._new_baked.zoom = cam->zoom;
+	iCluige.iCamera2D._new_baked.ignore_rotation = cam->ignore_rotation;
+	iCluige.iCamera2D._new_baked.global_tmp_cos_rotation = cosf(cam->rotation_radians);
+	iCluige.iCamera2D._new_baked.global_tmp_sin_rotation = sinf(cam->rotation_radians);
 
 	Vector2 screen_size_vec = iCluige.get_screen_size();
 	float screen_width = screen_size_vec.x * (1/cam->zoom.x);
 	float screen_height = screen_size_vec.y * (1/cam->zoom.y);
-	iCluige.iCamera2D._screen_anchor_center_x = screen_width / 2;
-	iCluige.iCamera2D._screen_anchor_center_y = screen_height / 2;
+	iCluige.iCamera2D._new_baked._screen_anchor_center_x = screen_width / 2;
+	iCluige.iCamera2D._new_baked._screen_anchor_center_y = screen_height / 2;
 
-	//updates values
 	if(cam->anchor_mode == ANCHOR_MODE_FIXED_TOP_LEFT)
 	{
-		cam->_tmp_limited_offseted_global_position.x =
+		iCluige.iCamera2D._new_baked._tmp_limited_offseted_global_position.x =
 			clamp_float(node2d->_new_baked.tmp_global_position.x, cam->limit_left, cam->limit_right)+ cam->offset.x;
 
-		cam->_tmp_limited_offseted_global_position.y =
+		iCluige.iCamera2D._new_baked._tmp_limited_offseted_global_position.y =
 			clamp_float(node2d->_new_baked.tmp_global_position.y, cam->limit_top, cam->limit_bottom) + cam->offset.y;
 
 	}
 	else
 	{
-		float offset_adapted_x = iCluige.iCamera2D._screen_anchor_center_x;
-		float offset_adapted_y = iCluige.iCamera2D._screen_anchor_center_y;
+		float offset_adapted_x = iCluige.iCamera2D._new_baked._screen_anchor_center_x;
+		float offset_adapted_y = iCluige.iCamera2D._new_baked._screen_anchor_center_y;
 
-		cam->_tmp_limited_offseted_global_position.x =
+		iCluige.iCamera2D._new_baked._tmp_limited_offseted_global_position.x =
 			clamp_float(node2d->_new_baked.tmp_global_position.x, cam->limit_left, cam->limit_right)+ cam->offset.x - offset_adapted_x;
 
-		cam->_tmp_limited_offseted_global_position.y =
+		iCluige.iCamera2D._new_baked._tmp_limited_offseted_global_position.y =
 			clamp_float(node2d->_new_baked.tmp_global_position.y, cam->limit_top, cam->limit_bottom) + cam->offset.y - offset_adapted_y;
 	}
 
-	iCluige.iCamera2D._old_baked.state_changed =
-		!iCluige.iVector2.is_equal_approx(&(cam->_tmp_limited_offseted_global_position),
-			&(iCluige.iCamera2D._old_baked._tmp_limited_offseted_global_position)) ||
-		!is_equal_approx(cam->global_tmp_cos_rotation, iCluige.iCamera2D._old_baked.global_tmp_cos_rotation) ||
-		!is_equal_approx(cam->global_tmp_sin_rotation, iCluige.iCamera2D._old_baked.global_tmp_sin_rotation) ||
-		!iCluige.iVector2.is_equal_approx(&(cam->zoom), &(iCluige.iCamera2D._old_baked.zoom)) ||
-		cam->anchor_mode != iCluige.iCamera2D._old_baked.anchor_mode ||
-		cam->ignore_rotation != iCluige.iCamera2D._old_baked.ignore_rotation ||
-		iCluige.iCamera2D.current_camera != iCluige.iCamera2D._old_baked.current_camera;
+	iCluige.iCamera2D.state_changed =
+			memcmp(&(iCluige.iCamera2D._new_baked),
+					&(iCluige.iCamera2D._old_baked),
+					sizeof (iCluige.iCamera2D._new_baked)) != 0;
+
+	int blbl = cam;
+	iCluige.iCamera2D.current_camera = cam;
 }
 
 
@@ -312,8 +308,8 @@ static Camera2D* c2d_new_Camera2D_from_Node2D(Node2D* new_Node2D)
 //	new_camera2D->limits[1] = &new_camera2D->limit_top;
 //	new_camera2D->limits[2] = &new_camera2D->limit_right;
 //	new_camera2D->limits[3] = &new_camera2D->limit_bottom;
-	new_camera2D->global_tmp_sin_rotation = 0;
-	new_camera2D->global_tmp_cos_rotation = 1;
+//	new_camera2D->global_tmp_sin_rotation = 0;
+//	new_camera2D->global_tmp_cos_rotation = 1;
 
 	//new_camera2D->_state_changes.state_changed = true;//see make_current()
 
@@ -413,5 +409,5 @@ void iiCamera2D_init()
 	iCluige.iCamera2D._Camera2D_factory.instantiate = c2d_instantiate;
 	iCluige.iNode.register_NodeFactory("Camera2D", &(iCluige.iCamera2D._Camera2D_factory));
 
-	iCluige.iCamera2D._old_baked.state_changed = true;
+	iCluige.iCamera2D.state_changed = true;
 }

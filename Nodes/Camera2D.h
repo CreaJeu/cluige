@@ -34,7 +34,7 @@ struct _Camera2D
 	Vector2 zoom;
 
 	//private attribute shouldn't be modified by user
-	Vector2 _tmp_limited_offseted_global_position;
+//	Vector2 _tmp_limited_offseted_global_position;
 
 	//for inheritance + private
 	Node2D* _this_Node2D; //link to super
@@ -48,8 +48,8 @@ struct _Camera2D
 	float limit_bottom;
 
 	//cosf(rotation) and sinf(rotation)
-	float global_tmp_sin_rotation;
-	float global_tmp_cos_rotation;
+//	float global_tmp_sin_rotation;
+//	float global_tmp_cos_rotation;
 
 	/*way of upgrading the camera
 	float drag_left_margin;
@@ -86,14 +86,17 @@ struct iiCamera2D
 	// it's not updated when you add a new camera to the tree
 	Camera2D* current_camera;
 
-	//default camera which is created at every lunch of cluige
+	//for make_current() calls, applied next frame
+	Camera2D* _future_current_camera;
+
+	//default camera which is created at every launch of cluige
 	Camera2D* default_camera;
 
 	//private
 	//not in _Camera2D because current_camera can change
+	bool state_changed;
 	struct
 	{
-		bool state_changed;
 		Camera2D* current_camera;
 		enum AnchorMode anchor_mode;
 		Vector2 _tmp_limited_offseted_global_position;
@@ -103,15 +106,15 @@ struct iiCamera2D
 		float global_tmp_sin_rotation;
 		float _screen_anchor_center_y;
 		float _screen_anchor_center_x;
-	} _old_baked;//see old_baked/new_baked in Node2D for more generic example
+	} _old_baked, _new_baked;
 
 	Camera2D* (*new_Camera2D)();
 
 	//private method
 	//void (*_predraw)(Node* this_node);//now virtual
 
-	float _screen_anchor_center_y;
-	float _screen_anchor_center_x;
+//	float _screen_anchor_center_y;
+//	float _screen_anchor_center_x;
 
 
 	Vector2 (*get_zoom)(const Camera2D* c2d);

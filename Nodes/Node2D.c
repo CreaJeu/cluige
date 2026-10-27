@@ -133,7 +133,7 @@ static Node2D* n2d_new_Node2D_from_Node(Node* new_node)
 //	new_node2D->_tmp_global_position = (Vector2){0., 0.};
 
 	new_node2D->_position_changed = true;
-	new_node2D->_new_baked.visible = false;
+	new_node2D->_new_baked.visible = true;
 	new_node2D->_new_baked.tmp_global_position = (Vector2){0., 0.};
 
 	new_node2D->_this_Node = new_node;

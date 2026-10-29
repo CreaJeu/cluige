@@ -5,6 +5,15 @@
 
 typedef struct _SpriteText SpriteText;
 
+//in screen space
+struct _CachedScreenChar //tmp think utf8 later?
+{
+	int16_t x;
+	int16_t y;
+	char c;
+	char utf8[3];//unused but makes the size of the struct = 64
+};
+
 struct _SpriteText
 {
 	//private
@@ -28,9 +37,11 @@ struct _SpriteText
 
 		int nb_chars;
 		int allocated_text_length;
+
+		Deque baked_chars;//Deque<CachedScreenText>
 	} _new_baked, _old_baked;
-	char* _old_baked_text;//the ASCII art / unicode art
-	char* _new_baked_text;//the ASCII art / unicode art
+
+	char* text;//the ASCII art / unicode art
 
 	//private
 	Node2D* _this_Node2D;
@@ -39,6 +50,7 @@ struct _SpriteText
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
 //	void (*_enter_tree_super)(Node*);
+	void (*_exit_tree_super)(Node* this_node);//called just before remove_child logic
 //	void (*_erase_super)(Node*);
 //	void (*_post_process_super)(Node*);
 	void (*_draw_super)(Node*);
@@ -46,6 +58,7 @@ struct _SpriteText
 	//virtual methods in .c :
 	//void erase(Node*);
 	//void draw(Node*);
+	//void enter_tree(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

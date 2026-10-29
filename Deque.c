@@ -30,6 +30,24 @@ static void dq_deque_alloc(Deque* this_Deque, VariantType elems_type, int capaci
 	this_Deque->_elems = iCluige.checked_malloc(capacity * sizeof(Variant));
 }
 
+static void dq_deque_realloc(Deque* this_Deque, int capacity)
+{
+	CLUIGE_ASSERT(capacity >= this_Deque->_nb_elems,
+			"Deque::deque_realloc() : asked capacity (%d) not enough for elements already inside (%d)",
+			capacity, this_Deque->_nb_elems);
+	Variant* grown = iCluige.checked_malloc(capacity * sizeof(Variant));
+	for(int i=0; i < this_Deque->_nb_elems; i++)
+	{
+		int i_old = (this_Deque->_front_i + i) % this_Deque->_capacity;
+		grown[i] = this_Deque->_elems[i_old];
+	}
+
+	this_Deque->_capacity = capacity;
+	this_Deque->_front_i = 0;
+	free(this_Deque->_elems);
+	this_Deque->_elems = grown;
+}
+
 static void dq_pre_delete_Deque(Deque* this_Deque)
 {
 	//if elements are pointers, they must be deleted outside of this function,
@@ -72,21 +90,6 @@ static Variant* dq__at_ptr(const Deque* this_Deque, int i)
 {
 	int i_array = dq__i_array(this_Deque, i);
 	return &(this_Deque->_elems[i_array]);
-}
-
-static void dq__grow(Deque* this_Deque)
-{
-	int new_cap = this_Deque->_capacity * 2;
-	Variant* grown = iCluige.checked_malloc(new_cap * sizeof(Variant));
-	for(int i=0; i < this_Deque->_nb_elems; i++)
-	{
-		int i_old = (this_Deque->_front_i + i) % this_Deque->_capacity;
-		grown[i] = this_Deque->_elems[i_old];
-	}
-
-	this_Deque->_capacity = new_cap;
-	this_Deque->_front_i = 0;
-	this_Deque->_elems = grown;
 }
 
 
@@ -136,7 +139,7 @@ static void dq__insert_va_list(Deque* this_Deque, int i, struct _Structed_va_lis
 	//assert((0 <= i) &&...); relevant assert must be called outside
 	if(this_Deque->_nb_elems == this_Deque->_capacity)
 	{
-		dq__grow(this_Deque);
+		dq_deque_realloc(this_Deque, this_Deque->_capacity * 2);
 	}
 
 	Variant new_elem = iCluige.iVariant.from_s_args(this_Deque->_elems_type, s_args_elem_value);
@@ -466,6 +469,7 @@ void dq_debug_str(const Deque* this_Deque, char* in_out)
 void iiDeque_init()
 {
 	iCluige.iDeque.deque_alloc = dq_deque_alloc;
+	iCluige.iDeque.deque_realloc = dq_deque_realloc;
 	iCluige.iDeque.pre_delete_Deque = dq_pre_delete_Deque;
 	iCluige.iDeque.free_all_elems_pointers = dq_free_all_elems_pointers;
 	iCluige.iDeque.at = dq_at;

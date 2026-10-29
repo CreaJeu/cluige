@@ -47,6 +47,11 @@ struct iiDeque
 	void (*deque_alloc)(Deque* this_Deque, VariantType elems_type, int capacity);
 	void (*pre_delete_Deque)(Deque* this_Deque);
 
+	//reallocate preallocated array to a new capacity
+	//elems (Variant) are copied to the new one
+	//asserts capacity >= this_Deque->_nb_elems
+	void (*deque_realloc)(Deque* this_Deque, int capacity);
+
 	//helper function if needed before calling clear() or pre_delete_Deque()
 	void (*free_all_elems_pointers)(Deque* this_Deque);
 

@@ -114,13 +114,15 @@ struct _SpriteSVG
 
 	//virtual methods - private copies of mother class pointers
 	void (*_delete_super)(Node*);
+	void (*_exit_tree_super)(Node* this_node);//called just before remove_child logic
 	void (*_bake_super)(Node*);
 //	void (*_erase_super)(Node*);
 	void (*_draw_super)(Node*);
 
 	//virtual methods in .c :
-	//void erase_Node(Node*);
+	//void erase(Node*);
 	//void draw(Node*);
+	//void enter_tree(Node*);
 };
 
 //~namespace to call like : iCluige.iNode.f(myNode, param)

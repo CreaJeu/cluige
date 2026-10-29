@@ -222,7 +222,6 @@ static void c2d_bake(Node* this_Node)
 					&(iCluige.iCamera2D._old_baked),
 					sizeof (iCluige.iCamera2D._new_baked)) != 0;
 
-	int blbl = cam;
 	iCluige.iCamera2D.current_camera = cam;
 }
 

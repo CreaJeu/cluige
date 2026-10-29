@@ -40,6 +40,14 @@ static void ssvg_delete_SpriteSVG(Node* this_Node)
 	delete_super(this_Node);
 }
 
+static void ssvg_exit_tree_SpriteText(Node* this_Node)
+{
+	SpriteSVG* this_SpriteSVG = iCluige.iSpriteSVG.cast_from_Node(this_Node);
+	this_SpriteSVG->_new_baked.cos_rot += 3;//trick to force erase
+	this_Node->erase(this_Node);
+	this_SpriteSVG->_exit_tree_super(this_Node);
+}
+
 static void ssvg_bake(Node* this_Node)
 {
 	Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
@@ -101,7 +109,7 @@ static void ssvg_erase(Node* this_Node)
 			this_Node2D->_position_changed ||
 			(!(this_Node2D->_new_baked.visible)) ||
 			iCluige.iCamera2D.state_changed ||
-			this_Node->_marked_for_queue_free ||
+//			this_Node->_marked_for_queue_free || //now queue_free_early() => off-tree erase() before tree erase()
 			memcmp(&(this_SpriteSVG->_old_baked),
 					&(this_SpriteSVG->_new_baked),
 					sizeof (this_SpriteSVG->_old_baked)) != 0
@@ -281,6 +289,7 @@ static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
 	//	new_Node virtual methods pointers are already pointing to
 	//	overriding methods (if any)
 	new_SpriteSVG->_delete_super = new_Node->delete_Node;
+	new_SpriteSVG->_exit_tree_super = new_Node->exit_tree;
 	new_SpriteSVG->_bake_super = new_Node->bake;
 	new_SpriteSVG->_draw_super = new_Node->draw;
 //	new_SpriteSVG->_erase_super = new_Node->erase;
@@ -296,6 +305,7 @@ static SpriteSVG* ssvg_new_SpriteSVG_from_Node2D(Node2D* new_Node2D)
 	new_Node2D->_sub_class = new_SpriteSVG;
 
 	new_Node->delete_Node = ssvg_delete_SpriteSVG;
+	new_Node->exit_tree = ssvg_exit_tree_SpriteText;
 	new_Node->erase = ssvg_erase;
 	new_Node->bake = ssvg_bake;
 	new_Node->draw = ssvg_draw;

@@ -269,6 +269,9 @@ void cluige_run()
 //			}
 //		}
 
+		//queue_free_early
+		iCluige.iNode._do_all_queue_free_early_step();
+
 		//ERASE
 		process_tree(iCluige._private_root, ERASE_PASS);
 //		for(int i=0; i<nb_just_removed; i++) //should never happen here
@@ -279,9 +282,6 @@ void cluige_run()
 //				n->erase(n);
 //			}
 //		}
-
-		//queue_free_early
-		iCluige.iNode._do_all_queue_free_early_step();
 
 //		erase();	//tmp
 //		//tmp

@@ -51,6 +51,7 @@
     - improve the sentence about memo_inkscape.svg
     - move "...philosophy, huge dico..." besides info about sorted Vs hash
 - test gcc & ld last version linux
+- refactor XXX* cast_from_node(n) into void cast_from_node(XXX** in_out, YYY** in_out, n)
 - node2D (et autre?) : meilleur test instanceof / class_name static par classe
 - **sprite svg (no anim) :**
     - file parsing fix discontinued paths
@@ -73,7 +74,7 @@
 	printf()
 	todo
 - fatal error => end loop + printf
-- add types in Variant (in union, VariantType, from_val(), compare()...) : char*, Pair*
+- add types in Variant (in union, VariantType, from_val(), compare()...) : char*, Pair, Vector2/Vector3, utf8 char
 
 
 
